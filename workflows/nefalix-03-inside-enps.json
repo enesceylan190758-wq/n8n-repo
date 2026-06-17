@@ -1,0 +1,139 @@
+{
+  "name": "Nefalix - Inside eNPS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Modül 4: Inside — Çalışan eNPS\n\n**Akış:** Aylık anonim nabız anketi → eNPS hesapla → yüksek memnuniyet Glassdoor teşviki / düşük yönetime rapor\n\n**Credential:** OpenAI, E-posta veya WhatsApp",
+        "height": 160,
+        "width": 380,
+        "color": 6
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 80]
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "months", "monthsInterval": 1 }] }
+      },
+      "name": "Aylık Anket",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/enps/response",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "eNPS Yanıt Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 520],
+      "webhookId": "nefalix-enps-response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "score", "value": "={{ Number($json.body?.score ?? $json.score ?? 0) }}", "type": "number" },
+            { "id": "2", "name": "department", "value": "={{ $json.body?.department ?? $json.department ?? 'Genel' }}", "type": "string" },
+            { "id": "3", "name": "feedback", "value": "={{ $json.body?.feedback ?? $json.feedback ?? '' }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "eNPS Parse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 8,
+              "operator": { "type": "number", "operation": "gte" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Promoter Çalışan?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "message",
+              "value": "Teşekkürler! Deneyiminizi Glassdoor veya Indeed'de anonim paylaşmanız bize çok yardımcı olur.",
+              "type": "string"
+            },
+            { "id": "2", "name": "flow", "value": "promoter", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Glassdoor Teşviki",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 420]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "report",
+              "value": "=📊 Düşük eNPS — Departman: {{ $json.department }}, Skor: {{ $json.score }}/10. Geri bildirim: {{ $json.feedback }}",
+              "type": "string"
+            },
+            { "id": "2", "name": "flow", "value": "detractor", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Yönetim Raporu",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 620]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, flow: $json.flow, message: $json.message ?? $json.report } }}",
+        "options": {}
+      },
+      "name": "Yanıt Dön",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1140, 520]
+    }
+  ],
+  "connections": {
+    "eNPS Yanıt Webhook": { "main": [[{ "node": "eNPS Parse", "type": "main", "index": 0 }]] },
+    "eNPS Parse": { "main": [[{ "node": "Promoter Çalışan?", "type": "main", "index": 0 }]] },
+    "Promoter Çalışan?": {
+      "main": [
+        [{ "node": "Glassdoor Teşviki", "type": "main", "index": 0 }],
+        [{ "node": "Yönetim Raporu", "type": "main", "index": 0 }]
+      ]
+    },
+    "Glassdoor Teşviki": { "main": [[{ "node": "Yanıt Dön", "type": "main", "index": 0 }]] },
+    "Yönetim Raporu": { "main": [[{ "node": "Yanıt Dön", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true }
+}

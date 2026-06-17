@@ -1,0 +1,233 @@
+{
+  "name": "Nefalix - Feedback & Reviews Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Modül 1: Feedback & Reviews Loop\n\n**Akış:** HBYS randevu bitti → AI NPS mesajı → WhatsApp gönder → NPS yanıtı → 8-10 Google link / 1-7 şikayet + Slack alarm\n\n**Credential:** OpenAI, WhatsApp Business API, Slack\n**İYS:** Ticari mesaj öncesi izin kontrolü ekleyin",
+        "height": 220,
+        "width": 420,
+        "color": 4
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 80]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/hbys/appointment-completed",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "HBYS Randevu Bitti",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 320],
+      "webhookId": "nefalix-hbys-appointment"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "patientName", "value": "={{ $json.body?.patientName ?? $json.patientName }}", "type": "string" },
+            { "id": "2", "name": "patientPhone", "value": "={{ $json.body?.patientPhone ?? $json.patientPhone }}", "type": "string" },
+            { "id": "3", "name": "clinicName", "value": "={{ $json.body?.clinicName ?? $json.clinicName ?? 'Klinik' }}", "type": "string" },
+            { "id": "4", "name": "doctorName", "value": "={{ $json.body?.doctorName ?? $json.doctorName ?? '' }}", "type": "string" },
+            { "id": "5", "name": "treatment", "value": "={{ $json.body?.treatment ?? $json.treatment ?? '' }}", "type": "string" },
+            { "id": "6", "name": "googleReviewUrl", "value": "={{ $json.body?.googleReviewUrl ?? $json.googleReviewUrl }}", "type": "string" },
+            { "id": "7", "name": "complaintFormUrl", "value": "={{ $json.body?.complaintFormUrl ?? $json.complaintFormUrl }}", "type": "string" },
+            { "id": "8", "name": "appointmentId", "value": "={{ $json.body?.appointmentId ?? $json.appointmentId }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Normalize HBYS",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 320]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Hasta: {{ $json.patientName }}, Klinik: {{ $json.clinicName }}, Doktor: {{ $json.doctorName }}, Tedavi: {{ $json.treatment }}.\n\nWhatsApp ile KVKK uyumlu, samimi bir NPS anketi yaz. 1-10 arası puan iste. Türkçe, max 3 cümle. Sadece mesaj metnini döndür.",
+        "options": { "maxIterations": 3, "enableStreaming": false }
+      },
+      "name": "AI NPS Mesajı",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [680, 320]
+    },
+    {
+      "parameters": {
+        "model": { "__rl": true, "mode": "list", "value": "gpt-4o-mini" },
+        "options": {}
+      },
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [680, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/PHONE_NUMBER_ID/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Normalize HBYS').item.json.patientPhone }}\",\n  \"type\": \"text\",\n  \"text\": { \"body\": \"{{ $json.output }}\" }\n}",
+        "options": {}
+      },
+      "name": "WhatsApp NPS Gönder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 320]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/nps/response",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "NPS Yanıtı Al",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 680],
+      "webhookId": "nefalix-nps-response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "score", "value": "={{ Number($json.body?.score ?? $json.score ?? 0) }}", "type": "number" },
+            { "id": "2", "name": "patientName", "value": "={{ $json.body?.patientName ?? $json.patientName }}", "type": "string" },
+            { "id": "3", "name": "patientPhone", "value": "={{ $json.body?.patientPhone ?? $json.patientPhone }}", "type": "string" },
+            { "id": "4", "name": "googleReviewUrl", "value": "={{ $json.body?.googleReviewUrl ?? $json.googleReviewUrl }}", "type": "string" },
+            { "id": "5", "name": "complaintFormUrl", "value": "={{ $json.body?.complaintFormUrl ?? $json.complaintFormUrl }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "NPS Skor Parse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 680]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 8,
+              "operator": { "type": "number", "operation": "gte" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Promoter? (8-10)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [680, 680]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "message",
+              "value": "=Teşekkürler {{ $json.patientName }}! Deneyiminizi Google'da paylaşır mısınız? {{ $json.googleReviewUrl }}",
+              "type": "string"
+            },
+            { "id": "2", "name": "flow", "value": "promoter", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Promoter Google Link",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 580]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "message",
+              "value": "=Üzgünüz {{ $json.patientName }}. Geri bildiriminizi önemsiyoruz, lütfen formu doldurun: {{ $json.complaintFormUrl }}",
+              "type": "string"
+            },
+            { "id": "2", "name": "flow", "value": "detractor", "type": "string" },
+            {
+              "id": "3",
+              "name": "alertMessage",
+              "value": "=🚨 KRİZ: {{ $json.patientName }} NPS {{ $json.score }}/10 — acil müdahale gerekli",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Detractor Şikayet",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 780]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "alertLog",
+              "value": "=🚨 KRİZ ALARM (Slack bağlanınca buraya gider): {{ $json.alertMessage }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Kriz Alarm Log",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1140, 780]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, flow: $json.flow, message: $json.message } }}",
+        "options": {}
+      },
+      "name": "NPS Yanıt Dön",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1140, 580]
+    }
+  ],
+  "connections": {
+    "HBYS Randevu Bitti": { "main": [[{ "node": "Normalize HBYS", "type": "main", "index": 0 }]] },
+    "Normalize HBYS": { "main": [[{ "node": "AI NPS Mesajı", "type": "main", "index": 0 }]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "AI NPS Mesajı", "type": "ai_languageModel", "index": 0 }]] },
+    "AI NPS Mesajı": { "main": [[{ "node": "WhatsApp NPS Gönder", "type": "main", "index": 0 }]] },
+    "NPS Yanıtı Al": { "main": [[{ "node": "NPS Skor Parse", "type": "main", "index": 0 }]] },
+    "NPS Skor Parse": { "main": [[{ "node": "Promoter? (8-10)", "type": "main", "index": 0 }]] },
+    "Promoter? (8-10)": {
+      "main": [
+        [{ "node": "Promoter Google Link", "type": "main", "index": 0 }],
+        [{ "node": "Detractor Şikayet", "type": "main", "index": 0 }]
+      ]
+    },
+    "Promoter Google Link": { "main": [[{ "node": "NPS Yanıt Dön", "type": "main", "index": 0 }]] },
+    "Detractor Şikayet": { "main": [[{ "node": "Kriz Alarm Log", "type": "main", "index": 0 }]] },
+    "Kriz Alarm Log": { "main": [[{ "node": "NPS Yanıt Dön", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "availableInMCP": true }
+}

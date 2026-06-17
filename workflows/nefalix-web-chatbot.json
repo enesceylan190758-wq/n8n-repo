@@ -6,9 +6,9 @@
         "public": true,
         "mode": "webhook",
         "options": {
-          "allowedOrigins": "https://nefalixai.com,https://www.nefalixai.com,https://nefalix-landing.vercel.app,http://localhost:3000",
+          "allowedOrigins": "https://nefalixai.com,https://www.nefalixai.com,https://nefalix-landing.vercel.app,http://localhost:3000,http://localhost:5678",
           "loadPreviousSession": "notSupported",
-          "responseMode": "streaming"
+          "responseMode": "lastNode"
         }
       },
       "name": "Web Chat",
@@ -31,7 +31,7 @@
         "promptType": "auto",
         "options": {
           "systemMessage": "Sen Nefalix AI diş kliniği asistanısın. Görevin hastalara ve ziyaretçilere operasyonel bilgi vermek ve randevu sürecine yardımcı olmaktır.\n\nKLİNİK BİLGİLERİ (örnek pilot — MediDent İstanbul Kartal):\n- Branşlar: implant, gülüş tasarımı, diş beyazlatma, kanal tedavisi, ortodonti, genel diş hekimliği\n- Randevu: ön muayene sonrası tedavi planı netleşir\n- Fiyat: muayene sonrası kişiye özel teklif verilir; mesajda kesin fiyat vaadi yapma\n- İletişim: detay ve randevu için telefon iste, WhatsApp üzerinden dönüş yapılacağını söyle\n\nKURALLAR:\n- Asla tıbbi teşhis koyma, reçete önerme veya tedavi garantisi verme.\n- Sağlık Bakanlığı hekim reklam kurallarına uygun, yanıltıcı olmayan bilgilendirme yap.\n- KVKK kapsamında veri güvenliğini vurgula; tıbbi veriler şifreli saklanır.\n- Kullanıcının dilinde yanıt ver (Türkçe, İngilizce, Arapça).\n- Kısa, profesyonel ve sıcak ton. Kendini Nefalix AI olarak tanıt.",
-          "enableStreaming": true,
+          "enableStreaming": false,
           "maxIterations": 5
         }
       },
@@ -45,18 +45,32 @@
         "model": {
           "__rl": true,
           "mode": "list",
-          "value": "gpt-5-mini"
+          "value": "gpt-4o-mini"
         }
       },
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [520, 520]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const items = $input.all();\nconst delayMs = 3000 + Math.floor(Math.random() * 2000);\nawait new Promise((resolve) => setTimeout(resolve, delayMs));\nreturn items;"
+      },
+      "name": "Natural Response Delay",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 300]
     }
   ],
   "connections": {
     "Web Chat": {
       "main": [[{ "node": "Nefalix Clinic Agent", "type": "main", "index": 0 }]]
+    },
+    "Nefalix Clinic Agent": {
+      "main": [[{ "node": "Natural Response Delay", "type": "main", "index": 0 }]]
     },
     "Conversation Memory": {
       "ai_memory": [[{ "node": "Nefalix Clinic Agent", "type": "ai_memory", "index": 0 }]]
