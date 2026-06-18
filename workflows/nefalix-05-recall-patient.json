@@ -11,16 +11,29 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [180, 80]
+      "position": [
+        180,
+        80
+      ]
     },
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "days", "daysInterval": 1 }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
       },
       "name": "Günlük Kontrol",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
@@ -32,19 +45,52 @@
       "name": "HBYS Hasta Listesi",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [240, 480],
+      "position": [
+        240,
+        480
+      ],
       "webhookId": "nefalix-recall-check"
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "1", "name": "patientName", "value": "={{ $json.body?.patientName ?? $json.patientName }}", "type": "string" },
-            { "id": "2", "name": "patientPhone", "value": "={{ $json.body?.patientPhone ?? $json.patientPhone }}", "type": "string" },
-            { "id": "3", "name": "lastTreatment", "value": "={{ $json.body?.lastTreatment ?? $json.lastTreatment }}", "type": "string" },
-            { "id": "4", "name": "monthsSinceVisit", "value": "={{ Number($json.body?.monthsSinceVisit ?? $json.monthsSinceVisit ?? 6) }}", "type": "number" },
-            { "id": "5", "name": "doctorName", "value": "={{ $json.body?.doctorName ?? $json.doctorName ?? '' }}", "type": "string" },
-            { "id": "6", "name": "bookingUrl", "value": "={{ $json.body?.bookingUrl ?? $json.bookingUrl ?? 'https://cal.com/medident' }}", "type": "string" }
+            {
+              "id": "1",
+              "name": "patientName",
+              "value": "={{ $json.body?.patientName ?? $json.patientName }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "patientPhone",
+              "value": "={{ $json.body?.patientPhone ?? $json.patientPhone }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "lastTreatment",
+              "value": "={{ $json.body?.lastTreatment ?? $json.lastTreatment ?? 'kontrol muayenesi' }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "monthsSinceVisit",
+              "value": "={{ Math.round(Number($json.body?.monthsSinceVisit ?? $json.monthsSinceVisit ?? ($json.body?.lastVisitDays ? Number($json.body.lastVisitDays) / 30 : ($json.lastVisitDays ? Number($json.lastVisitDays) / 30 : 6)))) }}",
+              "type": "number"
+            },
+            {
+              "id": "5",
+              "name": "doctorName",
+              "value": "={{ $json.body?.doctorName ?? $json.doctorName ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "6",
+              "name": "bookingUrl",
+              "value": "={{ $json.body?.bookingUrl ?? $json.bookingUrl ?? 'https://cal.com/medident' }}",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -52,17 +98,27 @@
       "name": "Hasta Normalize",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [480, 380]
+      "position": [
+        480,
+        380
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
           "conditions": [
             {
               "leftValue": "={{ $json.monthsSinceVisit }}",
               "rightValue": 6,
-              "operator": { "type": "number", "operation": "gte" }
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
             }
           ],
           "combinator": "and"
@@ -72,53 +128,200 @@
       "name": "6+ Ay Geçmiş mi?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [680, 380]
+      "position": [
+        680,
+        380
+      ]
     },
     {
       "parameters": {
         "promptType": "define",
         "text": "=Kayıp hasta geri çağrı mesajı yaz.\n\nHasta: {{ $json.patientName }}\nSon tedavi: {{ $json.lastTreatment }}\nDoktor: {{ $json.doctorName }}\nGeçen süre: {{ $json.monthsSinceVisit }} ay\nRandevu linki: {{ $json.bookingUrl }}\n\nWhatsApp, samimi, KVKK uyumlu, max 4 cümle. Sadece mesaj metni.",
-        "options": { "maxIterations": 2, "enableStreaming": false }
+        "options": {
+          "maxIterations": 2,
+          "enableStreaming": false
+        }
       },
       "name": "AI Hatırlatma Mesajı",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
-      "position": [900, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
-        "model": { "__rl": true, "mode": "list", "value": "gpt-4o-mini" },
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
         "options": {}
       },
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
-      "position": [900, 500]
+      "position": [
+        900,
+        500
+      ]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://graph.facebook.com/v21.0/PHONE_NUMBER_ID/messages",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "whatsAppApi",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Hasta Normalize').item.json.patientPhone }}\",\n  \"type\": \"text\",\n  \"text\": { \"body\": \"{{ $json.output }}\" }\n}",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "whatsappLog",
+              "value": "=📱 WhatsApp hatırlatma (API bağlanınca): {{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
         "options": {}
       },
-      "name": "WhatsApp Hatırlatma",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1120, 300]
+      "name": "WhatsApp Hatırlatma Log",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "useCustomSchema": false,
+        "resource": "row",
+        "operation": "create",
+        "tableId": "recall_campaigns",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "clinic_id",
+              "fieldValue": "51738ea8-c12e-40ce-a0e2-42869496d76b"
+            },
+            {
+              "fieldId": "last_treatment",
+              "fieldValue": "={{ $('Hasta Normalize').item.json.lastTreatment }}"
+            },
+            {
+              "fieldId": "months_since_visit",
+              "fieldValue": "={{ Math.round($('Hasta Normalize').item.json.monthsSinceVisit) }}"
+            },
+            {
+              "fieldId": "message_sent",
+              "fieldValue": "={{ $('AI Hatırlatma Mesajı').item.json.output }}"
+            },
+            {
+              "fieldId": "booking_url",
+              "fieldValue": "={{ $('Hasta Normalize').item.json.bookingUrl }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "sent"
+            }
+          ]
+        }
+      },
+      "name": "Supabase Recall Kaydet",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        300
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "UYVzTr3Rfadp18iR",
+          "name": "Nefalix Supabase Local"
+        }
+      }
     }
   ],
   "connections": {
-    "Günlük Kontrol": { "main": [[{ "node": "Hasta Normalize", "type": "main", "index": 0 }]] },
-    "HBYS Hasta Listesi": { "main": [[{ "node": "Hasta Normalize", "type": "main", "index": 0 }]] },
-    "Hasta Normalize": { "main": [[{ "node": "6+ Ay Geçmiş mi?", "type": "main", "index": 0 }]] },
-    "6+ Ay Geçmiş mi?": { "main": [[{ "node": "AI Hatırlatma Mesajı", "type": "main", "index": 0 }], []] },
-    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "AI Hatırlatma Mesajı", "type": "ai_languageModel", "index": 0 }]] },
-    "AI Hatırlatma Mesajı": { "main": [[{ "node": "WhatsApp Hatırlatma", "type": "main", "index": 0 }]] }
+    "Günlük Kontrol": {
+      "main": [
+        [
+          {
+            "node": "Hasta Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HBYS Hasta Listesi": {
+      "main": [
+        [
+          {
+            "node": "Hasta Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hasta Normalize": {
+      "main": [
+        [
+          {
+            "node": "6+ Ay Geçmiş mi?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6+ Ay Geçmiş mi?": {
+      "main": [
+        [
+          {
+            "node": "AI Hatırlatma Mesajı",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Hatırlatma Mesajı",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Hatırlatma Mesajı": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Hatırlatma Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Hatırlatma Log": {
+      "main": [
+        [
+          {
+            "node": "Supabase Recall Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1", "availableInMCP": true }
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  }
 }

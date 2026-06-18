@@ -11,16 +11,29 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [180, 80]
+      "position": [
+        180,
+        80
+      ]
     },
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "months", "monthsInterval": 1 }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "monthsInterval": 1
+            }
+          ]
+        }
       },
       "name": "Aylık Anket",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
@@ -32,16 +45,34 @@
       "name": "eNPS Yanıt Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [240, 520],
+      "position": [
+        240,
+        520
+      ],
       "webhookId": "nefalix-enps-response"
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "1", "name": "score", "value": "={{ Number($json.body?.score ?? $json.score ?? 0) }}", "type": "number" },
-            { "id": "2", "name": "department", "value": "={{ $json.body?.department ?? $json.department ?? 'Genel' }}", "type": "string" },
-            { "id": "3", "name": "feedback", "value": "={{ $json.body?.feedback ?? $json.feedback ?? '' }}", "type": "string" }
+            {
+              "id": "1",
+              "name": "score",
+              "value": "={{ Number($json.body?.score ?? $json.score ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "2",
+              "name": "department",
+              "value": "={{ $json.body?.department ?? $json.department ?? 'Genel' }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "feedback",
+              "value": "={{ $json.body?.feedback ?? $json.feedback ?? '' }}",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -49,17 +80,27 @@
       "name": "eNPS Parse",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [460, 520]
+      "position": [
+        460,
+        520
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
           "conditions": [
             {
               "leftValue": "={{ $json.score }}",
               "rightValue": 8,
-              "operator": { "type": "number", "operation": "gte" }
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
             }
           ],
           "combinator": "and"
@@ -69,7 +110,10 @@
       "name": "Promoter Çalışan?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [680, 520]
+      "position": [
+        680,
+        520
+      ]
     },
     {
       "parameters": {
@@ -81,7 +125,12 @@
               "value": "Teşekkürler! Deneyiminizi Glassdoor veya Indeed'de anonim paylaşmanız bize çok yardımcı olur.",
               "type": "string"
             },
-            { "id": "2", "name": "flow", "value": "promoter", "type": "string" }
+            {
+              "id": "2",
+              "name": "flow",
+              "value": "promoter",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -89,7 +138,10 @@
       "name": "Glassdoor Teşviki",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [920, 420]
+      "position": [
+        920,
+        420
+      ]
     },
     {
       "parameters": {
@@ -101,7 +153,12 @@
               "value": "=📊 Düşük eNPS — Departman: {{ $json.department }}, Skor: {{ $json.score }}/10. Geri bildirim: {{ $json.feedback }}",
               "type": "string"
             },
-            { "id": "2", "name": "flow", "value": "detractor", "type": "string" }
+            {
+              "id": "2",
+              "name": "flow",
+              "value": "detractor",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -109,7 +166,10 @@
       "name": "Yönetim Raporu",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [920, 620]
+      "position": [
+        920,
+        620
+      ]
     },
     {
       "parameters": {
@@ -120,20 +180,135 @@
       "name": "Yanıt Dön",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1140, 520]
+      "position": [
+        1140,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "useCustomSchema": false,
+        "resource": "row",
+        "operation": "create",
+        "tableId": "enps_responses",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "clinic_id",
+              "fieldValue": "51738ea8-c12e-40ce-a0e2-42869496d76b"
+            },
+            {
+              "fieldId": "department",
+              "fieldValue": "={{ $('eNPS Parse').item.json.department }}"
+            },
+            {
+              "fieldId": "score",
+              "fieldValue": "={{ $('eNPS Parse').item.json.score }}"
+            },
+            {
+              "fieldId": "feedback",
+              "fieldValue": "={{ $('eNPS Parse').item.json.feedback }}"
+            },
+            {
+              "fieldId": "flow",
+              "fieldValue": "={{ $json.flow }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase eNPS Kaydet",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        520
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "UYVzTr3Rfadp18iR",
+          "name": "Nefalix Supabase Local"
+        }
+      }
     }
   ],
   "connections": {
-    "eNPS Yanıt Webhook": { "main": [[{ "node": "eNPS Parse", "type": "main", "index": 0 }]] },
-    "eNPS Parse": { "main": [[{ "node": "Promoter Çalışan?", "type": "main", "index": 0 }]] },
-    "Promoter Çalışan?": {
+    "eNPS Yanıt Webhook": {
       "main": [
-        [{ "node": "Glassdoor Teşviki", "type": "main", "index": 0 }],
-        [{ "node": "Yönetim Raporu", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "eNPS Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Glassdoor Teşviki": { "main": [[{ "node": "Yanıt Dön", "type": "main", "index": 0 }]] },
-    "Yönetim Raporu": { "main": [[{ "node": "Yanıt Dön", "type": "main", "index": 0 }]] }
+    "eNPS Parse": {
+      "main": [
+        [
+          {
+            "node": "Promoter Çalışan?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promoter Çalışan?": {
+      "main": [
+        [
+          {
+            "node": "Glassdoor Teşviki",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Yönetim Raporu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Glassdoor Teşviki": {
+      "main": [
+        [
+          {
+            "node": "Supabase eNPS Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yönetim Raporu": {
+      "main": [
+        [
+          {
+            "node": "Supabase eNPS Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase eNPS Kaydet": {
+      "main": [
+        [
+          {
+            "node": "Yanıt Dön",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1", "availableInMCP": true }
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  }
 }

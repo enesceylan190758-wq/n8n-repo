@@ -11,16 +11,29 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [180, 80]
+      "position": [
+        180,
+        80
+      ]
     },
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "hours", "hoursInterval": 6 }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
       },
       "name": "Her 6 Saatte Kontrol",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
@@ -32,18 +45,46 @@
       "name": "Yeni Yorum Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [240, 480],
+      "position": [
+        240,
+        480
+      ],
       "webhookId": "nefalix-google-review"
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "1", "name": "reviewText", "value": "={{ $json.body?.reviewText ?? $json.reviewText ?? $json.comment }}", "type": "string" },
-            { "id": "2", "name": "rating", "value": "={{ Number($json.body?.rating ?? $json.rating ?? 5) }}", "type": "number" },
-            { "id": "3", "name": "authorName", "value": "={{ $json.body?.authorName ?? $json.authorName ?? 'Hasta' }}", "type": "string" },
-            { "id": "4", "name": "reviewId", "value": "={{ $json.body?.reviewId ?? $json.reviewId }}", "type": "string" },
-            { "id": "5", "name": "clinicName", "value": "={{ $json.body?.clinicName ?? $json.clinicName ?? 'MediDent İstanbul' }}", "type": "string" }
+            {
+              "id": "1",
+              "name": "reviewText",
+              "value": "={{ $json.body?.reviewText ?? $json.body?.text ?? $json.reviewText ?? $json.text ?? $json.comment ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "rating",
+              "value": "={{ Number($json.body?.rating ?? $json.rating ?? 5) }}",
+              "type": "number"
+            },
+            {
+              "id": "3",
+              "name": "authorName",
+              "value": "={{ $json.body?.authorName ?? $json.authorName ?? 'Hasta' }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "reviewId",
+              "value": "={{ $json.body?.reviewId ?? $json.reviewId }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "clinicName",
+              "value": "={{ $json.body?.clinicName ?? $json.clinicName ?? 'MediDent İstanbul' }}",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -51,29 +92,45 @@
       "name": "Yorumu Normalize Et",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [480, 380]
+      "position": [
+        480,
+        380
+      ]
     },
     {
       "parameters": {
         "promptType": "define",
         "text": "=Google yorumu analiz et ve yanıt taslağı üret.\n\nKlinik: {{ $json.clinicName }}\nYazar: {{ $json.authorName }}\nPuan: {{ $json.rating }}/5\nYorum: {{ $json.reviewText }}\n\nJSON döndür: sentiment (positive/neutral/negative), themes (dizi), draftReply (KVKK/GDPR uyumlu, teşhis yok, max 80 kelime, Türkçe), urgency (low/medium/high)",
         "hasOutputParser": true,
-        "options": { "maxIterations": 3, "enableStreaming": false }
+        "options": {
+          "maxIterations": 3,
+          "enableStreaming": false
+        }
       },
       "name": "AI Yorum Analizi",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
-      "position": [700, 380]
+      "position": [
+        700,
+        380
+      ]
     },
     {
       "parameters": {
-        "model": { "__rl": true, "mode": "list", "value": "gpt-4o-mini" },
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
         "options": {}
       },
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
-      "position": [700, 580]
+      "position": [
+        700,
+        580
+      ]
     },
     {
       "parameters": {
@@ -83,7 +140,10 @@
       "name": "Structured Output",
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
-      "position": [860, 580]
+      "position": [
+        860,
+        580
+      ]
     },
     {
       "parameters": {
@@ -102,16 +162,155 @@
       "name": "Onay Kuyruğu Log",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [940, 380]
+      "position": [
+        940,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "useCustomSchema": false,
+        "resource": "row",
+        "operation": "create",
+        "tableId": "google_reviews",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "clinic_id",
+              "fieldValue": "51738ea8-c12e-40ce-a0e2-42869496d76b"
+            },
+            {
+              "fieldId": "author_name",
+              "fieldValue": "={{ $('Yorumu Normalize Et').item.json.authorName }}"
+            },
+            {
+              "fieldId": "rating",
+              "fieldValue": "={{ $('Yorumu Normalize Et').item.json.rating }}"
+            },
+            {
+              "fieldId": "review_text",
+              "fieldValue": "={{ $('Yorumu Normalize Et').item.json.reviewText }}"
+            },
+            {
+              "fieldId": "sentiment",
+              "fieldValue": "={{ $('AI Yorum Analizi').item.json.output.sentiment }}"
+            },
+            {
+              "fieldId": "themes",
+              "fieldValue": "={{ JSON.stringify($('AI Yorum Analizi').item.json.output.themes) }}"
+            },
+            {
+              "fieldId": "draft_reply",
+              "fieldValue": "={{ $('AI Yorum Analizi').item.json.output.draftReply }}"
+            },
+            {
+              "fieldId": "urgency",
+              "fieldValue": "={{ $('AI Yorum Analizi').item.json.output.urgency }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "pending_approval"
+            }
+          ]
+        }
+      },
+      "name": "Supabase Yorum Kaydet",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        380
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "UYVzTr3Rfadp18iR",
+          "name": "Nefalix Supabase Local"
+        }
+      }
     }
   ],
   "connections": {
-    "Her 6 Saatte Kontrol": { "main": [[{ "node": "Yorumu Normalize Et", "type": "main", "index": 0 }]] },
-    "Yeni Yorum Webhook": { "main": [[{ "node": "Yorumu Normalize Et", "type": "main", "index": 0 }]] },
-    "Yorumu Normalize Et": { "main": [[{ "node": "AI Yorum Analizi", "type": "main", "index": 0 }]] },
-    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "AI Yorum Analizi", "type": "ai_languageModel", "index": 0 }]] },
-    "Structured Output": { "ai_outputParser": [[{ "node": "AI Yorum Analizi", "type": "ai_outputParser", "index": 0 }]] },
-    "AI Yorum Analizi": { "main": [[{ "node": "Onay Kuyruğu Log", "type": "main", "index": 0 }]] }
+    "Her 6 Saatte Kontrol": {
+      "main": [
+        [
+          {
+            "node": "Yorumu Normalize Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yeni Yorum Webhook": {
+      "main": [
+        [
+          {
+            "node": "Yorumu Normalize Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yorumu Normalize Et": {
+      "main": [
+        [
+          {
+            "node": "AI Yorum Analizi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Yorum Analizi",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Yorum Analizi",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Yorum Analizi": {
+      "main": [
+        [
+          {
+            "node": "Onay Kuyruğu Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onay Kuyruğu Log": {
+      "main": [
+        [
+          {
+            "node": "Supabase Yorum Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1", "availableInMCP": true }
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  }
 }

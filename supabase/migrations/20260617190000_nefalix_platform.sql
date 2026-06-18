@@ -136,12 +136,18 @@ CREATE INDEX IF NOT EXISTS idx_automation_events_clinic ON automation_events(cli
 CREATE INDEX IF NOT EXISTS idx_nps_clinic ON nps_responses(clinic_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_reviews_status ON google_reviews(clinic_id, status);
 
--- Pilot klinik seed
-INSERT INTO clinics (name, slug, google_review_url, complaint_form_url, booking_url)
+-- Pilot klinik seed (sabit UUID — n8n workflow'ları bu ID'yi kullanır)
+INSERT INTO clinics (id, name, slug, google_review_url, complaint_form_url, booking_url, whatsapp_phone)
 VALUES (
+  '51738ea8-c12e-40ce-a0e2-42869496d76b',
   'MediDent İstanbul Kartal',
   'medident-kartal',
   'https://g.page/r/example/review',
   'https://nefalixai.com/sikayet',
-  'https://cal.com/medident'
-) ON CONFLICT (slug) DO NOTHING;
+  'https://cal.com/medident',
+  NULL
+) ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name,
+  google_review_url = EXCLUDED.google_review_url,
+  complaint_form_url = EXCLUDED.complaint_form_url,
+  booking_url = EXCLUDED.booking_url;
