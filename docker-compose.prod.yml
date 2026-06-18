@@ -1,0 +1,45 @@
+# Production overlay — HTTPS (Caddy) + n8n host ayarları
+# Kullanım:
+#   docker compose -f docker-compose.yml -f docker-compose.evolution.yml -f docker-compose.prod.yml up -d
+
+services:
+  n8n:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - N8N_HOST=${N8N_PUBLIC_HOST:-api.nefalixai.com}
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://${N8N_PUBLIC_HOST:-api.nefalixai.com}/
+      - N8N_EDITOR_BASE_URL=https://${N8N_PUBLIC_HOST:-api.nefalixai.com}/
+    ports: !override
+      - "127.0.0.1:5678:5678"
+
+  evolution-api:
+    environment:
+      - SERVER_URL=https://${EVOLUTION_PUBLIC_HOST:-evo.nefalixai.com}
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: nefalix-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      - N8N_PUBLIC_HOST=${N8N_PUBLIC_HOST:-api.nefalixai.com}
+      - EVOLUTION_PUBLIC_HOST=${EVOLUTION_PUBLIC_HOST:-evo.nefalixai.com}
+      - ACME_EMAIL=${ACME_EMAIL:-}
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - nefalix-net
+    depends_on:
+      n8n:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:

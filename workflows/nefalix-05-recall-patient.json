@@ -169,25 +169,35 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
             {
-              "id": "1",
-              "name": "whatsappLog",
-              "value": "=📱 WhatsApp hatırlatma (API bağlanınca): {{ $json.output }}",
-              "type": "string"
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ number: String($('Hasta Normalize').item.json.patientPhone || '').replace(/\\D/g, ''), text: $('AI Hatırlatma Mesajı').item.json.output || '' }) }}",
         "options": {}
       },
-      "name": "WhatsApp Hatırlatma Log",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "name": "Evolution Recall Gönder",
       "position": [
         1120,
         300
-      ]
+      ],
+      "id": null
     },
     {
       "parameters": {
@@ -301,14 +311,14 @@
       "main": [
         [
           {
-            "node": "WhatsApp Hatırlatma Log",
+            "node": "Evolution Recall Gönder",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "WhatsApp Hatırlatma Log": {
+    "Evolution Recall Gönder": {
       "main": [
         [
           {

@@ -132,25 +132,35 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
             {
-              "id": "1",
-              "name": "whatsappLog",
-              "value": "=📱 NPS WhatsApp (API bağlanınca): {{ $json.output }}",
-              "type": "string"
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ number: String($('Normalize HBYS').item.json.patientPhone || '').replace(/\\D/g, ''), text: $json.output || '' }) }}",
         "options": {}
       },
-      "name": "WhatsApp NPS Log",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "name": "Evolution NPS Gönder",
       "position": [
         900,
         320
-      ]
+      ],
+      "id": null
     },
     {
       "parameters": {
@@ -383,6 +393,37 @@
           "name": "Nefalix Supabase Local"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ number: String($('NPS Skor Parse').item.json.patientPhone || '').replace(/\\D/g, ''), text: $json.message || '' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "name": "Evolution NPS Yanıt Gönder",
+      "position": [
+        1140,
+        680
+      ]
     }
   ],
   "connections": {
@@ -423,7 +464,7 @@
       "main": [
         [
           {
-            "node": "WhatsApp NPS Log",
+            "node": "Evolution NPS Gönder",
             "type": "main",
             "index": 0
           }
@@ -474,7 +515,7 @@
       "main": [
         [
           {
-            "node": "Supabase NPS Kaydet",
+            "node": "Evolution NPS Yanıt Gönder",
             "type": "main",
             "index": 0
           }
@@ -496,7 +537,7 @@
       "main": [
         [
           {
-            "node": "Supabase NPS Kaydet",
+            "node": "Evolution NPS Yanıt Gönder",
             "type": "main",
             "index": 0
           }
@@ -508,6 +549,17 @@
         [
           {
             "node": "NPS Yanıt Dön",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution NPS Yanıt Gönder": {
+      "main": [
+        [
+          {
+            "node": "Supabase NPS Kaydet",
             "type": "main",
             "index": 0
           }

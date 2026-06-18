@@ -140,14 +140,16 @@ CREATE INDEX IF NOT EXISTS idx_reviews_status ON google_reviews(clinic_id, statu
 INSERT INTO clinics (id, name, slug, google_review_url, complaint_form_url, booking_url, whatsapp_phone)
 VALUES (
   '51738ea8-c12e-40ce-a0e2-42869496d76b',
-  'MediDent İstanbul Kartal',
-  'medident-kartal',
-  'https://g.page/r/example/review',
-  'https://nefalixai.com/sikayet',
-  'https://cal.com/medident',
-  NULL
-) ON CONFLICT (slug) DO UPDATE SET
+  'Medident İstanbul',
+  'medident-istanbul',
+  'https://www.google.com/maps/search/?api=1&query=Medident+%C4%B0stanbul+Ac%C4%B1badem+Cd+195F+%C3%9Csk%C3%BCdar',
+  'https://www.sikayetvar.com/ozel-medident-agiz-ve-dis-sagligi-poliklinigi',
+  'https://medidentistanbul.com/iletisim/',
+  '+905491190819'
+) ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
   google_review_url = EXCLUDED.google_review_url,
   complaint_form_url = EXCLUDED.complaint_form_url,
-  booking_url = EXCLUDED.booking_url;
+  booking_url = EXCLUDED.booking_url,
+  whatsapp_phone = EXCLUDED.whatsapp_phone;

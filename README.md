@@ -1,11 +1,16 @@
 # Nefalix n8n Repo
 
+**Proje merkezi (Masaüstü):** `~/Desktop/nefalixai/` — tüm dokümanlar, runbook'lar ve repo linkleri.
+
 Nefalix AI otomasyon altyapısı: **n8n workflow'ları** + **[n8n-mcp](https://github.com/czlonkowski/n8n-mcp)** (Cursor/Claude ile workflow üretimi).
 
 ## Ne var?
 
 | Klasör / dosya | Açıklama |
 |----------------|----------|
+| `AGENTS.md` | AI agent SOP — 3 katmanlı mimari (directive / orchestration / execution) |
+| `directives/` | Standard Operating Procedures (ne yapılacak) |
+| `execution/` | Deterministik script'ler (import, test, patch) |
 | `docker-compose.yml` | Yerel n8n + n8n-mcp (czlonkowski image) |
 | `.cursor/mcp.json.example` | Cursor'da n8n-mcp bağlantısı |
 | `workflows/` | Import edilebilir workflow şablonları |

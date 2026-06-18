@@ -1,0 +1,19 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$N8N_PUBLIC_HOST} {
+	encode gzip
+	reverse_proxy n8n:5678
+}
+
+{$EVOLUTION_PUBLIC_HOST} {
+	encode gzip
+	reverse_proxy evolution-api:8080
+}
+
+# DNS gelene kadar IP üzerinden HTTP (Vercel test)
+:80 {
+	encode gzip
+	reverse_proxy n8n:5678
+}

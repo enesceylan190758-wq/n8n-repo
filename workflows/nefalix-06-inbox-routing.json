@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Modül 2: Inbox — Team Inbox\n\n**Akış:** WhatsApp/Web Chat mesajı → AI taslak yanıt → Slack bildirim → onay sonrası gönder\n\n*Web Chat ayrı workflow'da (Nefalix AI - Web Chatbot)*",
+        "content": "## Modül 2: Inbox — Team Inbox\n\n**Akış:** WhatsApp mesajı → AI taslak yanıt → Supabase (draft_ready)\n\nOtomatik gönderim KAPALI — yanıt sadece manuel/onaylı gönderilir.\n\n*Web Chat ayrı workflow'da (Nefalix AI - Web Chatbot)*",
         "height": 140,
         "width": 380,
         "color": 7
@@ -45,19 +45,19 @@
             {
               "id": "2",
               "name": "patientName",
-              "value": "={{ $json.body?.patientName ?? $json.patientName ?? 'Hasta' }}",
+              "value": "={{ $json.body?.patientName ?? $json.patientName ?? $json.body?.data?.pushName ?? $json.data?.pushName ?? 'Hasta' }}",
               "type": "string"
             },
             {
               "id": "3",
               "name": "message",
-              "value": "={{ $json.body?.message ?? $json.body?.body ?? $json.message ?? $json.text ?? '' }}",
+              "value": "={{ $json.body?.message ?? $json.body?.body ?? $json.message ?? $json.text ?? $json.body?.data?.message?.conversation ?? $json.data?.message?.conversation ?? '' }}",
               "type": "string"
             },
             {
               "id": "4",
               "name": "phone",
-              "value": "={{ $json.body?.phone ?? $json.body?.from ?? $json.phone ?? $json.from ?? '' }}",
+              "value": "={{ ($json.body?.data?.key?.remoteJidAlt ?? $json.data?.key?.remoteJidAlt ?? $json.body?.data?.key?.participantAlt ?? $json.data?.key?.participantAlt ?? $json.body?.data?.key?.remoteJid ?? $json.data?.key?.remoteJid ?? $json.body?.phone ?? $json.phone ?? '').split('@')[0].replace(/\\D/g, '') }}",
               "type": "string"
             }
           ]
@@ -152,6 +152,14 @@
             {
               "fieldId": "body",
               "fieldValue": "={{ $('Mesaj Normalize').item.json.message }}"
+            },
+            {
+              "fieldId": "sender_phone",
+              "fieldValue": "={{ $('Mesaj Normalize').item.json.phone }}"
+            },
+            {
+              "fieldId": "sender_name",
+              "fieldValue": "={{ $('Mesaj Normalize').item.json.patientName }}"
             },
             {
               "fieldId": "ai_draft_reply",

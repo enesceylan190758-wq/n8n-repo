@@ -1,0 +1,104 @@
+{
+  "name": "Nefalix - Inbox Yanıt Gönder",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Inbox — Onaylı WhatsApp Gönderimi\n\nDashboard'dan tetiklenir. Otomatik inbox akışından bağımsız.",
+        "height": 100,
+        "width": 360,
+        "color": 7
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 80]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/inbox/send",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Gönder Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 300],
+      "webhookId": "nefalix-inbox-send"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "phone",
+              "value": "={{ String($json.body?.phone ?? $json.phone ?? '').replace(/\\D/g, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "text",
+              "value": "={{ $json.body?.text ?? $json.text ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "messageId",
+              "value": "={{ $json.body?.messageId ?? $json.messageId ?? '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Parse İstek",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.EVOLUTION_API_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ number: $json.phone, text: $json.text }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "name": "Evolution Gönder",
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = 'http://host.docker.internal:54321';\nconst key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\nconst messageId = $('Parse İstek').item.json.messageId;\nif (!messageId) {\n  return [{ json: { ok: true, updated: false } }];\n}\nawait this.helpers.httpRequest({\n  method: 'PATCH',\n  url: `${base}/rest/v1/inbox_messages?id=eq.${messageId}`,\n  headers: {\n    apikey: key,\n    Authorization: `Bearer ${key}`,\n    'Content-Type': 'application/json',\n    Prefer: 'return=minimal',\n  },\n  body: { status: 'replied' },\n  json: true,\n});\nreturn [{ json: { ok: true, updated: true, messageId } }];"
+      },
+      "name": "Supabase Durum Güncelle",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Gönder Webhook": {
+      "main": [[{ "node": "Parse İstek", "type": "main", "index": 0 }]]
+    },
+    "Parse İstek": {
+      "main": [[{ "node": "Evolution Gönder", "type": "main", "index": 0 }]]
+    },
+    "Evolution Gönder": {
+      "main": [[{ "node": "Supabase Durum Güncelle", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}
