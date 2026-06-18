@@ -132,18 +132,21 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://graph.facebook.com/v21.0/PHONE_NUMBER_ID/messages",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "whatsAppApi",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Normalize HBYS').item.json.patientPhone }}\",\n  \"type\": \"text\",\n  \"text\": { \"body\": \"{{ $json.output }}\" }\n}",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "whatsappLog",
+              "value": "=📱 NPS WhatsApp (API bağlanınca): {{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
         "options": {}
       },
-      "name": "WhatsApp NPS Gönder",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "name": "WhatsApp NPS Log",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
         900,
         320
@@ -420,7 +423,7 @@
       "main": [
         [
           {
-            "node": "WhatsApp NPS Gönder",
+            "node": "WhatsApp NPS Log",
             "type": "main",
             "index": 0
           }
