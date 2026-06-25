@@ -1,0 +1,280 @@
+{
+  "name": "Nefalix - Estesoft HBYS Adapter",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Estesoft → NPS Taslak (onaylı gönderim)\n\nRandevu **Tamamlandı** → AI NPS metni → `inbox_messages` (message_kind=estesoft_nps).\n**Otomatik WhatsApp gönderilmez** — yönetici dashboard'dan onaylar.\n\nWebhook: `POST /webhook/nefalix/estesoft/webhook`",
+        "height": 140,
+        "width": 440,
+        "color": 5
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/estesoft/webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Estesoft Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "nefalix-estesoft-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const CLINIC_ID = '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst raw = $json.body ?? $json;\nconst event = String(raw.event ?? raw.Event ?? raw.type ?? '').toLowerCase();\nconst data = raw.data ?? raw.Data ?? raw.payload ?? {};\nconst root = { ...data, ...raw };\n\nconst norm = (s) => String(s ?? '').normalize('NFD').replace(/\\p{M}/gu, '').toLowerCase();\n\nconst status = norm(root.status ?? root.Status ?? root.appointmentStatus ?? root.state ?? '');\nconst statusName = norm(root.statusName ?? root.StatusName ?? '');\nconst statusState = String(root.statusState ?? root.StatusState ?? '');\n\nconst completedHints = ['completed', 'complete', 'done', 'finished', 'tamamlandi', 'bitti', 'closed'];\nconst isCompletedEvent = /complete|tamam|finish|done|closed/.test(event);\nconst isCompletedStatus =\n  completedHints.some((h) => status.includes(h)) ||\n  statusName.includes('tamamlandi') ||\n  statusState === '+';\n\nif (!isCompletedEvent && !isCompletedStatus) {\n  return [{ json: { skip: true, reason: 'not_completed', event, status, statusName: root.statusName, statusState } }];\n}\n\nconst phoneRaw =\n  root.patientPhone ?? root.phone ?? root.mobile ?? root.gsm ??\n  root.customerPhone ?? root.Phone ?? root.patient?.phone ?? root.customer?.phone ?? '';\nconst phone = String(phoneRaw).replace(/\\D/g, '');\n\nconst patientName =\n  root.patientName ?? root.patient ?? root.customerName ?? root.customerRepresetName ??\n  root.customer?.name ?? root.patient?.name ?? 'Hasta';\n\nconst appointmentId = String(root.appointmentId ?? root.id ?? root.appointment_id ?? '');\n\nif (!phone || phone.length < 10) {\n  return [{ json: { skip: true, reason: 'missing_phone', event, appointmentId, statusName: root.statusName } }];\n}\n\nconst services = root.appointmentService ?? root.services ?? [];\nconst treatment =\n  root.treatment ?? root.service ?? root.serviceName ?? root.procedure ??\n  (Array.isArray(services) && services[0]?.serviceName) ?? '';\n\nreturn [{\n  json: {\n    skip: false,\n    clinic_id: CLINIC_ID,\n    patientName: String(patientName).trim(),\n    patientPhone: phone,\n    clinicName: root.clinicName ?? 'Medident İstanbul',\n    doctorName: root.doctor ?? root.doctorName ?? root.staffName ?? root.physician ?? '',\n    treatment: String(treatment).trim(),\n    appointmentId: appointmentId ? `estesoft-${appointmentId}` : '',\n    googleReviewUrl: root.googleReviewUrl ?? '',\n    complaintFormUrl: root.complaintFormUrl ?? '',\n  },\n}];"
+      },
+      "name": "Estesoft Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Tamamlandı mı?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $json;\nif (!item.appointmentId) return [{ json: item }];\n\nconst CLINIC_ID = item.clinic_id;\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) return [{ json: item }];\n\nconst headers = {\n  apikey: sbKey,\n  Authorization: `Bearer ${sbKey}`,\n};\n\nconst events = await this.helpers.httpRequest({\n  method: 'GET',\n  url: `${sbBase}/rest/v1/automation_events?clinic_id=eq.${CLINIC_ID}&event_type=eq.estesoft_nps_triggered&payload->>appointmentId=eq.${encodeURIComponent(item.appointmentId)}&select=id,payload&limit=5`,\n  headers,\n  json: true,\n});\n\nif (Array.isArray(events) && events.some((r) => r.payload?.source === 'historical_seed')) {\n  return [{ json: { skip: true, reason: 'historical_seed', appointmentId: item.appointmentId } }];\n}\n\nconst inbox = await this.helpers.httpRequest({\n  method: 'GET',\n  url: `${sbBase}/rest/v1/inbox_messages?message_kind=eq.estesoft_nps&metadata->>appointmentId=eq.${encodeURIComponent(item.appointmentId)}&select=id,status&limit=5`,\n  headers,\n  json: true,\n});\n\nconst activeInbox = Array.isArray(inbox) && inbox.some((r) => r.status === 'draft_ready' || r.status === 'replied');\nif (activeInbox) {\n  return [{ json: { skip: true, reason: 'dedup_inbox', appointmentId: item.appointmentId } }];\n}\n\nreturn [{ json: item }];"
+      },
+      "name": "Dedup Kontrol",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "dedup",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Yeni randevu?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1140,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $('Dedup Kontrol').first().json;\nif (!item.appointmentId) return [{ json: { ok: true, skipped: true } }];\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) return [{ json: { ok: true, note: 'no supabase key' } }];\n\nawait this.helpers.httpRequest({\n  method: 'POST',\n  url: `${sbBase}/rest/v1/automation_events`,\n  headers: {\n    apikey: sbKey,\n    Authorization: `Bearer ${sbKey}`,\n    'Content-Type': 'application/json',\n    Prefer: 'return=minimal',\n  },\n  body: {\n    clinic_id: item.clinic_id,\n    workflow_name: 'Nefalix - Estesoft HBYS Adapter',\n    event_type: 'estesoft_nps_triggered',\n    payload: {\n      appointmentId: item.appointmentId,\n      patientName: item.patientName,\n      source: 'adapter_draft',\n    },\n    status: 'success',\n  },\n  json: true,\n});\n\nreturn [{ json: { ok: true, appointmentId: item.appointmentId } }];"
+      },
+      "name": "Dedup Kaydet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Randevu/tedavi tamamlandı. Hastaya WhatsApp ile NPS anketi gönderilecek (yönetici onayından sonra).\n\nHasta: {{ $('Dedup Kontrol').item.json.patientName }}\nKlinik: {{ $('Dedup Kontrol').item.json.clinicName }}\nDoktor: {{ $('Dedup Kontrol').item.json.doctorName }}\nTedavi: {{ $('Dedup Kontrol').item.json.treatment }}\n\nMesaj şunları içersin:\n1) Teşekkür ve kısa samimi giriş\n2) \"Deneyiminizi 1-10 arası puanlar mısınız?\" sorusu (tek net soru)\n3) Puanı bu sohbette yazabileceğini belirt\n\nKVKK uyumlu, Türkçe, max 4 cümle. Sadece mesaj metnini döndür.",
+        "options": {
+          "maxIterations": 3,
+          "enableStreaming": false
+        }
+      },
+      "name": "AI NPS Taslak",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1360,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GCP_PROJECT_ID }}"
+        },
+        "modelName": "gemini-2.5-flash",
+        "options": {
+          "temperature": 0.4,
+          "maxOutputTokens": 2048
+        }
+      },
+      "name": "Gemini NPS Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $('Dedup Kontrol').first().json;\nconst ai = $('AI NPS Taslak').first().json;\nconst draft = String(ai.output || ai.text || '').trim();\nif (!draft) throw new Error('AI NPS taslak üretilemedi');\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\n\nconst phone = String(item.patientPhone || '').replace(/\\D/g, '');\nconst treatment = item.treatment || 'tedavi';\nconst doctor = item.doctorName || '';\nconst summary = `Estesoft: ${treatment}${doctor ? ` · ${doctor}` : ''} tamamlandı — NPS taslak onayı bekliyor`;\n\nconst row = await this.helpers.httpRequest({\n  method: 'POST',\n  url: `${sbBase}/rest/v1/inbox_messages`,\n  headers: {\n    apikey: sbKey,\n    Authorization: `Bearer ${sbKey}`,\n    'Content-Type': 'application/json',\n    Prefer: 'return=representation',\n  },\n  body: {\n    clinic_id: item.clinic_id,\n    channel: 'whatsapp',\n    direction: 'outbound',\n    message_kind: 'estesoft_nps',\n    body: summary,\n    ai_draft_reply: draft,\n    sender_phone: phone,\n    sender_name: item.patientName || 'Hasta',\n    status: 'draft_ready',\n    metadata: {\n      appointmentId: item.appointmentId,\n      treatment: item.treatment,\n      doctorName: item.doctorName,\n      source: 'estesoft',\n    },\n  },\n  json: true,\n});\n\nreturn [{ json: { ok: true, row, appointmentId: item.appointmentId, draft } }];"
+      },
+      "name": "Inbox Taslak Kaydet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Estesoft Webhook": {
+      "main": [
+        [
+          {
+            "node": "Estesoft Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estesoft Normalize": {
+      "main": [
+        [
+          {
+            "node": "Tamamlandı mı?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tamamlandı mı?": {
+      "main": [
+        [
+          {
+            "node": "Dedup Kontrol",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Dedup Kontrol": {
+      "main": [
+        [
+          {
+            "node": "Yeni randevu?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yeni randevu?": {
+      "main": [
+        [
+          {
+            "node": "AI NPS Taslak",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "AI NPS Taslak": {
+      "main": [
+        [
+          {
+            "node": "Inbox Taslak Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inbox Taslak Kaydet": {
+      "main": [
+        [
+          {
+            "node": "Dedup Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini NPS Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI NPS Taslak",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  }
+}

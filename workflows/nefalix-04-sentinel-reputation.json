@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Add-on: Sentinel — Sosyal Dinleme\n\n**Akış:** Web/Şikayetvar mention → AI duygu analizi → kritik ise WhatsApp/Slack alarm / nötr-pozitif haftalık rapor\n\n**Credential:** OpenAI, Slack, WhatsApp",
+        "content": "## Sentinel — İtibar analizi\n\nWebhook: `POST /webhook/nefalix/sentinel/mention`\nGoogle düşük puan (wf-09) ve Şikayetvar (wf-14) otomatik gelir.\n\nWhatsApp yalnızca `alert_urgent` (kritik) → gateway rate limit.",
         "height": 150,
         "width": 380,
         "color": 3
@@ -33,7 +33,8 @@
       "position": [
         240,
         300
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -58,7 +59,19 @@
             {
               "id": "1",
               "name": "source",
-              "value": "={{ $json.body?.source ?? $json.source ?? 'web' }}",
+              "value": "={{ $json.body?.source ?? $json.body?.platform ?? $json.source ?? 'web' }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "clinic_id",
+              "value": "={{ $json.body?.clinic_id ?? $json.clinic_id ?? '51738ea8-c12e-40ce-a0e2-42869496d76b' }}",
+              "type": "string"
+            },
+            {
+              "id": "6",
+              "name": "external_id",
+              "value": "={{ $json.body?.external_id ?? $json.external_id ?? '' }}",
               "type": "string"
             },
             {
@@ -94,7 +107,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=İtibar analizi yap.\n\nMarka: {{ $json.brandName }}\nKaynak: {{ $json.source }}\nİçerik: {{ $json.content }}\nURL: {{ $json.url }}\n\nJSON: sentiment (positive/neutral/negative/critical), riskScore (1-10), summary (1 cümle), recommendedAction (none/monitor/alert_urgent)",
+        "text": "=Sen Nefalix itibar analisti AI'sın. Klinik/otel/oto servis markası için internetteki mention'ı analiz et.\n\nMarka: {{ $json.brandName }}\nKaynak: {{ $json.source }}\nİçerik: {{ $json.content }}\nURL: {{ $json.url }}\n\nYönetici WhatsApp'ta okuyacak — özet net ve aksiyon odaklı olsun.\n\nJSON döndür:\n- sentiment: positive | neutral | negative | critical\n- riskScore: 1-10 (10 = acil müdahale)\n- summary: Türkçe 2-3 cümle — ne söylenmiş, firma için ne anlama geliyor\n- recommendedAction: none | monitor | alert_urgent\n- managerBrief: Türkçe kısa paragraf — yöneticiye \"şunları incelemen lazım, şu sonuçlar çıktı\" tonunda\n\nalert_urgent: şikayet, ifşa riski, viral olumsuzluk, yalan haber, riskScore>=7",
         "hasOutputParser": true,
         "options": {
           "maxIterations": 2,
@@ -111,16 +124,20 @@
     },
     {
       "parameters": {
-        "model": {
+        "projectId": {
           "__rl": true,
-          "mode": "list",
-          "value": "gpt-4o-mini"
+          "mode": "id",
+          "value": "={{ $env.GCP_PROJECT_ID }}"
         },
-        "options": {}
+        "modelName": "={{ $env.VERTEX_GEMINI_MODEL || 'gemini-2.5-flash' }}",
+        "options": {
+          "temperature": 0.4,
+          "maxOutputTokens": 2048
+        }
       },
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
+      "name": "Gemini Vertex Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
       "position": [
         700,
         580
@@ -129,7 +146,7 @@
     {
       "parameters": {
         "schemaType": "fromJson",
-        "jsonSchemaExample": "{\n  \"sentiment\": \"negative\",\n  \"riskScore\": 8,\n  \"summary\": \"Şikayetvar'da bekleme süresi şikayeti\",\n  \"recommendedAction\": \"alert_urgent\"\n}"
+        "jsonSchemaExample": "{\n  \"sentiment\": \"negative\",\n  \"riskScore\": 8,\n  \"summary\": \"Şikayetvar'da bekleme süresi şikayeti\",\n  \"recommendedAction\": \"alert_urgent\",\n  \"managerBrief\": \"Firmanızla ilgili olumsuz bir paylaşım tespit edildi. Bekleme süresi eleştirisi var; hasta memnuniyetsizliği riski yüksek. İncelemenizi öneririm.\"\n}"
       },
       "name": "Structured Output",
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
@@ -224,7 +241,7 @@
           "fieldValues": [
             {
               "fieldId": "clinic_id",
-              "fieldValue": "51738ea8-c12e-40ce-a0e2-42869496d76b"
+              "fieldValue": "={{ $('Mention Normalize').item.json.clinic_id }}"
             },
             {
               "fieldId": "source",
@@ -253,6 +270,10 @@
             {
               "fieldId": "is_critical",
               "fieldValue": "={{ $('AI Duygu Analizi').item.json.output.recommendedAction === 'alert_urgent' }}"
+            },
+            {
+              "fieldId": "external_id",
+              "fieldValue": "={{ $('Mention Normalize').item.json.external_id || null }}"
             }
           ]
         }
@@ -270,20 +291,49 @@
           "name": "Nefalix Supabase Local"
         }
       }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "managerAlertText",
+              "value": "=📊 *Nefalix Sentinel* — İtibar analizi\n\nFirma: {{ $('Mention Normalize').item.json.brandName }}\nKaynak: {{ $('Mention Normalize').item.json.source }}\nDuygu: {{ $json.output.sentiment }} | Risk: {{ $json.output.riskScore }}/10\n\n{{ $json.output.managerBrief || $json.output.summary }}\n\nÖneri: {{ $json.output.recommendedAction }}\n{{ $('Mention Normalize').item.json.url ? '🔗 ' + $('Mention Normalize').item.json.url : '' }}\n\nİncelemeniz önerilir → nefalixai.com/dashboard",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Yönetici Özet Mesajı",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        920,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({  number: String($env.CLINIC_MANAGER_WHATSAPP || '905491190819').replace(/\\D/g, ''), text: $json.managerAlertText || '', source: 'sentinel-alert', priority: 'critical' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "name": "WA Gateway Yöneticiye Bildir",
+      "position": [
+        1140,
+        520
+      ]
     }
   ],
   "connections": {
-    "Her 4 Saatte Tara": {
-      "main": [
-        [
-          {
-            "node": "Mention Normalize",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Mention Webhook": {
       "main": [
         [
@@ -301,17 +351,6 @@
           {
             "node": "AI Duygu Analizi",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Duygu Analizi",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -343,7 +382,7 @@
       "main": [
         [
           {
-            "node": "Kritik Alarm Log",
+            "node": "Yönetici Özet Mesajı",
             "type": "main",
             "index": 0
           }
@@ -351,6 +390,28 @@
         [
           {
             "node": "Haftalık Rapora Ekle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yönetici Özet Mesajı": {
+      "main": [
+        [
+          {
+            "node": "WA Gateway Yöneticiye Bildir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WA Gateway Yöneticiye Bildir": {
+      "main": [
+        [
+          {
+            "node": "Kritik Alarm Log",
             "type": "main",
             "index": 0
           }
@@ -374,6 +435,17 @@
           {
             "node": "Supabase Mention Kaydet",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vertex Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Duygu Analizi",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]

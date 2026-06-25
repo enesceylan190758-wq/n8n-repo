@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Modül 2: Inbox — Team Inbox\n\n**Akış:** WhatsApp mesajı → AI taslak yanıt → Supabase (draft_ready)\n\nOtomatik gönderim KAPALI — yanıt sadece manuel/onaylı gönderilir.\n\n*Web Chat ayrı workflow'da (Nefalix AI - Web Chatbot)*",
+        "content": "## Inbox + NPS skor\n\nWhatsApp → NPS puanı (1-10, son 7 gün NPS sorusu varsa) → otomatik Google link / yönetici alarm (wf-01).\nDiğer mesajlar → AI taslak → dashboard onayı.",
         "height": 140,
         "width": 380,
         "color": 7
@@ -59,6 +59,12 @@
               "name": "phone",
               "value": "={{ ($json.body?.data?.key?.remoteJidAlt ?? $json.data?.key?.remoteJidAlt ?? $json.body?.data?.key?.participantAlt ?? $json.data?.key?.participantAlt ?? $json.body?.data?.key?.remoteJid ?? $json.data?.key?.remoteJid ?? $json.body?.phone ?? $json.phone ?? '').split('@')[0].replace(/\\D/g, '') }}",
               "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "instance",
+              "value": "={{ $json.body?.instance ?? $json.instance ?? '' }}",
+              "type": "string"
             }
           ]
         },
@@ -74,8 +80,20 @@
     },
     {
       "parameters": {
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\nconst PILOT_CLINIC = '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst m = $('Mesaj Normalize').first().json;\nconst headers = { apikey: key, Authorization: `Bearer ${key}` };\nlet CLINIC_ID = PILOT_CLINIC;\nconst instanceName = String(m.instance || $env.EVOLUTION_INSTANCE || 'medident-pilot').trim();\nif (instanceName) {\n  const clinics = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/clinics?evolution_instance_name=eq.${encodeURIComponent(instanceName)}&select=id&limit=1`,\n    headers,\n    json: true,\n  });\n  if (Array.isArray(clinics) && clinics[0]?.id) CLINIC_ID = clinics[0].id;\n}\nconst phone = String(m.phone || '').replace(/\\D/g, '');\nconst currentMsg = String(m.message || '').trim();\nlet rows = [];\nif (phone) {\n  rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/inbox_messages?clinic_id=eq.${CLINIC_ID}&sender_phone=eq.${phone}&channel=eq.whatsapp&order=created_at.desc&limit=12`,\n    headers,\n    json: true,\n  });\n}\n\nconst cutoff = Date.now() - 45000;\nconst recentInbound = rows\n  .filter((r) => r.direction === 'inbound' && new Date(r.created_at).getTime() >= cutoff)\n  .map((r) => String(r.body || '').trim())\n  .filter(Boolean)\n  .reverse();\n\nconst burst = [...recentInbound];\nif (!burst.length || burst[burst.length - 1] !== currentMsg) burst.push(currentMsg);\nconst mergedMessage = burst.join(' ').trim() || currentMsg;\n\nconst older = rows.filter((r) => new Date(r.created_at).getTime() < cutoff).slice(0, 10).reverse();\nconst historyLines = [];\nfor (const r of older) {\n  if (r.direction === 'inbound') historyLines.push(`Hasta: ${r.body}`);\n  else historyLines.push(`Klinik: ${r.body}`);\n  if (r.direction === 'inbound' && r.ai_draft_reply && r.status === 'replied') {\n    historyLines.push(`Klinik: ${r.ai_draft_reply}`);\n  }\n}\nconst historyText = historyLines.length ? historyLines.join('\\n') : '— (ilk mesaj)';\n\n\nreturn [{\n  json: {\n    ...m,\n    clinic_id: CLINIC_ID,\n    instance: instanceName,\n    message: mergedMessage,\n    originalMessage: currentMsg,\n    historyText,\n    historyCount: older.length,\n  },\n}];"
+      },
+      "name": "Sohbet Geçmişi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        580,
+        300
+      ]
+    },
+    {
+      "parameters": {
         "promptType": "define",
-        "text": "=Klinik temsilcisi için taslak yanıt yaz.\n\nKanal: {{ $json.channel }}\nHasta: {{ $json.patientName }}\nMesaj: {{ $json.message }}\n\nKVKK uyumlu, teşhis yok, randevu için telefon iste. Max 3 cümle.",
+        "text": "=Sen Nefalix AI klinik WhatsApp asistanısın. Gelen mesaja klinik yöneticisinin onaylayacağı TASLAK yanıt yaz.\n\nGÖREV:\n- Randevu, konum, ulaşım, otel/VIP transfer, çalışma saatleri, fiyatın muayene sonrası netleşeceği gibi operasyonel sorulara yardımcı ol.\n- Geçmiş sohbeti dikkate al; tekrar sorma, bağlamı sürdür.\n- Kısa, profesyonel, sıcak ton. Max 3 cümle. Sadece yanıt metnini döndür.\n\nKURALLAR:\n- Asla tıbbi teşhis koyma, reçete önerme, tedavi garantisi verme.\n- KVKK uyumlu; kişisel veri toplama gerekiyorsa telefon iste.\n- Sağlık Bakanlığı hekim reklam kurallarına uygun bilgilendirme.\n- Kullanıcının dilinde yanıt ver (TR/EN/AR).\n\nGEÇMİŞ SOHBET (aynı numara, son mesajlar):\n{{ $json.historyText }}\n\nGÜNCEL MESAJ:\nKanal: {{ $json.channel }}\nGönderen: {{ $json.patientName }}\nMesaj: {{ $json.message }}",
         "options": {
           "maxIterations": 3,
           "enableStreaming": false
@@ -85,24 +103,28 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        680,
+        800,
         300
       ]
     },
     {
       "parameters": {
-        "model": {
+        "projectId": {
           "__rl": true,
-          "mode": "list",
-          "value": "gpt-4o-mini"
+          "mode": "id",
+          "value": "={{ $env.GCP_PROJECT_ID }}"
         },
-        "options": {}
+        "modelName": "gemini-2.5-flash",
+        "options": {
+          "temperature": 0.4,
+          "maxOutputTokens": 2048
+        }
       },
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
+      "name": "Gemini Vertex Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
       "position": [
-        680,
+        800,
         500
       ]
     },
@@ -124,67 +146,76 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        900,
+        1020,
         300
       ]
     },
     {
       "parameters": {
-        "useCustomSchema": false,
-        "resource": "row",
-        "operation": "create",
-        "tableId": "inbox_messages",
-        "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "clinic_id",
-              "fieldValue": "51738ea8-c12e-40ce-a0e2-42869496d76b"
-            },
-            {
-              "fieldId": "channel",
-              "fieldValue": "={{ $('Mesaj Normalize').item.json.channel }}"
-            },
-            {
-              "fieldId": "direction",
-              "fieldValue": "inbound"
-            },
-            {
-              "fieldId": "body",
-              "fieldValue": "={{ $('Mesaj Normalize').item.json.message }}"
-            },
-            {
-              "fieldId": "sender_phone",
-              "fieldValue": "={{ $('Mesaj Normalize').item.json.phone }}"
-            },
-            {
-              "fieldId": "sender_name",
-              "fieldValue": "={{ $('Mesaj Normalize').item.json.patientName }}"
-            },
-            {
-              "fieldId": "ai_draft_reply",
-              "fieldValue": "={{ $('AI Taslak Yanıt').item.json.output }}"
-            },
-            {
-              "fieldId": "status",
-              "fieldValue": "draft_ready"
-            }
-          ]
-        }
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\nconst m = $('Sohbet Geçmişi').item.json;\nconst ai = $('AI Taslak Yanıt').item.json;\nconst draft = ai.output || ai.text || '';\nconst row = await this.helpers.httpRequest({\n  method: 'POST',\n  url: `${base}/rest/v1/inbox_messages`,\n  headers: {\n    apikey: key,\n    Authorization: `Bearer ${key}`,\n    'Content-Type': 'application/json',\n    Prefer: 'return=representation',\n  },\n  body: {\n    clinic_id: m.clinic_id || '51738ea8-c12e-40ce-a0e2-42869496d76b',\n    channel: m.channel || 'whatsapp',\n    direction: 'inbound',\n    body: m.originalMessage || m.message || '',\n    sender_phone: m.phone || '',\n    sender_name: m.patientName || 'Hasta',\n    ai_draft_reply: draft,\n    status: draft ? 'draft_ready' : 'open',\n  },\n  json: true,\n});\nreturn [{ json: { ok: true, row } }];"
       },
       "name": "Supabase Inbox Kaydet",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        1120,
+        1240,
         300
-      ],
-      "credentials": {
-        "supabaseApi": {
-          "id": "UYVzTr3Rfadp18iR",
-          "name": "Nefalix Supabase Local"
-        }
-      }
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\n\nconst ctx = $('Sohbet Geçmişi').first().json;\nconst phone = String(ctx.phone || '').replace(/\\D/g, '');\nconst clinicId = ctx.clinic_id || '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst msg = String(ctx.originalMessage || ctx.message || '').trim();\nconst headers = { apikey: key, Authorization: `Bearer ${key}` };\nconst npsHint = /1\\s*[-–]\\s*10|puanlar\\s*mısınız|puanlay|memnuniyet|değerlendir/i;\nconst NPS_WINDOW_MS = 7 * 24 * 3600000;\n\nfunction parseScore(text) {\n  const t = String(text || '').trim();\n  const patterns = [\n    /^(?:puan\\s*)?(\\d{1,2})(?:\\s*\\/\\s*10)?$/i,\n    /\\b(\\d{1,2})\\s*\\/\\s*10\\b/,\n    /^(?:puan\\s*)?(\\d{1,2})\\s*puan$/i,\n  ];\n  if (t.length <= 12) patterns.push(/(?:^|\\s)(\\d{1,2})(?:\\s|$)/);\n  for (const re of patterns) {\n    const m = t.match(re);\n    if (!m) continue;\n    const n = Number(m[1]);\n    if (n >= 1 && n <= 10) return n;\n  }\n  return null;\n}\n\nconst score = parseScore(msg);\n\nlet rows = [];\nlet sendLogs = [];\nif (phone) {\n  rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/inbox_messages?clinic_id=eq.${clinicId}&sender_phone=eq.${phone}&channel=eq.whatsapp&order=created_at.desc&limit=20`,\n    headers,\n    json: true,\n  });\n  sendLogs = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/whatsapp_send_log?phone=eq.${phone}&order=created_at.desc&limit=15&select=created_at,message_preview,source_workflow`,\n    headers,\n    json: true,\n  }).catch(() => []);\n}\n\nconst cutoff = Date.now() - NPS_WINDOW_MS;\nconst recent = (rows || []).filter((r) => new Date(r.created_at).getTime() >= cutoff);\n\nconst surveyTimes = [];\nfor (const r of recent) {\n  if (r.direction === 'outbound' && (npsHint.test(r.body || '') || r.metadata?.npsSurvey)) {\n    surveyTimes.push(new Date(r.created_at).getTime());\n  }\n  if (r.message_kind === 'estesoft_nps' && r.status === 'replied') {\n    surveyTimes.push(new Date(r.created_at).getTime());\n  }\n}\nfor (const s of sendLogs || []) {\n  if (new Date(s.created_at).getTime() >= cutoff && npsHint.test(s.message_preview || '')) {\n    surveyTimes.push(new Date(s.created_at).getTime());\n  }\n}\n\nconst lastSurveyMs = surveyTimes.length ? Math.max(...surveyTimes) : 0;\nconst awaitingNps = lastSurveyMs > 0 && Date.now() - lastSurveyMs < NPS_WINDOW_MS;\n\nconst lastScoreMs = Math.max(\n  0,\n  ...recent\n    .filter((r) => r.direction === 'inbound' && r.metadata?.npsScore != null)\n    .map((r) => new Date(r.created_at).getTime()),\n);\n\nconst duplicateRecent = lastSurveyMs > 0 && lastScoreMs >= lastSurveyMs;\nconst isNpsScore = Boolean(score && awaitingNps && !duplicateRecent);\n\nreturn [{\n  json: {\n    ...ctx,\n    npsScore: score,\n    isNpsScore,\n    awaitingNps,\n    duplicateRecent,\n    lastSurveyMs: lastSurveyMs ? new Date(lastSurveyMs).toISOString() : null,\n  },\n}];"
+      },
+      "name": "NPS Skor Kontrol",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "nps",
+              "leftValue": "={{ $json.isNpsScore }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "NPS Skoru mu?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        920,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY;\nconst item = $('NPS Skor Kontrol').first().json;\nconst score = item.npsScore;\nconst phone = String(item.phone || '').replace(/\\D/g, '');\nconst clinicId = item.clinic_id || '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };\n\nconst clinics = await this.helpers.httpRequest({\n  method: 'GET',\n  url: `${base}/rest/v1/clinics?id=eq.${clinicId}&select=name,google_review_url,google_maps_url,complaint_form_url,sikayetvar_url&limit=1`,\n  headers,\n  json: true,\n});\nconst clinic = Array.isArray(clinics) && clinics[0] ? clinics[0] : {};\n\nconst webhookBase = ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '');\nconst payload = {\n  score,\n  patientName: item.patientName || 'Hasta',\n  patientPhone: phone,\n  googleMapsUrl: clinic.google_maps_url || clinic.google_review_url || '',\n  googleReviewUrl: clinic.google_maps_url || clinic.google_review_url || '',\n  complaintFormUrl: clinic.complaint_form_url || clinic.sikayetvar_url || '',\n};\n\nconst npsRes = await this.helpers.httpRequest({\n  method: 'POST',\n  url: `${webhookBase}/webhook/nefalix/nps/response`,\n  headers: { ...headers, Accept: 'application/json' },\n  body: payload,\n  json: true,\n});\n\nconst flow = npsRes?.flow || npsRes?.json?.flow || null;\n\nawait this.helpers.httpRequest({\n  method: 'POST',\n  url: `${base}/rest/v1/inbox_messages`,\n  headers: { ...headers, Prefer: 'return=minimal' },\n  body: {\n    clinic_id: clinicId,\n    channel: 'whatsapp',\n    direction: 'inbound',\n    message_kind: 'inbound',\n    body: String(score),\n    sender_phone: phone,\n    sender_name: item.patientName || 'Hasta',\n    status: 'replied',\n    metadata: { npsScore: score, flow, npsHandled: true },\n  },\n  json: true,\n});\n\nreturn [{ json: { ok: true, score, flow, nps: npsRes } }];"
+      },
+      "name": "NPS Yanıt Tetikle",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        200
+      ]
     }
   ],
   "connections": {
@@ -203,19 +234,19 @@
       "main": [
         [
           {
-            "node": "AI Taslak Yanıt",
+            "node": "Sohbet Geçmişi",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
+    "Sohbet Geçmişi": {
+      "main": [
         [
           {
-            "node": "AI Taslak Yanıt",
-            "type": "ai_languageModel",
+            "node": "NPS Skor Kontrol",
+            "type": "main",
             "index": 0
           }
         ]
@@ -237,6 +268,46 @@
         [
           {
             "node": "Supabase Inbox Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vertex Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Taslak Yanıt",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NPS Skor Kontrol": {
+      "main": [
+        [
+          {
+            "node": "NPS Skoru mu?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NPS Skoru mu?": {
+      "main": [
+        [
+          {
+            "node": "NPS Yanıt Tetikle",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Taslak Yanıt",
             "type": "main",
             "index": 0
           }

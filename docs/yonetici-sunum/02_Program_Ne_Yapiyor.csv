@@ -1,0 +1,8 @@
+﻿Bölüm,Klinikte ne işe yarar?,Örnek,Durum
+Gelen kutusu,WhatsApp mesajları tek listede. Yapay zeka taslak yanıt yazar; personel onaylayıp gönderir.,Hasta: 'İmplant fiyatı?' → taslak hazır,Kurulu — sunucu bekliyor
+Google yorumları,Yeni yorum gelince analiz + cevap taslağı. Yönetici onaylar.,4 yıldız yorum → nazik cevap önerisi,Kurulu — ekran geliştirilecek
+Hasta memnuniyeti (NPS),"Randevu sonrası puan istenir. Memnun hasta Google'a, memnun değilse şikâyet formuna yönlendirilir.",9/10 → Google linki,Kurulu
+İtibar takibi,Şikâyetvar vb. mention'lar tek yerde; acil olanlar işaretlenir.,Olumsuz haber → alarm,Kurulu
+Geri çağırma,Uzun süredir gelmeyen hastaya hatırlatma mesajı.,6 ay gelmeyen hasta,Kurulu
+Web sitesi sohbet,Siteden yazan ziyaretçiye anında cevap.,Gece gelen soru,Bağlantı güncellenecek
+Yönetim paneli,Tüm veriler tek ekranda: nefalixai.com/dashboard,Sabah 10 dk kontrol,Hazır

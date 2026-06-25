@@ -1,0 +1,64 @@
+{
+  "name": "Nefalix - WhatsApp QR Bağlantı",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WhatsApp QR (VPS)\n\nDashboard `/api/whatsapp/connect` → bu webhook.\n\nVercel Supabase'e erişemez; klinik + Evolution işlemleri burada.\n\n`POST /webhook/nefalix/whatsapp/connect`\n`{ clinicId, action: start|refresh|status, instanceName?, reset? }`",
+        "height": 140,
+        "width": 400,
+        "color": 4
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/whatsapp/connect",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "WhatsApp Connect Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "nefalix-whatsapp-connect"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json.body ?? $json;\nconst clinicId = input.clinicId || input.clinic_id;\nconst action = String(input.action || 'status').toLowerCase();\nconst reset = action === 'refresh' || Boolean(input.reset);\nconst instanceInput = input.instanceName || input.instance;\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nconst evoBase = ($env.EVOLUTION_API_URL || 'http://evolution-api:8080').replace(/\\/$/, '');\nconst evoKey = $env.EVOLUTION_API_KEY;\nconst whBase = ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'https://api.nefalixai.com/').replace(/\\/$/, '');\nconst inboxWebhook = `${whBase}/webhook/nefalix/inbox/incoming`;\n\nif (!clinicId) throw new Error('clinicId gerekli');\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik (VPS .env)');\nif (!evoKey) throw new Error('EVOLUTION_API_KEY eksik (VPS .env)');\n\nconst sbH = {\n  apikey: sbKey,\n  Authorization: `Bearer ${sbKey}`,\n  'Content-Type': 'application/json',\n  Prefer: 'return=representation',\n};\n\nasync function sbGet(path) {\n  return await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${sbBase}/rest/v1/${path}`,\n    headers: sbH,\n    json: true,\n  });\n}\n\nasync function sbPatch(path, body) {\n  return await this.helpers.httpRequest({\n    method: 'PATCH',\n    url: `${sbBase}/rest/v1/${path}`,\n    headers: sbH,\n    body,\n    json: true,\n  });\n}\n\nconst clinics = await sbGet.call(this, `clinics?select=id,name,sector,evolution_instance_name,integration_config,slug&id=eq.${clinicId}&limit=1`);\nconst clinic = Array.isArray(clinics) ? clinics[0] : null;\nif (!clinic) throw new Error('Firma bulunamadı');\nif ((clinic.sector || 'clinic') !== 'clinic') {\n  throw new Error('WhatsApp QR şu an yalnızca klinik sektöründe');\n}\n\nfunction normInstance(raw) {\n  const s = String(raw || '')\n    .toLowerCase()\n    .replace(/[^a-z0-9-]+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-+|-+$/g, '')\n    .slice(0, 50);\n  if (!/^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/.test(s)) {\n    throw new Error('Geçersiz instance adı (ör. medident-pilot)');\n  }\n  return s;\n}\n\nconst instance = normInstance(instanceInput || clinic.evolution_instance_name || clinic.slug);\n\nif (instanceInput && instance !== clinic.evolution_instance_name) {\n  await sbPatch.call(this, `clinics?id=eq.${clinicId}`, { evolution_instance_name: instance });\n}\n\nasync function evo(method, path, body) {\n  return await this.helpers.httpRequest({\n    method,\n    url: `${evoBase}${path}`,\n    headers: { apikey: evoKey, 'Content-Type': 'application/json', Accept: 'application/json' },\n    body,\n    json: true,\n  });\n}\n\nasync function connectionState(inst) {\n  const data = await evo.call(this, 'GET', `/instance/connectionState/${encodeURIComponent(inst)}`);\n  const state = data?.instance?.state || data?.state || 'unknown';\n  return String(state).toLowerCase();\n}\n\nasync function fetchQr(inst) {\n  const data = await evo.call(this, 'GET', `/instance/connect/${encodeURIComponent(inst)}`);\n  const b64 = data?.base64 || data?.qrcode?.base64 || '';\n  if (!b64 || b64 === 'null') throw new Error('QR alınamadı — Yenile\\'ye basın');\n  return b64.startsWith('data:') ? b64 : `data:image/png;base64,${b64}`;\n}\n\nasync function ensureInstance(inst) {\n  try {\n    await connectionState.call(this, inst);\n  } catch {\n    await evo.call(this, 'POST', '/instance/create', {\n      instanceName: inst,\n      integration: 'WHATSAPP-BAILEYS',\n      qrcode: true,\n    });\n  }\n}\n\nasync function resetInstance(inst) {\n  await evo.call(this, 'DELETE', `/instance/logout/${encodeURIComponent(inst)}`).catch(() => {});\n  await evo.call(this, 'DELETE', `/instance/delete/${encodeURIComponent(inst)}`).catch(() => {});\n  await ensureInstance.call(this, inst);\n}\n\nasync function configureWebhook(inst) {\n  await evo.call(this, 'POST', `/webhook/set/${encodeURIComponent(inst)}`, {\n    webhook: {\n      enabled: true,\n      url: inboxWebhook,\n      webhookByEvents: false,\n      webhookBase64: false,\n      events: ['MESSAGES_UPSERT'],\n    },\n  });\n}\n\nasync function markConnected() {\n  const cfg = { ...(clinic.integration_config || {}), evolution_connected: true };\n  await sbPatch.call(this, `clinics?id=eq.${clinicId}`, { integration_config: cfg });\n}\n\nif (action === 'start' || action === 'refresh') {\n  if (reset) await resetInstance.call(this, instance);\n  else await ensureInstance.call(this, instance);\n  const state = await connectionState.call(this, instance);\n  if (state === 'open') {\n    await configureWebhook.call(this, instance);\n    await markConnected.call(this);\n    return [{\n      json: {\n        ok: true,\n        instance,\n        state: 'open',\n        connected: true,\n        qr: null,\n        hint: 'WhatsApp bağlı — Inbox webhook ayarlandı.',\n      },\n    }];\n  }\n  const qr = await fetchQr.call(this, instance);\n  return [{\n    json: {\n      ok: true,\n      instance,\n      state,\n      connected: false,\n      qr,\n      hint: 'Telefonda WhatsApp → Bağlı cihazlar → Cihaz bağla → QR okutun (60 sn).',\n    },\n  }];\n}\n\nif (action === 'status') {\n  const state = await connectionState.call(this, instance);\n  if (state === 'open') {\n    await configureWebhook.call(this, instance);\n    await markConnected.call(this);\n    return [{ json: { ok: true, instance, state: 'open', connected: true, qr: null } }];\n  }\n  let qr = null;\n  try {\n    qr = await fetchQr.call(this, instance);\n  } catch {\n    /* QR süresi dolmuş olabilir */\n  }\n  return [{ json: { ok: true, instance, state, connected: false, qr } }];\n}\n\nthrow new Error('Geçersiz action (start | refresh | status)');"
+      },
+      "name": "QR + Supabase",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "WhatsApp Connect Webhook": {
+      "main": [
+        [
+          {
+            "node": "QR + Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

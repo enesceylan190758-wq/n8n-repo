@@ -17,6 +17,12 @@ services:
   evolution-api:
     environment:
       - SERVER_URL=https://${EVOLUTION_PUBLIC_HOST:-evo.nefalixai.com}
+    ports: !override
+      - "127.0.0.1:${EVOLUTION_PORT:-8080}:8080"
+
+  n8n-mcp:
+    ports: !override
+      - "127.0.0.1:${MCP_PORT:-3000}:3000"
 
   caddy:
     image: caddy:2-alpine
@@ -29,9 +35,11 @@ services:
     environment:
       - N8N_PUBLIC_HOST=${N8N_PUBLIC_HOST:-api.nefalixai.com}
       - EVOLUTION_PUBLIC_HOST=${EVOLUTION_PUBLIC_HOST:-evo.nefalixai.com}
+      - V2_SITE_HOST=${V2_SITE_HOST:-v2.nefalixai.com}
       - ACME_EMAIL=${ACME_EMAIL:-}
     volumes:
       - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./nefalix-site-v2:/srv/nefalix-site-v2:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:

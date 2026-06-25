@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Modül 1: Feedback & Reviews Loop\n\n**Akış:** HBYS randevu bitti → AI NPS mesajı → WhatsApp gönder → NPS yanıtı → 8-10 Google link / 1-7 şikayet + Slack alarm\n\n**Credential:** OpenAI, WhatsApp Business API, Slack\n**İYS:** Ticari mesaj öncesi izin kontrolü ekleyin",
+        "content": "## NPS Yanıt (aktif)\n\nEstesoft taslak → yönetici onay → anket.\n8–10: Google Maps + 5 yıldız/yorum iste.\n7 ve altı: kısa hasta mesajı → yönetici WhatsApp + panel alarm.",
         "height": 220,
         "width": 420,
         "color": 4
@@ -30,7 +30,8 @@
         240,
         320
       ],
-      "webhookId": "nefalix-hbys-appointment"
+      "webhookId": "nefalix-hbys-appointment",
+      "disabled": true
     },
     {
       "parameters": {
@@ -94,12 +95,13 @@
       "position": [
         460,
         320
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Hasta: {{ $json.patientName }}, Klinik: {{ $json.clinicName }}, Doktor: {{ $json.doctorName }}, Tedavi: {{ $json.treatment }}.\n\nWhatsApp ile KVKK uyumlu, samimi bir NPS anketi yaz. 1-10 arası puan iste. Türkçe, max 3 cümle. Sadece mesaj metnini döndür.",
+        "text": "=Randevu/tedavi tamamlandı. Hastaya WhatsApp ile NPS anketi gönderilecek.\n\nHasta: {{ $json.patientName }}\nKlinik: {{ $json.clinicName }}\nDoktor: {{ $json.doctorName }}\nTedavi: {{ $json.treatment }}\n\nMesaj şunları içersin:\n1) Teşekkür ve kısa samimi giriş\n2) \"Deneyiminizi 1-10 arası puanlar mısınız?\" sorusu (tek net soru)\n3) Puanı bu sohbette yazabileceğini belirt\n\nKVKK uyumlu, Türkçe, max 4 cümle. Sadece mesaj metnini döndür.",
         "options": {
           "maxIterations": 3,
           "enableStreaming": false
@@ -111,56 +113,50 @@
       "position": [
         680,
         320
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
-        "model": {
+        "projectId": {
           "__rl": true,
-          "mode": "list",
-          "value": "gpt-4o-mini"
+          "mode": "id",
+          "value": "={{ $env.GCP_PROJECT_ID }}"
         },
-        "options": {}
+        "modelName": "gemini-1.5-flash",
+        "options": {
+          "temperature": 0.4,
+          "maxOutputTokens": 2048
+        }
       },
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
+      "name": "Gemini Vertex Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
       "position": [
         680,
         520
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $env.EVOLUTION_API_KEY }}"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ number: String($('Normalize HBYS').item.json.patientPhone || '').replace(/\\D/g, ''), text: $json.output || '' }) }}",
+        "jsonBody": "={{ JSON.stringify({  number: String($('Normalize HBYS').item.json.patientPhone || '').replace(/\\D/g, ''), text: $json.output || '', source: 'nps-outbound', priority: 'normal' }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "onError": "continueRegularOutput",
-      "name": "Evolution NPS Gönder",
+      "name": "WA Gateway NPS Gönder",
       "position": [
         900,
         320
       ],
-      "id": null
+      "id": null,
+      "disabled": true
     },
     {
       "parameters": {
@@ -202,8 +198,8 @@
             },
             {
               "id": "4",
-              "name": "googleReviewUrl",
-              "value": "={{ $json.body?.googleReviewUrl ?? $json.googleReviewUrl }}",
+              "name": "googleMapsUrl",
+              "value": "={{ $json.body?.googleMapsUrl ?? $json.body?.googleReviewUrl ?? $json.googleMapsUrl ?? $json.googleReviewUrl }}",
               "type": "string"
             },
             {
@@ -261,7 +257,7 @@
             {
               "id": "1",
               "name": "message",
-              "value": "=Teşekkürler {{ $json.patientName }}! Deneyiminizi Google'da paylaşır mısınız? {{ $json.googleReviewUrl }}",
+              "value": "=Teşekkürler {{ $json.patientName }}! Memnuniyetiniz bizi çok mutlu etti. Google'da 5 yıldız verip kısa bir yorum yazar mısınız? {{ $json.googleMapsUrl || $json.googleReviewUrl }}",
               "type": "string"
             },
             {
@@ -289,7 +285,7 @@
             {
               "id": "1",
               "name": "message",
-              "value": "=Üzgünüz {{ $json.patientName }}. Geri bildiriminizi önemsiyoruz, lütfen formu doldurun: {{ $json.complaintFormUrl }}",
+              "value": "=Teşekkürler {{ $json.patientName }}, geri bildiriminizi aldık. Yaşadığınız sorunu çözmek için en kısa sürede sizinle iletişime geçeceğiz.",
               "type": "string"
             },
             {
@@ -301,7 +297,7 @@
             {
               "id": "3",
               "name": "alertMessage",
-              "value": "=🚨 KRİZ: {{ $json.patientName }} NPS {{ $json.score }}/10 — acil müdahale gerekli",
+              "value": "=🚨 DÜŞÜK NPS — ARAYIN\\n\\nHasta: {{ $json.patientName }}\\nTel: {{ $json.patientPhone }}\\nPuan: {{ $json.score }}/10\\n\\nHastayı arayıp gönül alın. Google'da olumsuz yorum yazmadan önce sorunu çözün.",
               "type": "string"
             }
           ]
@@ -341,7 +337,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { success: true, flow: $json.flow, message: $json.message } }}",
+        "responseBody": "={{ { success: true, flow: ($('Promoter Google Link').isExecuted ? $('Promoter Google Link').item.json.flow : $('Detractor Şikayet').item.json.flow), message: ($('Promoter Google Link').isExecuted ? $('Promoter Google Link').item.json.message : $('Detractor Şikayet').item.json.message) } }}",
         "options": {}
       },
       "name": "NPS Yanıt Dön",
@@ -371,11 +367,23 @@
             },
             {
               "fieldId": "flow",
-              "fieldValue": "={{ $json.flow }}"
+              "fieldValue": "={{ $('Promoter Google Link').isExecuted ? $('Promoter Google Link').item.json.flow : $('Detractor Şikayet').item.json.flow }}"
             },
             {
               "fieldId": "message_sent",
-              "fieldValue": "={{ $json.message }}"
+              "fieldValue": "={{ $('Promoter Google Link').isExecuted ? $('Promoter Google Link').item.json.message : $('Detractor Şikayet').item.json.message }}"
+            },
+            {
+              "fieldId": "patient_name",
+              "fieldValue": "={{ $('NPS Skor Parse').item.json.patientName }}"
+            },
+            {
+              "fieldId": "patient_phone",
+              "fieldValue": "={{ $('NPS Skor Parse').item.json.patientPhone }}"
+            },
+            {
+              "fieldId": "resolution_status",
+              "fieldValue": "={{ $('Detractor Şikayet').isExecuted ? 'open' : '' }}"
             }
           ]
         }
@@ -397,32 +405,80 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $env.EVOLUTION_API_KEY }}"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ number: String($('NPS Skor Parse').item.json.patientPhone || '').replace(/\\D/g, ''), text: $json.message || '' }) }}",
+        "jsonBody": "={{ JSON.stringify({  number: String($('NPS Skor Parse').item.json.patientPhone || '').replace(/\\D/g, ''), text: ($('Promoter Google Link').isExecuted ? $('Promoter Google Link').item.json.message : $('Detractor Şikayet').item.json.message) || '', source: 'nps-reply', priority: 'critical' }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "onError": "continueRegularOutput",
-      "name": "Evolution NPS Yanıt Gönder",
+      "name": "WA Gateway NPS Yanıt Gönder",
       "position": [
         1140,
         680
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({  number: String($env.CLINIC_MANAGER_WHATSAPP || '905491190819').replace(/\\D/g, ''), text: $('Detractor Şikayet').item.json.alertMessage + '\\n\\nBu hasta Google\\'da olumsuz yorum yazmadan önce görüşmeniz önerilir. Panel: nefalixai.com/dashboard', source: 'nps-manager-alert', priority: 'critical' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "name": "WA Gateway Yönetici NPS Alarm",
+      "position": [
+        1320,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "det",
+              "leftValue": "={{ $('Detractor Şikayet').isExecuted }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Detractor mu?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1260,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const detractor = $('Detractor Şikayet').first()?.json;\nif (!detractor) {\n  return [{ json: { panelAlert: false } }];\n}\n\nconst parse = $('NPS Skor Parse').first().json;\nconst base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\n\nconst clinicId = '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst phone = String(parse.patientPhone || '').replace(/\\D/g, '');\nconst score = Number(parse.score || 0);\nconst name = String(parse.patientName || 'Hasta').trim();\nconst alertBody = [\n  `🚨 Düşük NPS: ${score}/10`,\n  `Hasta: ${name}`,\n  phone ? `Tel: +${phone}` : '',\n  '',\n  'Hastayı arayıp gönül alın; Google olumsuz yorumdan önce sorunu çözün.',\n].filter(Boolean).join('\\n');\n\nawait this.helpers.httpRequest({\n  method: 'POST',\n  url: `${base}/rest/v1/inbox_messages`,\n  headers: {\n    apikey: key,\n    Authorization: `Bearer ${key}`,\n    'Content-Type': 'application/json',\n    Prefer: 'return=minimal',\n  },\n  body: {\n    clinic_id: clinicId,\n    channel: 'whatsapp',\n    direction: 'inbound',\n    message_kind: 'nps_alert',\n    body: alertBody,\n    sender_phone: phone,\n    sender_name: name,\n    status: 'open',\n    metadata: {\n      npsScore: score,\n      flow: 'detractor',\n      needsManagerCall: true,\n      alertMessage: detractor.alertMessage,\n    },\n  },\n  json: true,\n});\n\nreturn [{ json: { panelAlert: true, score, phone, name } }];"
+      },
+      "name": "Panel NPS Alarm Kaydet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        780
       ]
     }
   ],
@@ -449,22 +505,11 @@
         ]
       ]
     },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI NPS Mesajı",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "AI NPS Mesajı": {
       "main": [
         [
           {
-            "node": "Evolution NPS Gönder",
+            "node": "WA Gateway NPS Gönder",
             "type": "main",
             "index": 0
           }
@@ -515,7 +560,7 @@
       "main": [
         [
           {
-            "node": "Evolution NPS Yanıt Gönder",
+            "node": "WA Gateway NPS Yanıt Gönder",
             "type": "main",
             "index": 0
           }
@@ -526,18 +571,7 @@
       "main": [
         [
           {
-            "node": "Kriz Alarm Log",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Kriz Alarm Log": {
-      "main": [
-        [
-          {
-            "node": "Evolution NPS Yanıt Gönder",
+            "node": "WA Gateway NPS Yanıt Gönder",
             "type": "main",
             "index": 0
           }
@@ -555,7 +589,58 @@
         ]
       ]
     },
-    "Evolution NPS Yanıt Gönder": {
+    "WA Gateway NPS Yanıt Gönder": {
+      "main": [
+        [
+          {
+            "node": "Detractor mu?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WA Gateway Yönetici NPS Alarm": {
+      "main": [
+        [
+          {
+            "node": "Panel NPS Alarm Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vertex Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI NPS Mesajı",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detractor mu?": {
+      "main": [
+        [
+          {
+            "node": "WA Gateway Yönetici NPS Alarm",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase NPS Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Panel NPS Alarm Kaydet": {
       "main": [
         [
           {

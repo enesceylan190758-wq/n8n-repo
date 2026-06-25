@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Inbox — Onaylı WhatsApp Gönderimi\n\nDashboard'dan tetiklenir. Otomatik inbox akışından bağımsız.",
+        "content": "## Inbox — Gönder + Temizle\n\n`POST /webhook/nefalix/inbox/send` — onaylı WA yanıt\n`POST /webhook/nefalix/inbox/clear` — dashboard temizle (clinicId opsiyonel)",
         "height": 100,
         "width": 360,
         "color": 7
@@ -11,7 +11,10 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [180, 80]
+      "position": [
+        180,
+        80
+      ]
     },
     {
       "parameters": {
@@ -23,7 +26,10 @@
       "name": "Gönder Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "webhookId": "nefalix-inbox-send"
     },
     {
@@ -47,6 +53,12 @@
               "name": "messageId",
               "value": "={{ $json.body?.messageId ?? $json.messageId ?? '' }}",
               "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "clinicId",
+              "value": "={{ $json.body?.clinicId ?? $json.body?.clinic_id ?? $json.clinicId ?? '' }}",
+              "type": "string"
             }
           ]
         },
@@ -55,50 +67,117 @@
       "name": "Parse İstek",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey", "value": "={{ $env.EVOLUTION_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
-          ]
-        },
+        "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ number: $json.phone, text: $json.text }) }}",
+        "jsonBody": "={{ JSON.stringify({ number: $json.phone, text: $json.text, source: 'inbox-send', priority: 'normal', clinicId: $json.clinicId || undefined }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "onError": "continueRegularOutput",
-      "name": "Evolution Gönder",
-      "position": [680, 300]
+      "name": "WA Gateway Gönder",
+      "position": [
+        680,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const base = 'http://host.docker.internal:54321';\nconst key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\nconst messageId = $('Parse İstek').item.json.messageId;\nif (!messageId) {\n  return [{ json: { ok: true, updated: false } }];\n}\nawait this.helpers.httpRequest({\n  method: 'PATCH',\n  url: `${base}/rest/v1/inbox_messages?id=eq.${messageId}`,\n  headers: {\n    apikey: key,\n    Authorization: `Bearer ${key}`,\n    'Content-Type': 'application/json',\n    Prefer: 'return=minimal',\n  },\n  body: { status: 'replied' },\n  json: true,\n});\nreturn [{ json: { ok: true, updated: true, messageId } }];"
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\nconst PILOT = '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst req = $('Parse İstek').item.json;\nconst messageId = req.messageId;\nconst phone = req.phone || '';\nconst text = req.text || '';\nlet CLINIC_ID = req.clinicId || PILOT;\nconst headers = {\n  apikey: key,\n  Authorization: `Bearer ${key}`,\n  'Content-Type': 'application/json',\n  Prefer: 'return=minimal',\n};\n\nlet srcKind = '';\nlet npsSurvey = /1\\s*[-–]\\s*10|puanlar\\s*mısınız|puanlay|memnuniyet|değerlendir/i.test(text);\n\nif (!req.clinicId && messageId) {\n  const rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/inbox_messages?id=eq.${messageId}&select=clinic_id,message_kind,ai_draft_reply&limit=1`,\n    headers,\n    json: true,\n  });\n  if (rows?.[0]?.clinic_id) CLINIC_ID = rows[0].clinic_id;\n  srcKind = rows?.[0]?.message_kind || '';\n  if (srcKind === 'estesoft_nps') npsSurvey = true;\n}\n\nif (messageId) {\n  await this.helpers.httpRequest({\n    method: 'PATCH',\n    url: `${base}/rest/v1/inbox_messages?id=eq.${messageId}`,\n    headers,\n    body: { status: 'replied' },\n    json: true,\n  });\n}\n\nif (phone && text) {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: `${base}/rest/v1/inbox_messages`,\n    headers,\n    body: {\n      clinic_id: CLINIC_ID,\n      channel: 'whatsapp',\n      direction: 'outbound',\n      message_kind: srcKind === 'estesoft_nps' ? 'estesoft_nps' : 'inbound',\n      body: text,\n      sender_phone: phone,\n      status: 'replied',\n      metadata: npsSurvey ? { npsSurvey: true, source: srcKind || 'inbox-send' } : {},\n    },\n    json: true,\n  });\n}\n\nreturn [{ json: { ok: true, updated: Boolean(messageId), outboundLogged: Boolean(phone && text), clinicId: CLINIC_ID, npsSurvey } }];"
       },
       "name": "Supabase Durum Güncelle",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 300]
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\n\nconst raw = $json.body ?? $json;\nconst clinicId = raw.clinicId || raw.clinic_id || null;\nconst PILOT = '51738ea8-c12e-40ce-a0e2-42869496d76b';\n\nconst headers = {\n  apikey: key,\n  Authorization: `Bearer ${key}`,\n  Prefer: 'return=representation',\n};\n\nconst filter = raw.clearAll === true ? 'id=neq.00000000-0000-0000-0000-000000000000' : `clinic_id=eq.${clinicId || PILOT}`;\nconst listUrl = `${base}/rest/v1/inbox_messages?${filter}&select=id`;\nconst rows = await this.helpers.httpRequest({ method: 'GET', url: listUrl, headers, json: true });\nconst count = Array.isArray(rows) ? rows.length : 0;\n\nif (count > 0) {\n  await this.helpers.httpRequest({\n    method: 'DELETE',\n    url: `${base}/rest/v1/inbox_messages?${filter}`,\n    headers,\n    json: true,\n  });\n}\n\nreturn [{ json: { ok: true, deleted: count, clinicId: clinicId || (raw.clearAll ? 'all' : PILOT), clearAll: raw.clearAll === true } }];"
+      },
+      "name": "Inbox Temizle",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/inbox/clear",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Temizle Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        520
+      ],
+      "webhookId": "nefalix-inbox-clear"
     }
   ],
   "connections": {
     "Gönder Webhook": {
-      "main": [[{ "node": "Parse İstek", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Parse İstek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Parse İstek": {
-      "main": [[{ "node": "Evolution Gönder", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "WA Gateway Gönder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Evolution Gönder": {
-      "main": [[{ "node": "Supabase Durum Güncelle", "type": "main", "index": 0 }]]
+    "WA Gateway Gönder": {
+      "main": [
+        [
+          {
+            "node": "Supabase Durum Güncelle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Temizle Webhook": {
+      "main": [
+        [
+          {
+            "node": "Inbox Temizle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

@@ -59,6 +59,7 @@ Yönetilen Supabase'in TR bölgesi yok. KVKK açısından hasta/ad/telefon/yorum
 3. DNS (VPS IP alındıktan sonra):
    - `api.nefalixai.com` → A → VPS IP
    - `evo.nefalixai.com` → A → VPS IP
+   - `v2.nefalixai.com` → A → VPS IP (yeni site canlı önizleme)
 4. Mac'ten deploy:
    ```bash
    cd ~/n8n-repo
@@ -75,21 +76,50 @@ Sunucuda manuel:
 cd /opt/nefalix && bash execution/setup-vps.sh
 ```
 
+## Yeni Site v2 Canlı Önizleme
+
+`nefalix-site-v2/` statik HTML/CSS/JS sitesi Caddy üzerinden ayrı host olarak sunulur:
+
+```bash
+bash execution/deploy-v2-site.sh root@VPS_IP
+```
+
+**Kural:** Sadece v2 site güncellemesi için `execution/deploy-to-vps.sh` çalıştırma; o script tam VPS kurulum akışını tetikler ve Supabase reset riski taşır.
+
+Canlı adres için DNS:
+
+```text
+v2.nefalixai.com  A  VPS_IP
+```
+
 ## Workflow Supabase URL
 
-- Mac: `http://host.docker.internal:54321`
-- TR VPS: `http://kong:8000` (Docker network) veya `https://db.nefalixai.com` (internal)
-
-`execution/patch-supabase-workflows.py` ile güncelle.
+- Mac / VPS n8n container: `http://host.docker.internal:54321` (127.0.0.1 değil — container içinden host'a erişim)
+- `.env` içinde `SUPABASE_URL` n8n için bu değer olmalı; host'tan curl için `127.0.0.1:54321` ayrı kullanılabilir
 
 ## Vercel (tunnel kalkar)
 
 ```env
 N8N_DASHBOARD_URL=https://api.nefalixai.com/webhook/nefalix/dashboard/data
 N8N_INBOX_SEND_URL=https://api.nefalixai.com/webhook/nefalix/inbox/send
+
+# PayTR (public pricing page)
+PAYTR_MERCHANT_ID=
+PAYTR_MERCHANT_KEY=
+PAYTR_MERCHANT_SALT=
+PAYTR_TEST_MODE=0
+PAYTR_DEBUG=1
+PAYTR_OK_URL=https://nefalixai.com/fiyatlar?payment=success
+PAYTR_FAIL_URL=https://nefalixai.com/fiyatlar?payment=failed
 ```
 
 `execution/setup-dashboard-tunnel.sh` artık gerekmez.
+
+PayTR panelindeki bildirim / callback adresi:
+
+```text
+https://nefalixai.com/api/billing?action=paytr-callback
+```
 
 ## KVKK notları (özet — hukuk danışmanı onayı)
 

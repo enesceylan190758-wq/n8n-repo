@@ -11,7 +11,10 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [180, 80]
+      "position": [
+        180,
+        80
+      ]
     },
     {
       "parameters": {
@@ -23,22 +26,36 @@
       "name": "Dashboard Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "webhookId": "nefalix-dashboard-data"
     },
     {
       "parameters": {
-        "jsCode": "const base = 'http://host.docker.internal:54321';\nconst key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';\n\nasync function get(table, query = 'select=*&order=created_at.desc&limit=50') {\n  return await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/${table}?${query}`,\n    headers: {\n      apikey: key,\n      Authorization: `Bearer ${key}`,\n    },\n    json: true,\n  });\n}\n\nconst [clinics, nps, reviews, enps, mentions, recall, inbox] = await Promise.all([\n  get.call(this, 'clinics', 'select=id,name,slug,whatsapp_phone,booking_url,created_at,logo_url,website_url,email,address,google_review_url,google_maps_url,trustpilot_url,sikayetvar_url,website_reviews_url,google_rating,google_review_count&order=name.asc'),\n  get.call(this, 'nps_responses'),\n  get.call(this, 'google_reviews'),\n  get.call(this, 'enps_responses'),\n  get.call(this, 'reputation_mentions'),\n  get.call(this, 'recall_campaigns'),\n  get.call(this, 'inbox_messages'),\n]);\n\nreturn [{ json: { clinics, nps, reviews, enps, mentions, recall, inbox } }];"
+        "jsCode": "const base = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst key = $env.SUPABASE_SERVICE_ROLE_KEY || $env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';\n\nasync function get(table, query = 'select=*&order=created_at.desc&limit=50') {\n  return await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${base}/rest/v1/${table}?${query}`,\n    headers: {\n      apikey: key,\n      Authorization: `Bearer ${key}`,\n    },\n    json: true,\n  });\n}\n\nconst [clinics, nps, reviews, enps, mentions, recall, inbox] = await Promise.all([\n  get.call(this, 'clinics', 'select=id,name,slug,sector,whatsapp_phone,booking_url,created_at,logo_url,website_url,email,address,google_review_url,google_maps_url,trustpilot_url,sikayetvar_url,website_reviews_url,google_rating,google_review_count,google_place_id,google_reviews_synced_at,manager_whatsapp_phone,crm_type,evolution_instance_name,automation_enabled,integration_config,complaint_form_url&order=name.asc'),\n  get.call(this, 'nps_responses'),\n  get.call(this, 'google_reviews'),\n  get.call(this, 'enps_responses'),\n  get.call(this, 'reputation_mentions'),\n  get.call(this, 'recall_campaigns'),\n  get.call(this, 'inbox_messages', 'select=id,clinic_id,channel,direction,body,ai_draft_reply,status,created_at,sender_phone,sender_name,message_kind,metadata&order=created_at.desc&limit=80'),\n]);\n\nreturn [{ json: { clinics, nps, reviews, enps, mentions, recall, inbox } }];"
       },
       "name": "Supabase Oku",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [480, 300]
+      "position": [
+        480,
+        300
+      ]
     }
   ],
   "connections": {
     "Dashboard Webhook": {
-      "main": [[{ "node": "Supabase Oku", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Supabase Oku",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

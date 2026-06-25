@@ -4,7 +4,13 @@
 
 {$N8N_PUBLIC_HOST} {
 	encode gzip
-	reverse_proxy n8n:5678
+	handle_path /v2* {
+		root * /srv/nefalix-site-v2
+		file_server
+	}
+	handle {
+		reverse_proxy n8n:5678
+	}
 }
 
 {$EVOLUTION_PUBLIC_HOST} {
@@ -12,8 +18,14 @@
 	reverse_proxy evolution-api:8080
 }
 
-# DNS gelene kadar IP üzerinden HTTP (Vercel test)
-:80 {
+{$V2_SITE_HOST:v2.nefalixai.com} {
 	encode gzip
-	reverse_proxy n8n:5678
+	root * /srv/nefalix-site-v2
+	file_server
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
 }
+
+# Ham IP ile n8n açmayın — güvenlik riski. Sadece TLS hostnames kullanın.

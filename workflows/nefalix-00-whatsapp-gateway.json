@@ -1,0 +1,65 @@
+{
+  "name": "Nefalix - WhatsApp Gateway",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WhatsApp Rate Limit Gateway\n\nTüm outbound WA bu webhook üzerinden.\n\n`WHATSAPP_MIN_INTERVAL_SEC` (45)\n`WHATSAPP_MAX_PER_HOUR` (20)\n`WHATSAPP_MAX_BURST_5MIN` (3)\n`WHATSAPP_SEND_ENABLED` (true/false)\n\nPOST `/webhook/nefalix/whatsapp/send`\n`{ number, text, source, priority? }`",
+        "height": 180,
+        "width": 420,
+        "color": 6
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/whatsapp/send",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "WhatsApp Send Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        280
+      ],
+      "webhookId": "nefalix-whatsapp-send"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json.body ?? $json;\nconst number = String(input.number || '').replace(/\\D/g, '');\nconst text = String(input.text || '').trim();\nconst source = String(input.source || input.workflow || 'unknown').slice(0, 80);\nconst priority = String(input.priority || 'normal');\n\nif (!number || number.length < 10) {\n  return [{ json: { sent: false, error: 'invalid_number' } }];\n}\nif (!text) {\n  return [{ json: { sent: false, error: 'empty_text' } }];\n}\n\nconst ENABLED = String($env.WHATSAPP_SEND_ENABLED ?? 'true').toLowerCase() !== 'false';\nconst MIN_INTERVAL = Number($env.WHATSAPP_MIN_INTERVAL_SEC || 45);\nconst MAX_HOUR = Number($env.WHATSAPP_MAX_PER_HOUR || 20);\nconst MAX_5MIN = Number($env.WHATSAPP_MAX_BURST_5MIN || 3);\n\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\n\nconst sbH = {\n  apikey: sbKey,\n  Authorization: `Bearer ${sbKey}`,\n  'Content-Type': 'application/json',\n  Prefer: 'return=minimal',\n};\n\nconst clinicId = String(input.clinicId || input.clinic_id || '51738ea8-c12e-40ce-a0e2-42869496d76b');\nlet instance = String(input.instance || '').trim();\nif (!instance) {\n  const clinicRows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${sbBase}/rest/v1/clinics?id=eq.${clinicId}&select=evolution_instance_name&limit=1`,\n    headers: sbH,\n    json: true,\n  });\n  instance = clinicRows?.[0]?.evolution_instance_name || $env.EVOLUTION_INSTANCE || 'medident-pilot';\n}\nconst CLINIC_ID = clinicId;\n\n\nasync function countSince(iso) {\n  const rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${sbBase}/rest/v1/whatsapp_send_log?created_at=gte.${encodeURIComponent(iso)}&status=eq.sent&select=id`,\n    headers: sbH,\n    json: true,\n  });\n  return Array.isArray(rows) ? rows.length : 0;\n}\n\nasync function lastSentAt() {\n  const rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${sbBase}/rest/v1/whatsapp_send_log?status=eq.sent&order=created_at.desc&limit=1&select=created_at`,\n    headers: sbH,\n    json: true,\n  });\n  return rows?.[0]?.created_at ? new Date(rows[0].created_at).getTime() : 0;\n}\n\nasync function logRow(row) {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: `${sbBase}/rest/v1/whatsapp_send_log`,\n    headers: sbH,\n    body: { clinic_id: CLINIC_ID, phone: number, message_preview: text.slice(0, 160), source_workflow: source, ...row },\n    json: true,\n  });\n}\n\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\n\nif (!ENABLED) {\n  await logRow.call(this, { status: 'skipped', block_reason: 'whatsapp_disabled' });\n  return [{ json: { sent: false, skipped: true, reason: 'whatsapp_disabled', source } }];\n}\n\nconst now = Date.now();\nconst hourAgo = new Date(now - 3600000).toISOString();\nconst fiveMinAgo = new Date(now - 300000).toISOString();\nconst hourCount = await countSince.call(this, hourAgo);\nconst burstCount = await countSince.call(this, fiveMinAgo);\nconst lastMs = await lastSentAt.call(this);\nconst sinceLastSec = lastMs ? (now - lastMs) / 1000 : 9999;\n\nlet blocked = false;\nlet reason = '';\nif (hourCount >= MAX_HOUR) {\n  blocked = true;\n  reason = 'hourly_limit';\n} else if (burstCount >= MAX_5MIN) {\n  blocked = true;\n  reason = 'burst_limit';\n} else if (sinceLastSec < MIN_INTERVAL) {\n  blocked = true;\n  reason = 'min_interval';\n}\n\nif (blocked) {\n  const allowCritical = priority === 'critical' && hourCount < MAX_HOUR + 2 && burstCount < MAX_5MIN + 1;\n  if (!allowCritical) {\n    await logRow.call(this, { status: 'blocked', block_reason: reason });\n    return [{\n      json: {\n        sent: false,\n        blocked: true,\n        reason,\n        retryAfterSec: Math.max(1, Math.ceil(MIN_INTERVAL - sinceLastSec)),\n        source,\n        hourCount,\n        burstCount,\n      },\n    }];\n  }\n  const waitMs = Math.max(0, (Math.min(15, MIN_INTERVAL) - sinceLastSec) * 1000);\n  if (waitMs > 0) await sleep(waitMs);\n} else if (sinceLastSec < MIN_INTERVAL) {\n  await sleep((MIN_INTERVAL - sinceLastSec) * 1000);\n}\n\nconst evoBase = ($env.EVOLUTION_API_URL || 'http://evolution-api:8080').replace(/\\/$/, '');\nconst evoKey = $env.EVOLUTION_API_KEY;\n/* instance resolved above */\nif (!evoKey) {\n  await logRow.call(this, { status: 'failed', block_reason: 'no_evolution_key' });\n  return [{ json: { sent: false, error: 'EVOLUTION_API_KEY eksik' } }];\n}\n\ntry {\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: `${evoBase}/message/sendText/${instance}`,\n    headers: { apikey: evoKey, 'Content-Type': 'application/json' },\n    body: { number, text },\n    json: true,\n  });\n  await logRow.call(this, { status: 'sent' });\n  return [{ json: { sent: true, number, source, hourCount: hourCount + 1 } }];\n} catch (e) {\n  await logRow.call(this, { status: 'failed', block_reason: String(e.message || e).slice(0, 200) });\n  return [{ json: { sent: false, error: String(e.message || e), source } }];\n}\n"
+      },
+      "name": "Rate Limit + Gönder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "WhatsApp Send Webhook": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit + Gönder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  }
+}

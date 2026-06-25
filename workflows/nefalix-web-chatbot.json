@@ -42,15 +42,20 @@
     },
     {
       "parameters": {
-        "model": {
+        "projectId": {
           "__rl": true,
-          "mode": "list",
-          "value": "gpt-4o-mini"
+          "mode": "id",
+          "value": "={{ $env.GCP_PROJECT_ID }}"
+        },
+        "modelName": "gemini-2.5-flash",
+        "options": {
+          "temperature": 0.4,
+          "maxOutputTokens": 2048
         }
       },
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
+      "name": "Gemini Vertex Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
       "position": [520, 520]
     },
     {
@@ -75,7 +80,7 @@
     "Conversation Memory": {
       "ai_memory": [[{ "node": "Nefalix Clinic Agent", "type": "ai_memory", "index": 0 }]]
     },
-    "OpenAI Chat Model": {
+    "Gemini Vertex Model": {
       "ai_languageModel": [[{ "node": "Nefalix Clinic Agent", "type": "ai_languageModel", "index": 0 }]]
     }
   },

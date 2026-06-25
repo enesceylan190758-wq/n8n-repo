@@ -1,0 +1,95 @@
+{
+  "name": "Nefalix - Estesoft Randevu Poll",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Estesoft poll (güvenli mod)\n\nHer **1 dk** poll. Son `ESTESOFT_POLL_HOURS` Tamamlandı randevular.\nKoşu başına max `ESTESOFT_POLL_MAX_PER_RUN` (1) taslak.",
+        "height": 160,
+        "width": 440,
+        "color": 5
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "name": "Her 1 Dakika",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/estesoft/poll",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel Poll Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        460
+      ],
+      "webhookId": "nefalix-estesoft-poll"
+    },
+    {
+      "parameters": {
+        "jsCode": "const CLINIC_ID = '51738ea8-c12e-40ce-a0e2-42869496d76b';\nconst BASE = ($env.ESTESOFT_STELLA_API_BASE || 'https://medidentistanbul.stellamedi.com').replace(/\\/$/, '');\nconst UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';\n\nconst user = $env.ESTESOFT_API_USERNAME;\nconst password = $env.ESTESOFT_API_PASSWORD;\nconst apiKey = $env.ESTESOFT_API_KEY;\nif (!user || !password || !apiKey) {\n  throw new Error('ESTESOFT_API_USERNAME, ESTESOFT_API_PASSWORD, ESTESOFT_API_KEY eksik (VPS .env + docker-compose)');\n}\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\nconst sbH = {\n  apikey: sbKey,\n  Authorization: `Bearer ${sbKey}`,\n  'Content-Type': 'application/json',\n};\n\nconst webhookBase = ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '');\n\nasync function estesoft(method, path, body, token) {\n  const headers = { apikey: apiKey, Accept: 'application/json', 'User-Agent': UA };\n  if (body !== undefined) headers['Content-Type'] = 'application/json-patch+json';\n  if (token) headers.Authorization = `Bearer ${token}`;\n  return await this.helpers.httpRequest({\n    method,\n    url: `${BASE}${path}`,\n    headers,\n    body,\n    json: true,\n  });\n}\n\nasync function alreadyTriggered(extId) {\n  const rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${sbBase}/rest/v1/automation_events?clinic_id=eq.${CLINIC_ID}&event_type=eq.estesoft_nps_triggered&payload->>appointmentId=eq.${encodeURIComponent(extId)}&select=id,payload&limit=5`,\n    headers: sbH,\n    json: true,\n  });\n  if (Array.isArray(rows) && rows.some((r) => r.payload?.source === 'historical_seed')) {\n    return true;\n  }\n  const inbox = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${sbBase}/rest/v1/inbox_messages?message_kind=eq.estesoft_nps&metadata->>appointmentId=eq.${encodeURIComponent(extId)}&select=id,status&limit=5`,\n    headers: sbH,\n    json: true,\n  });\n  return Array.isArray(inbox) && inbox.some((r) => r.status === 'draft_ready' || r.status === 'replied');\n}\n\nfunction apptFreshness(appt) {\n  return (\n    appt.modified ||\n    appt.modifiedDate ||\n    appt.created ||\n    appt.createdDate ||\n    appt.endDate ||\n    appt.startDate ||\n    appt.appointmentDate ||\n    appt.date\n  );\n}\n\nconst norm = (s) => String(s ?? '').normalize('NFD').replace(/\\p{M}/gu, '').toLowerCase();\n\nconst tokenRes = await estesoft.call(this, 'POST', '/api/AuthApi/GetToken', { username: user, password });\nconst token = tokenRes.token || tokenRes.accessToken;\nif (!token) throw new Error(`Estesoft GetToken başarısız: ${JSON.stringify(tokenRes).slice(0, 300)}`);\n\nconst list = await estesoft.call(this, 'GET', '/api/AppointmentApi/List', undefined, token);\nconst appointments = list.data || [];\nconst MAX_PER_RUN = Number($env.ESTESOFT_POLL_MAX_PER_RUN || 1);\nconst POLL_HOURS = Number($env.ESTESOFT_POLL_HOURS || 24);\nconst cutoff = Date.now() - POLL_HOURS * 3600000;\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\nconst results = [];\nlet triggeredThisRun = 0;\n\nfor (const appt of appointments) {\n  const statusName = String(appt.statusName ?? '');\n  const isDone = norm(statusName) === 'tamamlandi' || appt.statusState === '+';\n  if (!isDone) continue;\n\n  const extId = `estesoft-${appt.id}`;\n\n  if (triggeredThisRun >= MAX_PER_RUN) {\n    results.push({ id: appt.id, customerName: appt.customerName, skipped: true, reason: 'run_limit' });\n    continue;\n  }\n\n  const rawDate = apptFreshness(appt);\n  if (rawDate) {\n    const t = new Date(rawDate).getTime();\n    if (!Number.isNaN(t) && t < cutoff) {\n      results.push({ id: appt.id, customerName: appt.customerName, skipped: true, reason: 'too_old', at: rawDate });\n      continue;\n    }\n  }\n\n  if (await alreadyTriggered.call(this, extId)) {\n    results.push({ id: appt.id, customerName: appt.customerName, skipped: true, reason: 'dedup' });\n    continue;\n  }\n\n  const payload = {\n    event: 'appointment.completed',\n    id: appt.id,\n    statusName: appt.statusName,\n    statusState: appt.statusState,\n    customerName: appt.customerName,\n    phone: appt.phone,\n    staffName: appt.staffName,\n    serviceName: appt.serviceName,\n  };\n\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url: `${webhookBase}/webhook/nefalix/estesoft/webhook`,\n    headers: { 'Content-Type': 'application/json' },\n    body: payload,\n    json: true,\n  });\n\n  results.push({ id: appt.id, customerName: appt.customerName, triggered: true });\n  triggeredThisRun++;\n  if (triggeredThisRun < MAX_PER_RUN) await sleep(Number($env.WHATSAPP_MIN_INTERVAL_SEC || 45) * 1000);\n}\n\nreturn [{ json: { ok: true, at: new Date().toISOString(), scanned: appointments.length, results } }];"
+      },
+      "name": "Estesoft Poll",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Her 1 Dakika": {
+      "main": [
+        [
+          {
+            "node": "Estesoft Poll",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuel Poll Webhook": {
+      "main": [
+        [
+          {
+            "node": "Estesoft Poll",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  }
+}

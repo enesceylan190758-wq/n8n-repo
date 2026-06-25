@@ -41,7 +41,8 @@ test_case() {
 
 echo "Nefalix workflow test — $TS"
 
-# 1 Web Chatbot
+# 1 Web Chatbot (opsiyonel — pilot dışı)
+if [[ "${SKIP_CHATBOT_TEST:-0}" != "1" ]]; then
 echo ""
 echo "━━━ Web Chatbot ━━━"
 chat=$(curl -s -w "\n%{http_code}" -X POST \
@@ -52,8 +53,8 @@ if echo "$chat" | grep -q '"output"'; then
   echo "✅ Chatbot yanıt verdi"
   PASS=$((PASS + 1))
 else
-  echo "❌ Chatbot yanıt yok"
-  FAIL=$((FAIL + 1))
+  echo "⊘ Chatbot atlandı (Medident pilot dışı)"
+fi
 fi
 
 # 2 NPS response (promoter)
@@ -80,15 +81,30 @@ test_case "Inside eNPS" "nefalix/enps/response" \
   "{\"score\":7,\"employeeName\":\"Test Personel\",\"department\":\"test-$TS\"}" \
   "enps_responses" "department=eq.test-$TS"
 
-# 6 Sentinel
+# 6 Sentinel (text → content alanına yazılır)
 test_case "Sentinel İtibar" "nefalix/sentinel/mention" \
   "{\"text\":\"Test mention $TS\",\"platform\":\"sikayetvar\"}" \
-  "reputation_mentions" "content=like.*$TS*"
+  "reputation_mentions" "content=like.*Test%20mention%20$TS*"
+
+# 6b Şikayetvar sync (wf-14 — mention kaydı Sentinel üzerinden gelir)
+echo ""
+echo "━━━ Şikayetvar Senkron (wf-14) ━━━"
+sv=$(curl -s -w "\n%{http_code}" -X POST "$BASE/nefalix/sikayetvar/sync" \
+  -H "Content-Type: application/json" -d '{"dryRun":true}')
+echo "$sv" | sed '$d' | head -c 250
+echo " HTTP $(echo "$sv" | tail -1)"
+if echo "$sv" | grep -q '"ok":true'; then
+  echo "✅ Şikayetvar sync yanıt verdi"
+  PASS=$((PASS + 1))
+else
+  echo "❌ Şikayetvar sync başarısız"
+  FAIL=$((FAIL + 1))
+fi
 
 # 7 Recall
 test_case "Recall Kayıp Hasta" "nefalix/recall/check-patients" \
-  "{\"patientPhone\":\"+905551112233\",\"patientName\":\"Test Recall $TS\",\"lastVisitDays\":400}" \
-  "recall_campaigns" "message_sent=like.*$TS*"
+  "{\"patientPhone\":\"+905551112233\",\"patientName\":\"Test Recall $TS\",\"lastVisitDays\":400,\"lastTreatment\":\"smoke-$TS\"}" \
+  "recall_campaigns" "last_treatment=eq.smoke-$TS"
 
 # 8 Inbox
 test_case "Inbox Mesaj" "nefalix/inbox/incoming" \

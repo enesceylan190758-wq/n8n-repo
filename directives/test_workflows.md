@@ -17,10 +17,12 @@ WAIT_AI=12 bash execution/test-all-workflows.sh
 | Modül | Webhook path |
 |-------|----------------|
 | NPS | `nefalix/nps/response` |
-| HBYS | `nefalix/hbys/appointment-completed` |
+| **13** | Estesoft poll | `nefalix/estesoft/poll` (cron 10 dk) |
+| HBYS (direkt test) | `nefalix/hbys/appointment-completed` |
 | Google | `nefalix/google/new-review` |
 | eNPS | `nefalix/enps/response` |
 | Sentinel | `nefalix/sentinel/mention` |
+| Şikayetvar sync | `nefalix/sikayetvar/sync` (wf-14, 4h cron) |
 | Recall | `nefalix/recall/check-patients` |
 | Inbox | `nefalix/inbox/incoming` |
 | Chat | `/webhook/8bb40d02-.../chat` |

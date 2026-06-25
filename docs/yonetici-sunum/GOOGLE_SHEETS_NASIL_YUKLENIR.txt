@@ -1,0 +1,24 @@
+NEFALIX — YÖNETİCİ SUNUMU → GOOGLE SHEETS
+
+1. drive.google.com → Yeni → Google E-Tablolar
+2. Dosya → İçe aktar → Yükle
+3. Bu klasördeki CSV dosyalarını TEK TEK içe aktarın
+   (Her CSV = ayrı sekme olur; içe aktarırken "Yeni sayfa oluştur" seçin)
+4. Sekme adlarını dosya adıyla aynı yapın (01_Ozet, 02_Program...)
+
+ÖNERİLEN SIRALAMA:
+  01_Ozet → toplantıda ilk açılan sayfa
+  11_Sunum_Akisi_20dk → sunucu için rehber
+  08_Toplantida_Onay → son slayt
+
+GOOGLE DRIVE YETKİSİ:
+  Şu an program otomatik Drive'a yazamıyor.
+  Seçenekler:
+  A) Bu CSV'leri yükleyin (5 dk, önerilen)
+  B) Sheet'i "Düzenleyebilir" link ile paylaşın — manuel kopyalama
+  C) İleride Google API bağlantısı eklenebilir
+
+RENKLENDİRME (isteğe bağlı):
+  - Başlık satırı: koyu yeşil arka plan, beyaz yazı
+  - "Profesyonel ★" satırları: açık yeşil
+  - Risk "Çok yüksek": açık kırmızı

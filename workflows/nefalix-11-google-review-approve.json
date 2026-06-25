@@ -1,0 +1,49 @@
+{
+  "name": "Nefalix - Google Yorum Onayla",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/google/review-approve",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Onay Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "nefalix-google-review-approve"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nconst reviewId = body.reviewId || body.id;\nconst replyText = (body.replyText || body.text || '').trim();\nconst sentBy = body.sentBy || 'dashboard';\nif (!reviewId || !replyText) throw new Error('reviewId ve replyText gerekli');\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nconst sbH = { apikey: sbKey, Authorization: `Bearer ${sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };\n\nconst updated = await this.helpers.httpRequest({\n  method: 'PATCH',\n  url: `${sbBase}/rest/v1/google_reviews?id=eq.${reviewId}`,\n  headers: sbH,\n  body: {\n    draft_reply: replyText,\n    status: 'published',\n  },\n  json: true,\n});\n\n// Google Business Profile API bağlanınca burada otomatik yayınlanacak (MVP: panel onayı + kayıt)\nreturn [{ json: { ok: true, review: updated[0] || null, sentBy, note: 'Yanıt kaydedildi. Google İşletme panelinden de yayınlayabilirsiniz.' } }];"
+      },
+      "name": "Supabase Onayla",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Onay Webhook": {
+      "main": [
+        [
+          {
+            "node": "Supabase Onayla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

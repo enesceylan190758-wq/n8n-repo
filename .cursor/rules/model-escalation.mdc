@@ -1,0 +1,57 @@
+---
+description: Kritik işlerde kullanıcıya üst model seçimini açıkça söyle
+alwaysApply: true
+---
+
+# Model Yükseltme (Nefalix)
+
+Kullanıcı çoğu zaman **Auto** veya ekonomik modda çalışır. Üst modele geçişi kullanıcı yapar; ben sessizce varsaymam.
+
+## Varsayılan
+
+- Rutin iş: Auto / mevcut model ile devam et
+- Küçük CSS, tek dosya patch, deploy, okuma → model değiştirme isteme
+- API key / billing sorunlarında model tartışmasına girme; önce pratik çözüm
+
+## Üst model iste — açıkça söyle
+
+Aşağıdakilerden biri varsa işe başlamadan veya devam etmeden önce kullanıcıya net yaz:
+
+> **Bu iş için model değiştir:** `[GPT-5.5 | Claude Opus | Claude Sonnet]` — sebep: …
+
+### GPT-5.5 öner
+
+- Canlı prod kırığı (dashboard, auth, ödeme, NPS akışı)
+- Çok dosyalı debug (n8n + Supabase + Vercel birlikte)
+- Mimari / güvenlik kararı (RLS, webhook, secret rotasyon)
+- Önceki denemede yanlış veya eksik analiz; ikinci tur derin inceleme
+
+### Claude Opus öner
+
+- En zor tek problem: kök neden, edge case, race condition
+- Büyük refactor planı (çok dosya, geri alma riski yüksek)
+- Kritik iş mantığı (KVKK, İYS, HBYS, faturalama)
+
+### Claude Sonnet öner
+
+- Orta-zor: iyi analiz lazım ama Opus kadar ağır değil
+- UX/UI planı + uygulama (dashboard, mobil, çok ekran)
+- Test stratejisi, implementation plan, code review
+
+## Nasıl yazacağım
+
+1. **Tek cümle sebep** — neden mevcut model yetmeyebilir
+2. **Tek model öner** — en fazla iki alternatif
+3. **Ne yapacağımı söyle** — model değişince hangi adımları atacağım
+4. Onay bekle veya "şimdilik Auto ile devam" de
+
+Örnek:
+
+> Bu iş için **GPT-5.5** aç: canlı dashboard auth + API routing birlikte kırık; üç katmanı (frontend, Vercel, Supabase) aynı anda izlemem lazım. Auto ile devam edersem yanlış teşhis riski yüksek.
+
+## Yapma
+
+- Her işte üst model isteme
+- "Belki daha iyi olur" diye belirsiz öneri
+- Kullanıcı üst model açmadan büyük refactor veya prod deploy önerme
+- Antigravity / harici araçları kritik deploy için önerme

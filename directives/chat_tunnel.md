@@ -1,36 +1,32 @@
-# Site Chat Tunnel
+# Site Chat (Sabit VPS URL)
 
 ## Hedef
-nefalixai.com chatbot'unun yerel n8n'e bağlanması (VPS olmadan geçici çözüm).
+nefalixai.com chatbot → `api.nefalixai.com` üzerinden n8n Web Chatbot workflow.
 
 ## Akış
 ```
-nefalixai.com (Vercel) → cloudflared tunnel → localhost:5678 → Web Chatbot workflow
+nefalixai.com (Vercel) → api.nefalixai.com/webhook/{id}/chat → Nefalix AI - Web Chatbot
 ```
 
-## Adımlar
+## Kurulum
 
-1. Stack çalışıyor olmalı (`directives/start_stack.md`)
-
-2. Tunnel başlat:
+1. Web chatbot'u VPS'e import et:
    ```bash
-   cloudflared tunnel --url http://localhost:5678
+   python3 execution/import-web-chatbot.py
    ```
-   Çıkan URL örn: `https://xxxx.trycloudflare.com`
+   Çıktıdaki `CHAT_WEBHOOK_URL=` satırını kopyala.
 
-3. Landing'de webhook güncelle:
-   - Dosya: `~/nefalix-landing/nefalix-chat.js`
-   - `WEBHOOK_URL` → `https://xxxx.trycloudflare.com/webhook/8bb40d02-5ff5-4262-bfda-ebc6ea458a22/chat`
-
-4. Vercel deploy:
+2. Landing + Vercel:
    ```bash
-   cd ~/nefalix-landing
-   vercel --prod --yes
+   export N8N_CHAT_WEBHOOK_URL='https://api.nefalixai.com/webhook/....../chat'
+   bash execution/update-vercel-vps-urls.sh
    ```
+
+   Veya `nefalix-landing/nefalix-chat.js` içinde `WEBHOOK_URL` doğrudan güncelle + `vercel --prod`.
 
 ## Doğrula
 ```bash
-curl -s -X POST "https://TUNNEL_URL/webhook/8bb40d02-5ff5-4262-bfda-ebc6ea458a22/chat" \
+curl -s -X POST "$N8N_CHAT_WEBHOOK_URL" \
   -H "Content-Type: application/json" \
   -d '{"action":"sendMessage","sessionId":"test","chatInput":"Merhaba"}'
 ```
@@ -40,9 +36,9 @@ Yanıtta `"output"` olmalı.
 
 | Sorun | Çözüm |
 |-------|--------|
-| Tunnel URL her restart'ta değişir | nefalix-chat.js + Vercel redeploy |
-| Mac kapalı | Chat durur → VPS gerekli |
-| CORS | Chat trigger allowedOrigins nefalixai.com içerir |
+| 404 webhook not registered | `import-web-chatbot.py` + workflow active |
+| CORS | Chat trigger `allowedOrigins` nefalixai.com içerir |
+| Model hatası | Vertex credential + `GCP_PROJECT_ID` VPS .env |
 
-## Kalıcı çözüm
-VPS (Hostinger KVM 2) + sabit domain — bu directive güncellenecek.
+## Eski (tunnel) — kullanmayın
+`trycloudflare.com` geçici çözümdü; Mac kapalıyken chat dururdu.

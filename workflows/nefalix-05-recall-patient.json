@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Add-on: Recall — Kayıp Hasta Geri Kazanım\n\n**Akış:** HBYS/CRM → son randevudan X ay geçmiş → AI kişisel mesaj → WhatsApp + Cal.com link\n\n**Credential:** OpenAI, WhatsApp, Google Sheets veya HBYS API",
+        "content": "## Add-on: Recall — Kayıp Hasta Geri Kazanım\n\n**Akış:** HBYS/CRM → son randevudan X ay geçmiş → AI kişisel mesaj → WhatsApp + Cal.com link\n\n**Credential:** Vertex Gemini, WhatsApp, Google Sheets veya HBYS API",
         "height": 150,
         "width": 400,
         "color": 2
@@ -33,7 +33,8 @@
       "position": [
         240,
         300
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -152,16 +153,20 @@
     },
     {
       "parameters": {
-        "model": {
+        "projectId": {
           "__rl": true,
-          "mode": "list",
-          "value": "gpt-4o-mini"
+          "mode": "id",
+          "value": "={{ $env.GCP_PROJECT_ID }}"
         },
-        "options": {}
+        "modelName": "gemini-1.5-flash",
+        "options": {
+          "temperature": 0.4,
+          "maxOutputTokens": 2048
+        }
       },
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
+      "name": "Gemini Vertex Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
       "position": [
         900,
         500
@@ -170,29 +175,16 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $env.EVOLUTION_INSTANCE }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "={{ $env.EVOLUTION_API_KEY }}"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ number: String($('Hasta Normalize').item.json.patientPhone || '').replace(/\\D/g, ''), text: $('AI Hatırlatma Mesajı').item.json.output || '' }) }}",
+        "jsonBody": "={{ JSON.stringify({  number: String($('Hasta Normalize').item.json.patientPhone || '').replace(/\\D/g, ''), text: $('AI Hatırlatma Mesajı').item.json.output || '', source: 'recall', priority: 'normal' }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "onError": "continueRegularOutput",
-      "name": "Evolution Recall Gönder",
+      "name": "WA Gateway Recall Gönder",
       "position": [
         1120,
         300
@@ -296,34 +288,34 @@
         []
       ]
     },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Hatırlatma Mesajı",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "AI Hatırlatma Mesajı": {
       "main": [
         [
           {
-            "node": "Evolution Recall Gönder",
+            "node": "WA Gateway Recall Gönder",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Evolution Recall Gönder": {
+    "WA Gateway Recall Gönder": {
       "main": [
         [
           {
             "node": "Supabase Recall Kaydet",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vertex Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Hatırlatma Mesajı",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]

@@ -1,0 +1,119 @@
+{
+  "name": "Nefalix - Google Yorum Senkronu",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Google Places → Supabase\n\nTüm kliniklerin Google yorumlarını Places API ile çeker.\n\n**Gerekli:** `GOOGLE_PLACES_API_KEY` (n8n env)\n\nPlaces API istek başına max 5 yorum döner; toplam sayı `clinics.google_review_count`.\n\nManuel: `POST /webhook/nefalix/google/sync-reviews`",
+        "height": 160,
+        "width": 420,
+        "color": 5
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "name": "Her 6 Saatte",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/google/sync-reviews",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel Senkron Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        460
+      ],
+      "webhookId": "nefalix-google-sync-reviews"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiKey = $env.GOOGLE_PLACES_API_KEY;\nif (!apiKey) throw new Error('GOOGLE_PLACES_API_KEY eksik');\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\n\nconst sbHeaders = {\n  apikey: sbKey,\n  Authorization: `Bearer ${sbKey}`,\n  'Content-Type': 'application/json',\n};\n\nasync function sb(method, path, body, prefer = 'return=minimal') {\n  return await this.helpers.httpRequest({\n    method,\n    url: `${sbBase}/rest/v1/${path}`,\n    headers: { ...sbHeaders, Prefer: prefer },\n    body,\n    json: true,\n  });\n}\n\nasync function places(method, path, body, fieldMask) {\n  const headers = {\n    'Content-Type': 'application/json',\n    'X-Goog-Api-Key': apiKey,\n  };\n  if (fieldMask) headers['X-Goog-FieldMask'] = fieldMask;\n  return await this.helpers.httpRequest({\n    method,\n    url: `https://places.googleapis.com/v1${path}`,\n    headers,\n    body,\n    json: true,\n  });\n}\n\nfunction sentiment(r) {\n  if (r >= 4) return 'positive';\n  if (r === 3) return 'neutral';\n  return 'negative';\n}\n\nasync function resolvePlaceId(clinic) {\n  if (clinic.google_place_id) return clinic.google_place_id.replace('places/', '');\n  const urls = [clinic.google_maps_url, clinic.google_review_url].filter(Boolean).join(' ');\n  const m = urls.match(/ChIJ[\\w-]{20,}/);\n  if (m) return m[0];\n  const q = [clinic.name, clinic.address].filter(Boolean).join(' ');\n  if (!q) return null;\n  const data = await places.call(this, 'POST', '/places:searchText', {\n    textQuery: q,\n    languageCode: 'tr',\n    regionCode: 'TR',\n  }, 'places.id,places.rating,places.userRatingCount');\n  const id = data.places?.[0]?.id;\n  return id ? id.replace('places/', '') : null;\n}\n\nconst clinics = await sb.call(this, 'GET', 'clinics?select=id,name,address,google_place_id,google_maps_url,google_review_url,google_rating,google_review_count&order=name.asc');\nconst results = [];\n\n    const webhookBase = ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '');\n    const sentinelHits = [];\n\nfor (const clinic of clinics) {\n  try {\n    const placeId = await resolvePlaceId.call(this, clinic);\n    if (!placeId) {\n      results.push({ clinic: clinic.name, ok: false, error: 'place_id yok' });\n      continue;\n    }\n    const details = await places.call(this, 'GET', `/places/${encodeURIComponent(placeId)}`, undefined, 'id,rating,userRatingCount,reviews,googleMapsUri');\n    await sb.call(this, 'PATCH', `clinics?id=eq.${clinic.id}`, {\n      google_place_id: placeId,\n      google_rating: details.rating,\n      google_review_count: details.userRatingCount,\n      google_reviews_synced_at: new Date().toISOString(),\n      ...(details.googleMapsUri && !clinic.google_maps_url ? { google_maps_url: details.googleMapsUri } : {}),\n    });\n    let inserted = 0;\n    for (const [i, review] of (details.reviews || []).entries()) {\n      const ext = review.name?.split('/reviews/').pop() || `${clinic.id}:${i}:${review.rating}`;\n      const author = review.authorAttribution?.displayName || 'Google kullanıcısı';\n      const text = review.text?.text || '';\n      const existing = await sb.call(this, 'GET', `google_reviews?clinic_id=eq.${clinic.id}&external_review_id=eq.${encodeURIComponent(ext)}&select=id`);\n      if (existing?.length) {\n        await sb.call(this, 'PATCH', `google_reviews?id=eq.${existing[0].id}`, {\n          author_name: author,\n          rating: review.rating,\n          review_text: text,\n          sentiment: sentiment(review.rating),\n        });\n      } else {\n        await sb.call(this, 'POST', 'google_reviews', {\n          clinic_id: clinic.id,\n          external_review_id: ext,\n          author_name: author,\n          rating: review.rating,\n          review_text: text,\n          sentiment: sentiment(review.rating),\n          status: 'pending_approval',\n        });\n        inserted++;\n      }\n    }\n    results.push({ clinic: clinic.name, ok: true, placeId, rating: details.rating, total: details.userRatingCount, synced: (details.reviews || []).length, inserted });\n  } catch (e) {\n    results.push({ clinic: clinic.name, ok: false, error: e.message });\n  }\n}\n\nreturn [{ json: { ok: true, at: new Date().toISOString(), results, sentinelHits } }];"
+      },
+      "name": "Google Senkron",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + 'webhook/nefalix/google/draft-reviews' }}",
+        "options": {}
+      },
+      "name": "Taslak Tetikle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Her 6 Saatte": {
+      "main": [
+        [
+          {
+            "node": "Google Senkron",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuel Senkron Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Senkron",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Senkron": {
+      "main": [
+        [
+          {
+            "node": "Taslak Tetikle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

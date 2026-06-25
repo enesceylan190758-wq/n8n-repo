@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Evolution → n8n Inbox webhook bağlantısı
+# EVOLUTION_INSTANCE yoksa medident-pilot kullanılır (grep fail → set -u exit önlenir)
 set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-source_env() { grep "^$1=" .env | cut -d= -f2-; }
+source_env() { grep "^$1=" .env 2>/dev/null | cut -d= -f2- || true; }
 
-KEY=$(source_env EVOLUTION_API_KEY)
-INSTANCE=$(source_env EVOLUTION_INSTANCE)
+KEY=$(grep '^EVOLUTION_API_KEY=' .env | cut -d= -f2-)
+INSTANCE=$(grep '^EVOLUTION_INSTANCE=' .env 2>/dev/null | cut -d= -f2- || true)
 INSTANCE=${INSTANCE:-medident-pilot}
 API_URL=${EVOLUTION_API_URL:-http://localhost:8080}
 

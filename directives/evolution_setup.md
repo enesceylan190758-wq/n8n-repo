@@ -13,6 +13,23 @@ bash execution/setup-evolution.sh
 
 ## İlk bağlantı (QR)
 
+### Dashboard (önerilen — SSH gerekmez)
+
+1. [Dashboard](https://nefalixai.com/dashboard) → **Firmalar** → firma düzenle
+2. **Evolution instance adı** girin (ör. `medident-pilot`)
+3. **Kaydet** → **QR oluştur**
+4. Telefonda **WhatsApp → Bağlı cihazlar → Cihaz bağla** ile okutun
+
+Vercel ortam değişkenleri: `EVOLUTION_API_KEY`, `EVOLUTION_API_URL` (varsayılan `https://evo.nefalixai.com`).
+
+**Supabase Vercel'de yok** — DB VPS'te kapalı portta. Dashboard API'leri VPS n8n proxy üzerinden gider:
+- `N8N_WHATSAPP_CONNECT_URL` → wf-15
+- `N8N_SUPABASE_PROXY_URL` + `NEFALIX_INTERNAL_KEY` → wf-16 (firma kaydı vb.)
+
+API: `POST /api/whatsapp/connect` — `action: start | refresh | status`, `clinicId`, opsiyonel `instanceName`.
+
+### Yerel script (alternatif)
+
 **Önerilen yol — tarayıcıda QR sayfası:**
 
 ```bash
@@ -86,6 +103,24 @@ curl -s http://localhost:8080 \
 ## Mac kapanınca
 
 WhatsApp oturumu kopar → QR tekrar gerekir (VPS'te 7/24 çözülür).
+
+## Alım modu (gönderim kapalı)
+
+Pilot güvenlik kilidi — gelen mesajlar işlenir, **kimseye otomatik veya manuel WA gitmez**:
+
+```bash
+bash execution/activate-whatsapp-receive-only.sh root@VPS_IP
+```
+
+- `WHATSAPP_SEND_ENABLED=false` (gateway tüm giden mesajları reddeder / loglar)
+- wf-01 NPS, wf-12/13 Estesoft import sonrası **kapalı** kalır
+- wf-06 Inbox, wf-00 Gateway, Evolution webhook **açık**
+
+Gönderimi bilinçli açmak (siz «aç» deyince):
+
+```bash
+bash execution/enable-whatsapp-send.sh root@VPS_IP
+```
 
 ## Durdur
 

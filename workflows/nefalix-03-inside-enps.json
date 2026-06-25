@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Modül 4: Inside — Çalışan eNPS\n\n**Akış:** Aylık anonim nabız anketi → eNPS hesapla → yüksek memnuniyet Glassdoor teşviki / düşük yönetime rapor\n\n**Credential:** OpenAI, E-posta veya WhatsApp",
+        "content": "## Modül 4: Inside — Çalışan eNPS\n\n**Akış:** Aylık anonim nabız anketi → eNPS hesapla → yüksek memnuniyet Glassdoor teşviki / düşük yönetime rapor\n\n**Credential:** Vertex Gemini, E-posta veya WhatsApp",
         "height": 160,
         "width": 380,
         "color": 6

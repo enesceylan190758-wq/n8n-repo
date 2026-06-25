@@ -1,0 +1,94 @@
+{
+  "name": "Nefalix - Şikayetvar Senkron",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Şikayetvar → Sentinel\n\n`clinics.sikayetvar_url` marka sayfası taranır; yeni şikayetler wf-04'e gider.\n\nVPS IP 403 alırsa otomatik `r.jina.ai` proxy.\n\n**Manuel:** `POST /webhook/nefalix/sikayetvar/sync`\n\n**Cron:** 4 saatte bir",
+        "height": 170,
+        "width": 420,
+        "color": 6
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 4
+            }
+          ]
+        }
+      },
+      "name": "Her 4 Saatte",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/sikayetvar/sync",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel Senkron Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        460
+      ],
+      "webhookId": "nefalix-sikayetvar-sync"
+    },
+    {
+      "parameters": {
+        "jsCode": "const UA = 'Mozilla/5.0 (compatible; NefalixSikayetvarSync/1.0)';\nconst DELAY_MS = Number($env.SIKAYETVAR_REQUEST_DELAY_SEC || 2) * 1000;\nconst BRAND_RE = /title\\\\\":\\\\\"([^\\\\]+)\\\\\",\\\\\"href\\\\\":\\\\\"([^\\\\]+)\\\\\"[^}]*complaintId\\\\\":(\\d+)/g;\nconst JINA_LINK_RE = /\\[([^\\]]+)\\]\\((https:\\/\\/www\\.sikayetvar\\.com\\/[^)\\s]+)/g;\nconst EXCERPT_RE = /lg:inline\">([^<]{40,4000})<\\/span>/;\nconst CHILDREN_RE = /children\\\\\":\\\\\"([^\\\\]{80,4000})\\\\\"/g;\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\nconst sbH = { apikey: sbKey, Authorization: `Bearer ${sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' };\nconst webhookBase = ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '');\nconst clinicFilter = $json.body?.clinic_id || $json.clinic_id || null;\nconst dryRun = Boolean($json.body?.dryRun || $json.dryRun);\nconst forceJina = ['1','true','yes','jina'].includes(String($env.SIKAYETVAR_USE_JINA || '').toLowerCase());\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\n\nasync function sb(method, path, body) {\n  return await this.helpers.httpRequest({ method, url: `${sbBase}/rest/v1/${path}`, headers: sbH, body, json: true });\n}\n\nasync function fetchPage(url) {\n  if (forceJina) {\n    const body = await this.helpers.httpRequest({ method: 'GET', url: `https://r.jina.ai/${url}`, headers: { 'User-Agent': UA }, json: false });\n    return { body, mode: 'jina' };\n  }\n  try {\n    const body = await this.helpers.httpRequest({ method: 'GET', url, headers: { 'User-Agent': UA }, json: false });\n    return { body, mode: 'direct' };\n  } catch (e) {\n    const msg = String(e.message || e);\n    const code = e.statusCode || e.httpCode || Number((msg.match(/status code (\\d+)/i) || [])[1]) || 0;\n    if ([403, 429, 503].includes(code) || /403|429|blocked/i.test(msg)) {\n      const body = await this.helpers.httpRequest({ method: 'GET', url: `https://r.jina.ai/${url}`, headers: { 'User-Agent': UA }, json: false });\n      return { body, mode: 'jina' };\n    }\n    throw e;\n  }\n}\n\n\nfunction pathFromSikayetvarUrl(url) {\n  const m = String(url).match(/sikayetvar\\.com(\\/[^?\\s#]+)/i);\n  return (m ? m[1] : '').replace(/^\\/|\\/$/g, '');\n}\n\nfunction decodeHtml(s) {\n  return String(s || '').replace(/&#x27;/g, \"'\").replace(/&quot;/g, '\"').replace(/&amp;/g, '&');\n}\n\nfunction parseBrandJina(text, profileUrl) {\n  const brandPath = pathFromSikayetvarUrl(profileUrl).split('/').filter(Boolean)[0] || '';\n  const out = [];\n  const seen = new Set();\n  let m;\n  const re = new RegExp(JINA_LINK_RE.source, 'g');\n  while ((m = re.exec(text)) !== null) {\n    const title = m[1].trim();\n    const url = m[2].split('\"')[0].trim();\n    const path = pathFromSikayetvarUrl(url);\n    if (!path.startsWith(`${brandPath}/`) || path === brandPath) continue;\n    const extId = path.split('/').pop();\n    if (seen.has(extId)) continue;\n    seen.add(extId);\n    let excerpt = '';\n    const pos = text.indexOf(url);\n    if (pos >= 0) {\n      const lines = text.slice(pos, pos + 1200).split('\\n').map((l) => l.trim()).filter(Boolean);\n      for (const ln of lines.slice(2, 6)) {\n        if (ln.startsWith('[') || ln.startsWith('!')) continue;\n        if (ln.length > 60) { excerpt = ln; break; }\n      }\n    }\n    out.push({ external_id: extId, title, href: `/${path}`, url, excerpt });\n  }\n  return out;\n}\n\nfunction parseBrand(html, profileUrl, mode) {\n  if (mode === 'jina' || html.includes('Markdown Content:')) return parseBrandJina(html, profileUrl);\n  const out = [];\n  const seen = new Set();\n  let m;\n  const re = new RegExp(BRAND_RE.source, 'g');\n  while ((m = re.exec(html)) !== null) {\n    const [, title, href, cid] = m;\n    if (seen.has(cid)) continue;\n    seen.add(cid);\n    const path = href.startsWith('/') ? href : `/${href}`;\n    out.push({ external_id: cid, title: decodeHtml(title), href: path, url: `https://www.sikayetvar.com${path}` });\n  }\n  return out.length ? out : parseBrandJina(html, profileUrl);\n}\n\nfunction parseExcerpt(html, title, mode) {\n  if (mode === 'jina' || html.includes('Markdown Content:')) {\n    for (const ln of html.split('\\n')) {\n      const text = ln.trim();\n      if (text.length < 80) continue;\n      const low = text.toLowerCase();\n      if (/(markdown content|url source|title:)/i.test(low)) continue;\n      if (title.toLowerCase().slice(0, 30) && low.includes(title.toLowerCase().slice(0, 30)) && text.length < title.length + 30) continue;\n      if (/\\d{2}\\.\\d{2}\\.\\d{4}/.test(text) || /(dolgu|ağrı|diş|klinik|mağdur|işlem)/i.test(low)) return text;\n    }\n    return title;\n  }\n  const ex = html.match(EXCERPT_RE);\n  if (ex && ex[1] && !ex[1].startsWith('...')) return decodeHtml(ex[1]).trim();\n  const lowTitle = title.toLowerCase();\n  let chunk;\n  const re = new RegExp(CHILDREN_RE.source, 'g');\n  while ((chunk = re.exec(html)) !== null) {\n    const text = decodeHtml(chunk[1]).trim();\n    const low = text.toLowerCase();\n    if (text.length < 80) continue;\n    if (lowTitle.slice(0, 40) && low.includes(lowTitle.slice(0, 40)) && text.length < title.length + 20) continue;\n    if (/(şikayetvar|tüm markalar|404|aydınlatma)/i.test(low)) continue;\n    if (/(dolgu|ağrı|diş|klinik|doktor|hasta|mağdur)/i.test(low)) return text;\n  }\n  return title;\n}\n\nasync function alreadySynced(clinicId, externalId, url) {\n  for (const q of [\n    `reputation_mentions?clinic_id=eq.${clinicId}&source=eq.sikayetvar&external_id=eq.${encodeURIComponent(externalId)}&select=id&limit=1`,\n    `reputation_mentions?clinic_id=eq.${clinicId}&source=eq.sikayetvar&url=eq.${encodeURIComponent(url)}&select=id&limit=1`,\n  ]) {\n    const rows = await sb.call(this, 'GET', q);\n    if (Array.isArray(rows) && rows.length) return true;\n  }\n  const events = await sb.call(this, 'GET', `automation_events?clinic_id=eq.${clinicId}&event_type=eq.sikayetvar_forwarded&payload->>complaintId=eq.${encodeURIComponent(externalId)}&select=id&limit=1`);\n  return Array.isArray(events) && events.length > 0;\n}\n\nlet clinicQuery = 'clinics?select=id,name,sikayetvar_url&sikayetvar_url=not.is.null&order=name.asc';\nif (clinicFilter) clinicQuery = `clinics?select=id,name,sikayetvar_url&id=eq.${clinicFilter}`;\nconst clinics = await sb.call(this, 'GET', clinicQuery);\nif (!clinics?.length) throw new Error('sikayetvar_url olan klinik yok');\n\nconst results = [];\nfor (const clinic of clinics) {\n  const profileUrl = (clinic.sikayetvar_url || '').trim();\n  if (!profileUrl) {\n    results.push({ clinic: clinic.name, ok: false, error: 'sikayetvar_url yok' });\n    continue;\n  }\n  try {\n    const { body: brandHtml, mode: fetchMode } = await fetchPage.call(this, profileUrl);\n    const complaints = parseBrand(brandHtml, profileUrl, fetchMode);\n    let forwarded = 0;\n    let skipped = 0;\n    const details = [];\n    for (let i = 0; i < complaints.length; i++) {\n      const c = complaints[i];\n      if (await alreadySynced.call(this, clinic.id, c.external_id, c.url)) {\n        skipped++;\n        continue;\n      }\n      if (i > 0) await sleep(DELAY_MS);\n      let excerpt = c.excerpt || '';\n      if (!excerpt) {\n        const { body: detailHtml, mode: detailMode } = await fetchPage.call(this, c.url);\n        excerpt = parseExcerpt(detailHtml, c.title, detailMode);\n      }\n      const content = excerpt && excerpt !== c.title ? `${c.title}\\n\\n${excerpt}` : c.title;\n      if (!dryRun) {\n        await this.helpers.httpRequest({\n          method: 'POST',\n          url: `${webhookBase}/webhook/nefalix/sentinel/mention`,\n          headers: { 'Content-Type': 'application/json' },\n          body: {\n            source: 'sikayetvar',\n            platform: 'sikayetvar',\n            clinic_id: clinic.id,\n            brandName: clinic.name,\n            text: content,\n            content,\n            url: c.url,\n            external_id: c.external_id,\n          },\n          json: true,\n        });\n        await sb.call(this, 'POST', 'automation_events', {\n          clinic_id: clinic.id,\n          workflow_name: 'nefalix-14-sikayetvar-sync',\n          event_type: 'sikayetvar_forwarded',\n          payload: { complaintId: c.external_id, url: c.url, title: c.title },\n        });\n        await sleep(DELAY_MS);\n      }\n      forwarded++;\n      details.push({ id: c.external_id, title: c.title, dryRun, fetchMode });\n    }\n    if (!dryRun) {\n      await sb.call(this, 'PATCH', `clinics?id=eq.${clinic.id}`, { sikayetvar_synced_at: new Date().toISOString() });\n    }\n    results.push({ clinic: clinic.name, ok: true, listed: complaints.length, forwarded, skipped, fetchMode, details });\n  } catch (e) {\n    results.push({ clinic: clinic.name, ok: false, error: e.message });\n  }\n}\n\nreturn [{ json: { ok: true, at: new Date().toISOString(), dryRun, results } }];"
+      },
+      "name": "Şikayetvar Senkron",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Her 4 Saatte": {
+      "main": [
+        [
+          {
+            "node": "Şikayetvar Senkron",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuel Senkron Webhook": {
+      "main": [
+        [
+          {
+            "node": "Şikayetvar Senkron",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

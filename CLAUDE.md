@@ -43,6 +43,10 @@ LLM'ler olasılıksaldır; Nefalix iş mantığı (KVKK, İYS, HBYS, Supabase) d
 - **Workflow'lar ayrı** — tek dev workflow yok; veri Supabase'te birleşir
 - **WhatsApp:** MVP'de log stub; gerçek API credential gelince directive güncellenir
 
+## Yeni oturum devri
+
+Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** oku (git’te tutulur; güncel durum, yarım işler, sonraki adımlar).
+
 ## Directive Index
 
 | Görev | SOP |
@@ -52,6 +56,7 @@ LLM'ler olasılıksaldır; Nefalix iş mantığı (KVKK, İYS, HBYS, Supabase) d
 | Tüm workflow'ları test et | `directives/test_workflows.md` |
 | Supabase migration | `directives/supabase_migrate.md` |
 | Site chat tunnel | `directives/chat_tunnel.md` |
+| Vertex AI / Gemini (GCP kredi) | `directives/vertex_ai_setup.md` |
 
 ## Self-Annealing Döngüsü
 

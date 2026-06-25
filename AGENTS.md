@@ -43,16 +43,28 @@ LLM'ler olasılıksaldır; Nefalix iş mantığı (KVKK, İYS, HBYS, Supabase) d
 - **Workflow'lar ayrı** — tek dev workflow yok; veri Supabase'te birleşir
 - **WhatsApp:** MVP'de log stub; gerçek API credential gelince directive güncellenir
 
+## Yeni oturum devri
+
+Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** oku (git’te tutulur; güncel durum, yarım işler, sonraki adımlar).
+
 ## Directive Index
 
 | Görev | SOP |
 |-------|-----|
 | Stack başlat (Docker + Supabase) | `directives/start_stack.md` |
 | Workflow import | `directives/import_workflows.md` |
+| Vertex AI / Gemini (GCP kredi) | `directives/vertex_ai_setup.md` |
 | Tüm workflow'ları test et | `directives/test_workflows.md` |
 | Supabase migration | `directives/supabase_migrate.md` |
 | Site chat tunnel | `directives/chat_tunnel.md` |
+| Estesoft CRM (Medident) | `directives/estesoft_integration.md` |
 | Evolution API (WhatsApp pilot) | `directives/evolution_setup.md` |
+| Randevu tetikleme (HBYS/CRM) | `directives/appointment_trigger.md` |
+| Ürün yol haritası | `directives/product_roadmap.md` |
+| Google yorum senkronu (Places API) | `directives/google_reviews_sync.md` |
+| Şikayetvar itibar tarama | `directives/sikayetvar_sync.md` |
+| Medident dashboard otomasyonları | `directives/activate_medident_pilot.md` |
+| Güvenlik / secret rotasyon | `directives/security.md` |
 
 ## Self-Annealing Döngüsü
 

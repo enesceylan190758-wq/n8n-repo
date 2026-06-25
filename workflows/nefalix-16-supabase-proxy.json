@@ -1,0 +1,64 @@
+{
+  "name": "Nefalix - Supabase Proxy (Vercel)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Supabase Proxy\n\nVercel serverless → VPS Supabase (54321 dışarı kapalı).\n\n`POST /webhook/nefalix/supabase-proxy`\nHeader: `X-Nefalix-Internal-Key`\nBody: `{ method, table, query?, body?, prefer? }`",
+        "height": 120,
+        "width": 380,
+        "color": 6
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/supabase-proxy",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Supabase Proxy Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "nefalix-supabase-proxy"
+    },
+    {
+      "parameters": {
+        "jsCode": "const expected = $env.NEFALIX_INTERNAL_KEY || '';\nconst headers = $json.headers || {};\nconst got = headers['x-nefalix-internal-key'] || headers['X-Nefalix-Internal-Key'] || '';\nif (!expected || got !== expected) {\n  throw new Error('Unauthorized');\n}\n\nconst input = $json.body ?? $json;\nconst method = String(input.method || 'GET').toUpperCase();\nconst table = String(input.table || '').trim();\nconst query = String(input.query || '').replace(/^\\?/, '');\nconst body = input.body;\nconst prefer = input.prefer || 'return=representation';\n\nif (!table) throw new Error('table gerekli');\nif (!['GET', 'POST', 'PATCH', 'DELETE'].includes(method)) throw new Error('Geçersiz method');\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\n\nconst sbH = {\n  apikey: sbKey,\n  Authorization: `Bearer ${sbKey}`,\n  'Content-Type': 'application/json',\n  Prefer: prefer,\n};\n\nconst url = `${sbBase}/rest/v1/${table}${query ? `?${query}` : ''}`;\nconst data = await this.helpers.httpRequest({\n  method,\n  url,\n  headers: sbH,\n  body: body != null ? body : undefined,\n  json: true,\n});\n\nreturn [{ json: { ok: true, data } }];"
+      },
+      "name": "Forward Supabase",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Supabase Proxy Webhook": {
+      "main": [
+        [
+          {
+            "node": "Forward Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

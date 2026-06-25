@@ -92,7 +92,8 @@ if [[ -n "$STATUS" ]]; then
     grep -q '^SUPABASE_SERVICE_ROLE_KEY=' .env && sed -i.bak "s|^SUPABASE_SERVICE_ROLE_KEY=.*|SUPABASE_SERVICE_ROLE_KEY=$SERVICE|" .env || echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE" >>.env
   fi
   if [[ -n "$API_URL" ]]; then
-    grep -q '^SUPABASE_URL=' .env && sed -i.bak "s|^SUPABASE_URL=.*|SUPABASE_URL=$API_URL|" .env || echo "SUPABASE_URL=$API_URL" >>.env
+    # n8n Docker container 127.0.0.1'e erişemez — host gateway
+    grep -q '^SUPABASE_URL=' .env && sed -i.bak "s|^SUPABASE_URL=.*|SUPABASE_URL=http://host.docker.internal:54321|" .env || echo "SUPABASE_URL=http://host.docker.internal:54321" >>.env
   fi
   rm -f .env.bak
 fi
