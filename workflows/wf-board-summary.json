@@ -1,0 +1,116 @@
+{
+  "name": "Nefalix AI — wf-board-summary (Aylık Yönetici Özeti)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "monthsInterval": 1,
+              "triggerAtDayOfMonth": 1,
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Aylık Cron",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, name, slug FROM clinics WHERE subscription_status IN ('active','trialing')"
+      },
+      "name": "Aktif Klinikleri Getir",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "credentials": {
+        "postgres": { "id": "supabase_postgres", "name": "Supabase DB" }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT score, feedback FROM enps_responses WHERE clinic_id = '{{ $json.id }}' AND created_at >= NOW() - INTERVAL '90 days'"
+      },
+      "name": "eNPS Verisi",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [680, 200],
+      "credentials": {
+        "postgres": { "id": "supabase_postgres", "name": "Supabase DB" }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT rating, review_text, sentiment FROM google_reviews WHERE clinic_id = '{{ $json.id }}' AND created_at >= NOW() - INTERVAL '90 days' ORDER BY created_at DESC LIMIT 20"
+      },
+      "name": "Google Yorum Verisi",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [680, 400],
+      "credentials": {
+        "postgres": { "id": "supabase_postgres", "name": "Supabase DB" }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NEFALIX_API_URL }}/ai/summary",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "clinic_id", "value": "={{ $('Aktif Klinikleri Getir').item.json.id }}" },
+            { "name": "period", "value": "={{ new Date().toISOString().slice(0,7).replace('-','_') }}" },
+            { "name": "enps_data", "value": "={{ $('eNPS Verisi').all().map(i => i.json) }}" },
+            { "name": "review_data", "value": "={{ $('Google Yorum Verisi').all().map(i => i.json) }}" }
+          ]
+        }
+      },
+      "name": "FastAPI /ai/summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT whatsapp_phone FROM clinics WHERE id = '{{ $('Aktif Klinikleri Getir').item.json.id }}'"
+      },
+      "name": "Yönetici WhatsApp",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "credentials": {
+        "postgres": { "id": "supabase_postgres", "name": "Supabase DB" }
+      }
+    }
+  ],
+  "connections": {
+    "Aylık Cron": {
+      "main": [[{ "node": "Aktif Klinikleri Getir", "type": "main", "index": 0 }]]
+    },
+    "Aktif Klinikleri Getir": {
+      "main": [
+        [
+          { "node": "eNPS Verisi", "type": "main", "index": 0 },
+          { "node": "Google Yorum Verisi", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "eNPS Verisi": {
+      "main": [[{ "node": "FastAPI /ai/summary", "type": "main", "index": 0 }]]
+    },
+    "FastAPI /ai/summary": {
+      "main": [[{ "node": "Yönetici WhatsApp", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "board-summary" }, { "name": "cron" }]
+}

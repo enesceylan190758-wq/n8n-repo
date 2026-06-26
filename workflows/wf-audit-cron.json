@@ -1,0 +1,121 @@
+{
+  "name": "Nefalix AI — wf-audit-cron (GEO/AEO Haftalık Denetim)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [1],
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Haftalık Cron",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT l.id as location_id, l.website_url, l.business_name, c.id as clinic_id FROM locations l JOIN clinics c ON c.id = l.clinic_id WHERE l.website_url IS NOT NULL"
+      },
+      "name": "Tüm Lokasyonları Getir",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "credentials": {
+        "postgres": { "id": "supabase_postgres", "name": "Supabase DB" }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NEFALIX_API_URL }}/ai/score",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "location_id", "value": "={{ $json.location_id }}" },
+            { "name": "website_url", "value": "={{ $json.website_url }}" }
+          ]
+        }
+      },
+      "name": "FastAPI /ai/score",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.grade }}",
+              "operation": "equals",
+              "value2": "D"
+            }
+          ]
+        }
+      },
+      "name": "Grade D mi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.NEFALIX_API_URL }}/webhooks/n8n",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "event_type", "value": "grade_alert" },
+            { "name": "location_id", "value": "={{ $json.location_id }}" },
+            { "name": "clinic_id", "value": "={{ $json.clinic_id }}" },
+            { "name": "payload", "value": "={{ { grade: $json.grade, overall_score: $json.overall_score, website_url: $json.website_url } }}" }
+          ]
+        }
+      },
+      "name": "Alarm Tetikle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200]
+    }
+  ],
+  "connections": {
+    "Haftalık Cron": {
+      "main": [
+        [{ "node": "Tüm Lokasyonları Getir", "type": "main", "index": 0 }]
+      ]
+    },
+    "Tüm Lokasyonları Getir": {
+      "main": [
+        [{ "node": "FastAPI /ai/score", "type": "main", "index": 0 }]
+      ]
+    },
+    "FastAPI /ai/score": {
+      "main": [
+        [{ "node": "Grade D mi?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Grade D mi?": {
+      "main": [
+        [{ "node": "Alarm Tetikle", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "geo-aeo" }, { "name": "cron" }]
+}
