@@ -65,6 +65,7 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Şikayetvar itibar tarama | `directives/sikayetvar_sync.md` |
 | Medident dashboard otomasyonları | `directives/activate_medident_pilot.md` |
 | Güvenlik / secret rotasyon | `directives/security.md` |
+| Sosyal medya otomasyonu (IG/LinkedIn) | `directives/social_media_automation.md` |
 
 ## Self-Annealing Döngüsü
 
