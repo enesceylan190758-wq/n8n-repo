@@ -1,0 +1,90 @@
+{
+  "name": "Nefalix - Sosyal Medya Otomasyon",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Sosyal Medya — Üret → Drive\n\n**Pazartesi 09:00** veya `POST /webhook/nefalix/social/generate`\n→ GPT görsel + caption\n→ Google Drive klasörüne yükle (veya `.tmp/social-ready/`)\n\nInstagram planlayıcıya **sen** yüklersin.\n\nEnv: `OPENAI_API_KEY`, `SOCIAL_DRIVE_FOLDER_ID`, `GOOGLE_APPLICATION_CREDENTIALS`",
+        "height": 200,
+        "width": 420,
+        "color": 5
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 40]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "name": "Pazartesi 09:00 Üret",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/social/generate",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel Üret Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 480],
+      "webhookId": "nefalix-social-generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/social-generate-next.py'];\nif (body.slug) parts.push('--slug', JSON.stringify(String(body.slug)));\nif (body.post_number) parts.push('--post-number', String(Number(body.post_number)));\nif (body.provider) parts.push('--provider', JSON.stringify(String(body.provider)));\nif (body.skip_render) parts.push('--skip-render');\nif (body.skip_upload) parts.push('--skip-upload');\nif (body.dry_run) parts.push('--dry-run');\nreturn [{ json: { command: parts.join(' ') } }];"
+      },
+      "name": "Üret Komutu Hazırla",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 390]
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "name": "Social Üret",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [740, 390]
+    },
+    {
+      "parameters": {
+        "jsCode": "let parsed = {};\ntry {\n  parsed = JSON.parse($json.stdout || '{}');\n} catch (e) {\n  parsed = { raw: $json.stdout, stderr: $json.stderr };\n}\nreturn [{ json: { ok: true, ...parsed } }];"
+      },
+      "name": "Sonuç",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 390]
+    }
+  ],
+  "connections": {
+    "Pazartesi 09:00 Üret": {
+      "main": [[{ "node": "Üret Komutu Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Manuel Üret Webhook": {
+      "main": [[{ "node": "Üret Komutu Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Üret Komutu Hazırla": {
+      "main": [[{ "node": "Social Üret", "type": "main", "index": 0 }]]
+    },
+    "Social Üret": {
+      "main": [[{ "node": "Sonuç", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
