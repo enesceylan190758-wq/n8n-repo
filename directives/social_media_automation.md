@@ -1,185 +1,113 @@
-# Sosyal Medya Otomasyonu (Instagram + LinkedIn)
+# Sosyal Medya Otomasyonu (Instagram — manuel yükleme)
 
-> Üret → onay (WhatsApp) → yayın. Tam otomatik değil; human-in-the-loop.
+> Sistem üretir → Drive'a koyar → sen Instagram planlayıcıdan yüklersin.
 
-## Hedef
+## Akış
 
-NefalixAI marka postlarını haftalık üretmek, yöneticiye WhatsApp ile onaylatmak, onay sonrası Instagram/LinkedIn'e yayınlamak.
+```
+Pazartesi 09:00 (wf-17 cron)
+    ↓
+GPT görsel + caption üret
+    ↓
+Google Drive klasörüne paket yükle
+  (yedek: /opt/nefalix/.tmp/social-ready/)
+    ↓
+Sen: Drive'dan indir → Instagram planlayıcı → zamanla → yayınla
+```
 
-## Bileşenler
+**Yok:** WhatsApp, Meta API, onay adımı, otomatik Instagram paylaşımı.
 
-| Katman | Dosya |
-|--------|--------|
-| DB şema | `supabase/migrations/20260629130000_social_posts.sql` |
-| HTML şablon | `social-templates/base.html` |
-| Görsel üret (OpenAI) | `execution/render-social-image.py` |
-| PNG render (fallback) | `execution/render-social-post.py` |
-| Kuyruk üret | `execution/social-generate-next.py` |
-| Yayın | `execution/social-publish-approved.py` |
-| n8n | `workflows/nefalix-17-social-media.json` (wf-17) |
+## Paket içeriği
+
+Her post için bir klasör:
+
+```
+2026-06-29_post_01_post_01_brand_hero/
+  ├── image.png      ← Instagram'a yükle
+  └── caption.txt    ← kopyala-yapıştır (caption + hashtag)
+```
 
 ## Kurulum
 
 ### 1. Migration
 
 ```bash
-# directives/supabase_migrate.md
 supabase db push
-# veya SQL Editor'de migration dosyasını çalıştır
 ```
 
-10 şablon `social_post_templates` tablosuna seed edilir.
+### 2. Google Drive (5 dk)
 
-### 2. Görsel üretici (OpenAI — varsayılan)
-
-`OPENAI_API_KEY` VPS `.env` içinde zaten varsa ekstra kurulum gerekmez.
+1. [Google Drive](https://drive.google.com) → yeni klasör: **Nefalix Sosyal Medya**
+2. Klasörü paylaş → service account e-postası (`.tmp/gcp-service-account.json` içindeki `client_email`) → **Düzenleyici**
+3. Klasör URL'sinden ID al: `https://drive.google.com/drive/folders/BURASI_ID`
 
 ```bash
-SOCIAL_IMAGE_PROVIDER=openai          # openai | html (openai fail → html fallback)
-SOCIAL_OPENAI_IMAGE_MODEL=gpt-image-1 # veya dall-e-3
+# .env
+SOCIAL_DRIVE_FOLDER_ID=1abc...xyz
+GOOGLE_APPLICATION_CREDENTIALS=.tmp/gcp-service-account.json
 OPENAI_API_KEY=sk-...
 ```
 
-Akış:
-1. Şablon metni → OpenAI image prompt
-2. 1024×1024 PNG üretilir → `.tmp/social-renders/`
-3. `image_path` + `image_url` Supabase'e yazılır
-4. OpenAI hata verirse otomatik HTML/Puppeteer fallback
+4. [Google Cloud Console](https://console.cloud.google.com) → API'ler → **Google Drive API** etkinleştir (aynı GCP projesi)
 
-Manuel test:
-```bash
-python3 execution/render-social-image.py --slug post_01_brand_hero --provider openai
+### 3. Drive olmadan (en basit)
+
+`SOCIAL_DRIVE_FOLDER_ID` boş bırak → dosyalar sadece VPS'te:
+
+```
+/opt/nefalix/.tmp/social-ready/2026-06-29_post_01_.../
 ```
 
-### 3. VPS bağımlılıkları (sadece HTML fallback için)
+Mac'te Google Drive masaüstü uygulaması bu klasörü sync edebilir veya `scp` ile çekersin.
 
-```bash
-# Chrome + puppeteer (PNG render için)
-cd /opt/nefalix/.tmp/sosyal_medya_postlar && npm install puppeteer
-# veya repo root'ta puppeteer kurulu olmalı
-```
-
-### 4. Env (`.env` / VPS)
-
-```bash
-NEFALIX_REPO_ROOT=/opt/nefalix
-SOCIAL_DEFAULT_PLATFORM=both          # instagram | linkedin | both
-SOCIAL_PUBLIC_BASE_URL=https://api.nefalixai.com/static/social  # IG image_url için
-
-# Instagram (Meta Graph API)
-META_PAGE_ACCESS_TOKEN=
-INSTAGRAM_BUSINESS_ACCOUNT_ID=
-
-# LinkedIn Marketing API
-LINKEDIN_ACCESS_TOKEN=
-LINKEDIN_ORGANIZATION_ID=
-
-# Onay bildirimi (mevcut)
-CLINIC_MANAGER_WHATSAPP=905491190819
-```
-
-Credential yoksa yayın adımı **approved** kalır ve `publish_error` notu düşer — manuel paylaşım yapılabilir.
-
-### 5. Workflow import
+### 4. Workflow
 
 ```bash
 python3 execution/import-workflows.py
 ```
 
-## Webhook'lar
-
-| Akış | Method | Path |
-|------|--------|------|
-| Sonraki postu üret | POST | `/webhook/nefalix/social/generate` |
-| Onay / red / zamanla | POST | `/webhook/nefalix/social/approve` |
-| Onaylı postları yayınla | POST | `/webhook/nefalix/social/publish` |
-
-Tam URL: `https://api.nefalixai.com/webhook/...`
-
-### Üret (manuel)
+## Komutlar
 
 ```bash
-curl -X POST https://api.nefalixai.com/webhook/nefalix/social/generate \
-  -H "Content-Type: application/json" \
-  -d '{}'
+# Sonraki postu üret + Drive'a yükle
+python3 execution/social-generate-next.py
+
+# Belirli post
+python3 execution/social-generate-next.py --slug post_03_promoter_rule
+
+# Webhook (canlı)
+curl -X POST https://api.nefalixai.com/webhook/nefalix/social/generate -d '{}'
 ```
 
-Belirli şablon:
+## Env
 
-```bash
-curl -X POST https://api.nefalixai.com/webhook/nefalix/social/generate \
-  -H "Content-Type: application/json" \
-  -d '{"slug":"post_01_brand_hero"}'
-```
+| Değişken | Zorunlu | Açıklama |
+|----------|---------|----------|
+| `OPENAI_API_KEY` | Evet | GPT görsel |
+| `SUPABASE_*` | Evet | Kuyruk |
+| `SOCIAL_DRIVE_FOLDER_ID` | Hayır | Drive hedef klasör |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Drive için | GCP service account JSON |
+| `SOCIAL_IMAGE_PROVIDER` | Hayır | `openai` (varsayılan) |
 
-### Onay
+## Instagram planlayıcı (senin işin)
 
-```bash
-curl -X POST https://api.nefalixai.com/webhook/nefalix/social/approve \
-  -H "Content-Type: application/json" \
-  -d '{"token":"<approval_token>","action":"approve"}'
-```
+1. Drive'dan `image.png` indir
+2. Instagram uygulaması → Profesyonel panel → Planlanmış içerikler
+3. Görseli yükle, `caption.txt` içeriğini yapıştır
+4. Tarih/saat seç → Planla
 
-Zamanlama:
-
-```json
-{"token":"...","action":"schedule","scheduled_at":"2026-07-01T10:00:00Z"}
-```
-
-### Yayın
-
-```bash
-curl -X POST https://api.nefalixai.com/webhook/nefalix/social/publish \
-  -H "Content-Type: application/json" \
-  -d '{"post_id":"<uuid>"}'
-```
-
-## Akış
-
-```
-Pazartesi 09:00 (cron)
-  → social-generate-next.py
-      → sıradaki şablonu seç (round-robin)
-      → social_posts kaydı (pending_approval)
-      → OpenAI GPT image (varsayılan) veya HTML fallback
-      → yöneticiye WA onay mesajı
-
-Yönetici onaylar (webhook / dashboard ileride)
-  → status = approved
-  → otomatik publish webhook tetiklenir
-
-Saatlik cron
-  → social-publish-approved.py
-      → approved/scheduled postları Instagram + LinkedIn API
-```
-
-## Manuel scriptler (n8n dışında)
-
-```bash
-python3 execution/social-generate-next.py --dry-run
-python3 execution/social-generate-next.py --slug post_01_brand_hero
-python3 execution/render-social-post.py --post-id <uuid>
-python3 execution/social-publish-approved.py --dry-run
-```
-
-## İletişim kuralları (postlarda)
-
-- **Mail:** `nefalixai@gmail.com`
-- **Tel:** yazılmaz
-- **Site:** `nefalixai.com`
+~2 dakika/post.
 
 ## Edge cases
 
 | Sorun | Çözüm |
 |-------|--------|
-| OpenAI image fail | Otomatik HTML fallback; `SOCIAL_IMAGE_PROVIDER=html` ile zorla |
-| PNG render fail (html) | `--skip-render` ile üret; görseli sonra ekle |
-| Execute Command node yok | n8n self-hosted; cloud'da scriptleri VPS cron ile çalıştır |
-| IG `image_url` 403 | `SOCIAL_PUBLIC_BASE_URL` nginx static serve ayarla |
-| WA onay mesajı gitmiyor | `WHATSAPP_SEND_ENABLED=true`, wf-00 gateway kontrol |
+| Drive 403 | Klasörü service account mailine paylaş |
+| Drive API kapalı | GCP Console → Drive API enable |
+| PyJWT yok | `pip install PyJWT cryptography` |
+| OpenAI fail | Otomatik HTML şablon fallback |
 
-## Self-anneal
+## İletişim (postlarda)
 
-- Yeni post teması → `social_post_templates` INSERT veya migration patch
-- Görsel layout değişikliği → `social-templates/base.html`
-- Caption tonu → `caption_template` alanı veya Gemini polish (ileride wf-17 code node)
+- Mail: `nefalixai@gmail.com`
+- Tel: yok

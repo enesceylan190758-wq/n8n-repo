@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Sosyal Medya — Üret → Onay → Yayın\n\n**Üret:** Pazartesi 09:00 cron veya `POST /webhook/nefalix/social/generate`\n→ `execution/social-generate-next.py` (şablon seç, PNG render, WA onay)\n\n**Onay:** `POST /webhook/nefalix/social/approve`\n`{\"token\":\"...\",\"action\":\"approve|reject|schedule\",\"scheduled_at\":\"ISO\"}`\n\n**Yayın:** Saatlik cron veya `POST /webhook/nefalix/social/publish`\n→ `execution/social-publish-approved.py`\n\nEnv: `META_PAGE_ACCESS_TOKEN`, `INSTAGRAM_BUSINESS_ACCOUNT_ID`, `LINKEDIN_*`, `SOCIAL_PUBLIC_BASE_URL`",
-        "height": 260,
-        "width": 480,
+        "content": "## Sosyal Medya — Üret → Drive\n\n**Pazartesi 09:00** veya `POST /webhook/nefalix/social/generate`\n→ GPT görsel + caption\n→ Google Drive klasörüne yükle (veya `.tmp/social-ready/`)\n\nInstagram planlayıcıya **sen** yüklersin.\n\nEnv: `OPENAI_API_KEY`, `SOCIAL_DRIVE_FOLDER_ID`, `GOOGLE_APPLICATION_CREDENTIALS`",
+        "height": 200,
+        "width": 420,
         "color": 5
       },
       "name": "Sticky Note",
@@ -27,23 +27,7 @@
       "name": "Pazartesi 09:00 Üret",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 340]
-    },
-    {
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "hours",
-              "hoursInterval": 1
-            }
-          ]
-        }
-      },
-      "name": "Saatlik Yayın Kontrol",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [240, 720]
+      "position": [240, 300]
     },
     {
       "parameters": {
@@ -55,43 +39,17 @@
       "name": "Manuel Üret Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [240, 520],
+      "position": [240, 480],
       "webhookId": "nefalix-social-generate"
     },
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "nefalix/social/approve",
-        "responseMode": "lastNode",
-        "options": {}
-      },
-      "name": "Onay Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [240, 920],
-      "webhookId": "nefalix-social-approve"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "nefalix/social/publish",
-        "responseMode": "lastNode",
-        "options": {}
-      },
-      "name": "Manuel Yayın Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [240, 1100],
-      "webhookId": "nefalix-social-publish"
-    },
-    {
-      "parameters": {
-        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/social-generate-next.py'];\nif (body.slug) parts.push('--slug', JSON.stringify(String(body.slug)));\nif (body.post_number) parts.push('--post-number', String(Number(body.post_number)));\nif (body.platform) parts.push('--platform', JSON.stringify(String(body.platform)));\nif (body.provider) parts.push('--provider', JSON.stringify(String(body.provider)));\nif (body.skip_render) parts.push('--skip-render');\nif (body.skip_wa) parts.push('--skip-wa');\nif (body.dry_run) parts.push('--dry-run');\nreturn [{ json: { command: parts.join(' ') } }];"
+        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/social-generate-next.py'];\nif (body.slug) parts.push('--slug', JSON.stringify(String(body.slug)));\nif (body.post_number) parts.push('--post-number', String(Number(body.post_number)));\nif (body.provider) parts.push('--provider', JSON.stringify(String(body.provider)));\nif (body.skip_render) parts.push('--skip-render');\nif (body.skip_upload) parts.push('--skip-upload');\nif (body.dry_run) parts.push('--dry-run');\nreturn [{ json: { command: parts.join(' ') } }];"
       },
       "name": "Üret Komutu Hazırla",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [500, 430]
+      "position": [500, 390]
     },
     {
       "parameters": {
@@ -100,43 +58,16 @@
       "name": "Social Üret",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [740, 430]
+      "position": [740, 390]
     },
     {
       "parameters": {
-        "jsCode": "let parsed = {};\ntry {\n  parsed = JSON.parse($json.stdout || '{}');\n} catch (e) {\n  parsed = { raw: $json.stdout, stderr: $json.stderr };\n}\nreturn [{ json: { ok: true, step: 'generate', ...parsed } }];"
+        "jsCode": "let parsed = {};\ntry {\n  parsed = JSON.parse($json.stdout || '{}');\n} catch (e) {\n  parsed = { raw: $json.stdout, stderr: $json.stderr };\n}\nreturn [{ json: { ok: true, ...parsed } }];"
       },
-      "name": "Üret Sonucu",
+      "name": "Sonuç",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [980, 430]
-    },
-    {
-      "parameters": {
-        "command": "={{ 'cd ' + JSON.stringify(($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '')) + ' && python3 execution/social-publish-approved.py' + (($json.body && $json.body.post_id) ? (' --post-id ' + $json.body.post_id) : '') }}"
-      },
-      "name": "Social Yayınla",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
-      "position": [500, 860]
-    },
-    {
-      "parameters": {
-        "jsCode": "let parsed = {};\ntry {\n  parsed = JSON.parse($json.stdout || '{}');\n} catch (e) {\n  parsed = { raw: $json.stdout, stderr: $json.stderr };\n}\nreturn [{ json: { ok: true, step: 'publish', ...parsed } }];"
-      },
-      "name": "Yayın Sonucu",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [740, 860]
-    },
-    {
-      "parameters": {
-        "jsCode": "const body = $json.body ?? $json;\nconst token = String(body.token || body.approval_token || '').trim();\nconst action = String(body.action || 'approve').toLowerCase();\nconst scheduledAt = body.scheduled_at || body.scheduledAt || null;\nconst approvedBy = body.approved_by || body.approvedBy || 'whatsapp';\nif (!token) throw new Error('token gerekli');\n\nconst sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY;\nif (!sbKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY eksik');\nconst sbH = { apikey: sbKey, Authorization: `Bearer ${sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };\n\nconst rows = await this.helpers.httpRequest({ method: 'GET', url: `${sbBase}/rest/v1/social_posts?approval_token=eq.${encodeURIComponent(token)}&limit=1`, headers: sbH, json: true });\nif (!rows?.length) throw new Error('Geçersiz onay token');\nconst post = rows[0];\nif (!['pending_approval', 'draft', 'approved', 'scheduled'].includes(post.status)) {\n  return [{ json: { ok: false, error: 'Post zaten işlenmiş', status: post.status, post_id: post.id } }];\n}\n\nlet patch = { updated_at: new Date().toISOString(), approved_by: approvedBy };\nif (action === 'reject') {\n  patch.status = 'rejected';\n} else if (action === 'schedule' && scheduledAt) {\n  patch.status = 'scheduled';\n  patch.scheduled_at = scheduledAt;\n} else {\n  patch.status = 'approved';\n  if (scheduledAt) {\n    patch.status = 'scheduled';\n    patch.scheduled_at = scheduledAt;\n  }\n}\n\nconst updated = await this.helpers.httpRequest({ method: 'PATCH', url: `${sbBase}/rest/v1/social_posts?id=eq.${post.id}`, headers: sbH, body: patch, json: true });\n\nconst webhookBase = ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '');\nlet publishTriggered = false;\nif (patch.status === 'approved') {\n  try {\n    await this.helpers.httpRequest({ method: 'POST', url: `${webhookBase}/webhook/nefalix/social/publish`, headers: { 'Content-Type': 'application/json' }, body: { post_id: post.id }, json: true });\n    publishTriggered = true;\n  } catch (e) {\n    publishTriggered = false;\n  }\n}\n\nreturn [{ json: { ok: true, action, post_id: post.id, new_status: patch.status, publishTriggered, post: updated[0] || null } }];"
-      },
-      "name": "Onay İşle",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [500, 920]
+      "position": [980, 390]
     }
   ],
   "connections": {
@@ -150,19 +81,7 @@
       "main": [[{ "node": "Social Üret", "type": "main", "index": 0 }]]
     },
     "Social Üret": {
-      "main": [[{ "node": "Üret Sonucu", "type": "main", "index": 0 }]]
-    },
-    "Saatlik Yayın Kontrol": {
-      "main": [[{ "node": "Social Yayınla", "type": "main", "index": 0 }]]
-    },
-    "Manuel Yayın Webhook": {
-      "main": [[{ "node": "Social Yayınla", "type": "main", "index": 0 }]]
-    },
-    "Social Yayınla": {
-      "main": [[{ "node": "Yayın Sonucu", "type": "main", "index": 0 }]]
-    },
-    "Onay Webhook": {
-      "main": [[{ "node": "Onay İşle", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Sonuç", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
