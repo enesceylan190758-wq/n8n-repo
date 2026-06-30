@@ -69,6 +69,10 @@ python3 execution/import-workflows.py
 ## Komutlar
 
 ```bash
+# Excel strateji dosyası (10 post, takvim, marka kuralları, görsel brief)
+python3 execution/generate-social-media-excel.py
+# → docs/NefalixAI_Sosyal_Medya_Strateji.xlsx
+
 # Sonraki postu üret + Drive'a yükle
 python3 execution/social-generate-next.py
 
