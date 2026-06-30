@@ -86,7 +86,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/social-generate-next.py'];\nif (body.slug) parts.push('--slug', JSON.stringify(String(body.slug)));\nif (body.post_number) parts.push('--post-number', String(Number(body.post_number)));\nif (body.platform) parts.push('--platform', JSON.stringify(String(body.platform)));\nif (body.skip_render) parts.push('--skip-render');\nif (body.skip_wa) parts.push('--skip-wa');\nif (body.dry_run) parts.push('--dry-run');\nreturn [{ json: { command: parts.join(' ') } }];"
+        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/social-generate-next.py'];\nif (body.slug) parts.push('--slug', JSON.stringify(String(body.slug)));\nif (body.post_number) parts.push('--post-number', String(Number(body.post_number)));\nif (body.platform) parts.push('--platform', JSON.stringify(String(body.platform)));\nif (body.provider) parts.push('--provider', JSON.stringify(String(body.provider)));\nif (body.skip_render) parts.push('--skip-render');\nif (body.skip_wa) parts.push('--skip-wa');\nif (body.dry_run) parts.push('--dry-run');\nreturn [{ json: { command: parts.join(' ') } }];"
       },
       "name": "Üret Komutu Hazırla",
       "type": "n8n-nodes-base.code",

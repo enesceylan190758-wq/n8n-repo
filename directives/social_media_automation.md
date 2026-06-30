@@ -12,7 +12,8 @@ NefalixAI marka postlarını haftalık üretmek, yöneticiye WhatsApp ile onayla
 |--------|--------|
 | DB şema | `supabase/migrations/20260629130000_social_posts.sql` |
 | HTML şablon | `social-templates/base.html` |
-| PNG render | `execution/render-social-post.py` |
+| Görsel üret (OpenAI) | `execution/render-social-image.py` |
+| PNG render (fallback) | `execution/render-social-post.py` |
 | Kuyruk üret | `execution/social-generate-next.py` |
 | Yayın | `execution/social-publish-approved.py` |
 | n8n | `workflows/nefalix-17-social-media.json` (wf-17) |
@@ -29,7 +30,28 @@ supabase db push
 
 10 şablon `social_post_templates` tablosuna seed edilir.
 
-### 2. VPS bağımlılıkları
+### 2. Görsel üretici (OpenAI — varsayılan)
+
+`OPENAI_API_KEY` VPS `.env` içinde zaten varsa ekstra kurulum gerekmez.
+
+```bash
+SOCIAL_IMAGE_PROVIDER=openai          # openai | html (openai fail → html fallback)
+SOCIAL_OPENAI_IMAGE_MODEL=gpt-image-1 # veya dall-e-3
+OPENAI_API_KEY=sk-...
+```
+
+Akış:
+1. Şablon metni → OpenAI image prompt
+2. 1024×1024 PNG üretilir → `.tmp/social-renders/`
+3. `image_path` + `image_url` Supabase'e yazılır
+4. OpenAI hata verirse otomatik HTML/Puppeteer fallback
+
+Manuel test:
+```bash
+python3 execution/render-social-image.py --slug post_01_brand_hero --provider openai
+```
+
+### 3. VPS bağımlılıkları (sadece HTML fallback için)
 
 ```bash
 # Chrome + puppeteer (PNG render için)
@@ -37,7 +59,7 @@ cd /opt/nefalix/.tmp/sosyal_medya_postlar && npm install puppeteer
 # veya repo root'ta puppeteer kurulu olmalı
 ```
 
-### 3. Env (`.env` / VPS)
+### 4. Env (`.env` / VPS)
 
 ```bash
 NEFALIX_REPO_ROOT=/opt/nefalix
@@ -58,7 +80,7 @@ CLINIC_MANAGER_WHATSAPP=905491190819
 
 Credential yoksa yayın adımı **approved** kalır ve `publish_error` notu düşer — manuel paylaşım yapılabilir.
 
-### 4. Workflow import
+### 5. Workflow import
 
 ```bash
 python3 execution/import-workflows.py
@@ -119,7 +141,7 @@ Pazartesi 09:00 (cron)
   → social-generate-next.py
       → sıradaki şablonu seç (round-robin)
       → social_posts kaydı (pending_approval)
-      → HTML → PNG render
+      → OpenAI GPT image (varsayılan) veya HTML fallback
       → yöneticiye WA onay mesajı
 
 Yönetici onaylar (webhook / dashboard ileride)
@@ -150,7 +172,8 @@ python3 execution/social-publish-approved.py --dry-run
 
 | Sorun | Çözüm |
 |-------|--------|
-| PNG render fail | `--skip-render` ile üret; Manus PNG'yi elle yükle, `image_path` güncelle |
+| OpenAI image fail | Otomatik HTML fallback; `SOCIAL_IMAGE_PROVIDER=html` ile zorla |
+| PNG render fail (html) | `--skip-render` ile üret; görseli sonra ekle |
 | Execute Command node yok | n8n self-hosted; cloud'da scriptleri VPS cron ile çalıştır |
 | IG `image_url` 403 | `SOCIAL_PUBLIC_BASE_URL` nginx static serve ayarla |
 | WA onay mesajı gitmiyor | `WHATSAPP_SEND_ENABLED=true`, wf-00 gateway kontrol |

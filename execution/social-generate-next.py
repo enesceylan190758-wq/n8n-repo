@@ -96,7 +96,11 @@ def send_approval_wa(post: dict, template: dict) -> None:
     token = post.get("approval_token", "")
     approve_url = f"https://{public_base}/webhook/nefalix/social/approve"
     caption_preview = (post.get("caption") or "")[:400]
-    image_note = f"\n🖼 Görsel: {post.get('image_path')}" if post.get("image_path") else ""
+    image_note = ""
+    if post.get("image_url"):
+        image_note = f"\n🖼 Önizleme: {post.get('image_url')}"
+    elif post.get("image_path"):
+        image_note = f"\n🖼 Görsel: {post.get('image_path')}"
     text = (
         f"📱 *Nefalix Sosyal Medya* — Onay bekliyor\n\n"
         f"Post {template.get('post_number')}/10: {template.get('slug')}\n"
@@ -133,6 +137,7 @@ def main() -> None:
     parser.add_argument("--post-number", type=int)
     parser.add_argument("--platform", default=os.environ.get("SOCIAL_DEFAULT_PLATFORM", "both"))
     parser.add_argument("--skip-render", action="store_true")
+    parser.add_argument("--provider", choices=["openai", "html", "auto"], default="auto")
     parser.add_argument("--skip-wa", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -145,12 +150,16 @@ def main() -> None:
     post = create_post(template, args.platform)
 
     if not args.skip_render:
+        render_cmd = [
+            sys.executable,
+            str(ROOT / "execution" / "render-social-image.py"),
+            "--post-id",
+            post["id"],
+        ]
+        if args.provider != "auto":
+            render_cmd.extend(["--provider", args.provider])
         try:
-            subprocess.run(
-                [sys.executable, str(ROOT / "execution" / "render-social-post.py"), "--post-id", post["id"]],
-                check=True,
-                cwd=str(ROOT),
-            )
+            subprocess.run(render_cmd, check=True, cwd=str(ROOT))
             refreshed = sb("GET", f"social_posts?id=eq.{post['id']}&limit=1")
             if refreshed:
                 post = refreshed[0]
