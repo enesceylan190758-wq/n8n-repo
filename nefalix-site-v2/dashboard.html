@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Demo — NefalixAI</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* Dashboard Özel Stiller */
+  body {
+    background-color: #F8FAFC; /* Slate 50 */
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  .dashboard-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    background-color: #0F172A; /* Slate 900 */
+    color: #94A3B8; /* Slate 400 */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .sidebar-logo {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .sidebar-logo span {
+    color: #0D9488; /* Teal 600 */
+  }
+  
+  .sidebar-menu {
+    padding: 16px 12px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .menu-group {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: #64748B; /* Slate 500 */
+    margin: 20px 0 8px 12px;
+  }
+  
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #CBD5E1; /* Slate 300 */
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+  }
+  
+  .menu-item:hover {
+    background-color: rgba(255,255,255,0.05);
+    color: #FFFFFF;
+  }
+  
+  .menu-item.active {
+    background-color: #0D9488; /* Teal 600 */
+    color: #FFFFFF;
+  }
+  
+  .menu-item .badge {
+    margin-left: auto;
+    background-color: #EF4444; /* Red 500 */
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+  }
+  
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .clinic-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .clinic-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #0D9488;
+    color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  
+  .clinic-info {
+    flex: 1;
+  }
+  
+  .clinic-name {
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  
+  .clinic-plan {
+    color: #94A3B8;
+    font-size: 11px;
+  }
+  
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .topbar {
+    height: 72px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    flex-shrink: 0;
+  }
+  
+  .topbar-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+  }
+  
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .btn-demo-overlay {
+    background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+    transition: transform 0.2s;
+  }
+  
+  .btn-demo-overlay:hover {
+    transform: translateY(-1px);
+  }
+  
+  .dashboard-body {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+  }
+  
+  /* Grid Layouts */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .stat-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .stat-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0F172A;
+    margin-bottom: 8px;
+  }
+  
+  .stat-trend {
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .trend-up { color: #10B981; }
+  .trend-down { color: #EF4444; }
+  
+  .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+  
+  .panel {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+  }
+  
+  .panel-body {
+    padding: 0;
+    flex: 1;
+  }
+  
+  /* List Items */
+  .list-item {
+    padding: 16px 24px;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: background-color 0.2s;
+  }
+  
+  .list-item:hover {
+    background-color: #F8FAFC;
+  }
+  
+  .list-item:last-child {
+    border-bottom: none;
+  }
+  
+  .item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  
+  .icon-google { background-color: #E0F2FE; color: #3B82F6; }
+  .icon-wa { background-color: #DCFCE7; color: #10B981; }
+  .icon-alert { background-color: #FEE2E2; color: #EF4444; }
+  
+  .item-content {
+    flex: 1;
+  }
+  
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  
+  .item-title {
+    font-weight: 600;
+    color: #0F172A;
+    font-size: 14px;
+  }
+  
+  .item-time {
+    font-size: 12px;
+    color: #94A3B8;
+  }
+  
+  .item-desc {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  
+  .item-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .btn-sm {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  
+  .btn-outline {
+    background: transparent;
+    border-color: #E2E8F0;
+    color: #475569;
+  }
+  
+  .btn-outline:hover {
+    background: #F1F5F9;
+  }
+  
+  .btn-primary-sm {
+    background: #0D9488;
+    color: white;
+  }
+  
+  /* Sentinel Alerts */
+  .alert-card {
+    padding: 16px 24px;
+    border-left: 4px solid #EF4444;
+    background-color: #FEF2F2;
+    margin-bottom: 1px;
+  }
+  
+  .alert-card.warning {
+    border-left-color: #F59E0B;
+    background-color: #FFFBEB;
+  }
+  
+  .progress-bar {
+    height: 8px;
+    background-color: #E2E8F0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background-color: #0D9488;
+    border-radius: 4px;
+  }
+  
+  /* Overlay for Demo */
+  .demo-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  
+  .dashboard-layout:hover .demo-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .demo-cta-box {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 400px;
+    border: 1px solid #E2E8F0;
+  }
+  
+  .demo-cta-box h3 {
+    font-size: 24px;
+    color: #0F172A;
+    margin-bottom: 16px;
+  }
+  
+  .demo-cta-box p {
+    color: #64748B;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  
+  .demo-cta-box .btn-primary {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #0D9488;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: background 0.2s;
+  }
+  
+  .demo-cta-box .btn-primary:hover {
+    background: #0F766E;
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-logo">Nefalix<span>AI</span></a>
+    </div>
+    
+    <div class="sidebar-menu">
+      <div class="menu-group">Özet</div>
+      <a href="#" class="menu-item active">📊 Genel Durum</a>
+      <a href="#" class="menu-item">🏢 Firmalar</a>
+      
+      <div class="menu-group">Modüller</div>
+      <a href="#" class="menu-item">💬 Inbox <span class="badge">8</span></a>
+      <a href="#" class="menu-item">⭐ NPS (Hasta)</a>
+      <a href="#" class="menu-item">🛡️ Google Yorumlar <span class="badge" style="background:#3B82F6">41</span></a>
+      <a href="#" class="menu-item">🔁 Recall (Kayıp Hasta)</a>
+      <a href="#" class="menu-item">🔍 Sentinel (İtibar) <span class="badge" style="background:#F59E0B">2</span></a>
+      <a href="#" class="menu-item">👥 eNPS (Çalışan)</a>
+      
+      <div class="menu-group">Ayarlar</div>
+      <a href="#" class="menu-item">💳 Abonelik & Plan</a>
+      <a href="#" class="menu-item">⚙️ Sistem Ayarları</a>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="clinic-selector">
+        <div class="clinic-avatar">M</div>
+        <div class="clinic-info">
+          <div class="clinic-name">MediDent İstanbul</div>
+          <div class="clinic-plan">Profesyonel Plan</div>
+        </div>
+        <div style="color:#64748B">▾</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">Genel Durum</div>
+      <div class="topbar-actions">
+        <span style="font-size:14px; color:#64748B; font-weight:500;">Son 30 Gün</span>
+        <a href="fiyatlar.html" class="btn-demo-overlay">Kendi Kliniğin İçin Kur →</a>
+      </div>
+    </div>
+    
+    <div class="dashboard-body">
+      
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Ortalama NPS <span>⭐</span></div>
+          <div class="stat-value">9.2<span style="font-size:16px; color:#64748B">/10</span></div>
+          <div class="stat-trend trend-up">↑ 0.4 geçen aya göre</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Yeni Google Yorumu <span>🛡️</span></div>
+          <div class="stat-value">41</div>
+          <div class="stat-trend trend-up">↑ %12 geçen aya göre</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Bekleyen Mesaj <span>💬</span></div>
+          <div class="stat-value">8</div>
+          <div class="stat-trend trend-down">↓ %5 geçen aya göre</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Kurtarılan Hasta <span>🔁</span></div>
+          <div class="stat-value">14</div>
+          <div class="stat-trend trend-up">↑ 3 geçen aya göre</div>
+        </div>
+      </div>
+      
+      <div class="content-grid">
+        <!-- Left Column -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+          
+          <!-- Inbox & AI Drafts -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Onay Bekleyen AI Yanıtları (Inbox)</div>
+              <a href="#" style="color:#0D9488; font-size:13px; font-weight:600; text-decoration:none;">Tümünü Gör →</a>
+            </div>
+            <div class="panel-body">
+              
+              <div class="list-item">
+                <div class="item-icon icon-wa">💬</div>
+                <div class="item-content">
+                  <div class="item-header">
+                    <div class="item-title">Ayşe Yılmaz (WhatsApp)</div>
+                    <div class="item-time">10 dk önce</div>
+                  </div>
+                  <div class="item-desc">
+                    <strong>Hasta:</strong> "Merhaba, yarınki randevumu iptal edebilir miyiz? Şehir dışına çıkmam gerekti."<br/>
+                    <span style="color:#0D9488; font-weight:500; display:inline-block; margin-top:4px;">🤖 AI Taslak:</span> "Merhaba Ayşe Hanım, randevunuzu iptal ettik. Seyahatinizden döndüğünüzde yeni bir randevu oluşturmak için bize yazabilirsiniz. İyi yolculuklar dileriz."
+                  </div>
+                  <div class="item-actions">
+                    <button class="btn-sm btn-primary-sm">Onayla ve Gönder</button>
+                    <button class="btn-sm btn-outline">Düzenle</button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="list-item">
+                <div class="item-icon icon-google">G</div>
+                <div class="item-content">
+                  <div class="item-header">
+                    <div class="item-title">Mehmet K. (Google Yorum - 5 Yıldız)</div>
+                    <div class="item-time">1 saat önce</div>
+                  </div>
+                  <div class="item-desc">
+                    <strong>Yorum:</strong> "İmplant tedavim çok rahat geçti, doktor bey çok ilgiliydi. Teşekkürler."<br/>
+                    <span style="color:#0D9488; font-weight:500; display:inline-block; margin-top:4px;">🤖 AI Taslak:</span> "Değerli yorumunuz için çok teşekkür ederiz Mehmet Bey. İmplant tedavinizin rahat geçmesine çok sevindik. Sağlıklı gülüşler dileriz!"
+                  </div>
+                  <div class="item-actions">
+                    <button class="btn-sm btn-primary-sm">Google'da Yayınla</button>
+                    <button class="btn-sm btn-outline">Düzenle</button>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <!-- Recall -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Recall (Geri Çağırma) Kampanyası</div>
+            </div>
+            <div class="panel-body" style="padding:24px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                <span style="font-size:14px; font-weight:600; color:#0F172A;">6 Aydır Gelmeyen Hastalar (Diş Taşı Temizliği)</span>
+                <span style="font-size:14px; font-weight:700; color:#0D9488;">%24 Dönüşüm</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 24%;"></div>
+              </div>
+              <p style="font-size:13px; color:#64748B; margin-top:12px;">120 hastaya otomatik WhatsApp hatırlatması gönderildi. 29 hasta yeni randevu aldı.</p>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Right Column -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+          
+          <!-- Sentinel Alerts -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Sentinel İtibar Uyarıları</div>
+            </div>
+            <div class="panel-body">
+              <div class="alert-card">
+                <div style="font-weight:700; color:#B91C1C; font-size:13px; margin-bottom:4px;">🚨 YÜKSEK RİSK (Şikayetvar)</div>
+                <div style="font-size:13px; color:#7F1D1D; margin-bottom:8px;">"Randevu saatimde 45 dakika bekletildim ve açıklama yapılmadı..."</div>
+                <a href="#" style="font-size:12px; color:#DC2626; font-weight:600; text-decoration:none;">Detayı Gör & Aksiyon Al →</a>
+              </div>
+              <div class="alert-card warning">
+                <div style="font-weight:700; color:#B45309; font-size:13px; margin-bottom:4px;">⚠️ ORTA RİSK (Google Yorum - 3 Yıldız)</div>
+                <div style="font-size:13px; color:#92400E; margin-bottom:8px;">"Tedavi iyiydi ama fiyatlar biraz yüksek geldi."</div>
+                <a href="#" style="font-size:12px; color:#D97706; font-weight:600; text-decoration:none;">AI Yanıt Taslağını Gör →</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- NPS Funnel -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">NPS Dönüşüm Hunisi</div>
+            </div>
+            <div class="panel-body" style="padding:24px;">
+              <div style="margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                  <span style="color:#64748B;">Gönderilen Anket</span>
+                  <span style="font-weight:600; color:#0F172A;">342</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 100%; background-color:#E2E8F0;"></div></div>
+              </div>
+              <div style="margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                  <span style="color:#64748B;">Yanıtlanan (1-10)</span>
+                  <span style="font-weight:600; color:#0F172A;">184 (%53)</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 53%; background-color:#94A3B8;"></div></div>
+              </div>
+              <div style="margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                  <span style="color:#64748B;">Promoter (9-10)</span>
+                  <span style="font-weight:600; color:#0F172A;">156</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 45%; background-color:#10B981;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                  <span style="color:#64748B;">Google Yorumuna Dönüşen</span>
+                  <span style="font-weight:600; color:#0F172A;">41 (%26)</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 12%; background-color:#3B82F6;"></div></div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- Interactive Demo Overlay -->
+  <div class="demo-overlay">
+    <div class="demo-cta-box">
+      <h3>Bu Sadece Bir Önizleme</h3>
+      <p>NefalixAI'nin kliniğinizin verileriyle nasıl çalışacağını görmek ve tüm modülleri canlı test etmek için ücretsiz bir demo görüşmesi planlayın.</p>
+      <a href="fiyatlar.html" class="btn-primary">Canlı Demoyu Başlat</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="shared.js"></script>
+</body>
+</html>
