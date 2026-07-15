@@ -6,7 +6,7 @@
         "public": true,
         "mode": "webhook",
         "options": {
-          "allowedOrigins": "https://nefalixai.com,https://www.nefalixai.com,https://nefalix-landing.vercel.app,http://localhost:3000,http://localhost:5678",
+          "allowedOrigins": "https://nefalix.com,https://www.nefalix.com,https://nefalixai.com,https://www.nefalixai.com,https://nefalix-landing.vercel.app,http://localhost:3000,http://localhost:5678",
           "loadPreviousSession": "notSupported",
           "responseMode": "lastNode"
         }

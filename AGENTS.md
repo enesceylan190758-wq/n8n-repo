@@ -62,10 +62,15 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Randevu tetikleme (HBYS/CRM) | `directives/appointment_trigger.md` |
 | Ürün yol haritası | `directives/product_roadmap.md` |
 | Google yorum senkronu (Places API) | `directives/google_reviews_sync.md` |
+| Günlük blog (site kaynaklar) | `directives/daily_blog.md` |
 | Şikayetvar itibar tarama | `directives/sikayetvar_sync.md` |
 | Medident dashboard otomasyonları | `directives/activate_medident_pilot.md` |
 | Güvenlik / secret rotasyon | `directives/security.md` |
 | Sosyal medya otomasyonu (IG/LinkedIn) | `directives/social_media_automation.md` |
+| Saha CRM (iç ekip satış) | `directives/saha_crm.md` |
+| Klinik CRM (Stella mantığı) | `directives/clinic_crm.md` |
+| Günlük GEO (AI alıntı) | `directives/geo.md` |
+| YouTube + GEO (kanal) | `directives/youtube_geo.md` |
 
 ## Self-Annealing Döngüsü
 

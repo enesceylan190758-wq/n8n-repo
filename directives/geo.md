@@ -1,0 +1,127 @@
+# Günlük GEO Otomasyonu
+
+## Hedef
+
+Her gün (İstanbul, Cursor gerekmez):
+
+1. **09:05** — GEO formatlı blog yazısı (`publish-daily-blog.py`) → public `/blog/:slug`
+2. **09:15** — 1 alıcı sorusu için GEO paketi (`publish-daily-geo.py`) → Supabase + **public site** `/geo/YYYY-MM-DD` + mail
+3. **Pazar 10:00** — citation ölçüm hatırlatma maili (`send-geo-weekly-reminder.py`)
+
+**Entity adı:** `Nefalix` (schema / llms / mail). UI’da NefalixAI kalabilir.
+
+Alıntı yüzeyleri: ChatGPT, Perplexity, Gemini, Google AI Overviews.
+
+> **Kritik:** AI motorları yalnızca public crawlable sayfaları alıntılar.
+> Supabase + yönetici maili GEO değildir. Başarı kriteri = `https://nefalix.com/geo/YYYY-MM-DD` 200 + cevap/SSS içeriği.
+
+## Akış
+
+```
+VPS cron 09:15 Europe/Istanbul
+    ↓
+python3 -u execution/publish-daily-geo.py
+    ↓
+geo-topics.json → sıradaki alıcı sorusu
+    ↓
+Vertex Gemini → answer / FAQ / LinkedIn one-liner
+    ↓
+Supabase geo_daily_runs INSERT (status=published)
+    ↓
+Landing (Vercel) /geo + /geo/:date  ← public crawl surface
+    ↓
+SMTP → yöneticiler (mailde public_url)
+```
+
+Public yüzeyler (nefalix-landing):
+
+| URL | Rol |
+|-----|-----|
+| `/geo` | İndeks listesi |
+| `/geo/YYYY-MM-DD` | Günlük paket (answer-first + FAQPage) |
+| `/geo-sitemap.xml` | Dinamik sitemap |
+| `llms.txt` | AI crawler özeti |
+
+## Kurulum (tek sefer)
+
+### 1. Migration
+
+```bash
+# Local
+docker exec -i supabase_db_n8n-repo psql -U postgres -d postgres \
+  < supabase/migrations/20260714160000_geo_daily_runs.sql
+
+# VPS (prod Supabase URL varsa REST migration veya SQL editor)
+```
+
+### 2. Env
+
+Blog ile aynı SMTP + Vertex env. Ek:
+
+```bash
+GEO_NOTIFY_TO=enes.ceylan190758@gmail.com,akadirysr@gmail.com
+# yoksa BLOG_NOTIFY_TO kullanılır
+```
+
+Landing Vercel: `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` veya N8N supabase-proxy
+(`geo_daily_runs` table okuması gerekli — anon SELECT policy mevcut).
+
+### 3. Cron
+
+```bash
+bash execution/setup-geo-cron.sh
+```
+
+Blog cron ayrıca:
+
+```bash
+bash execution/setup-blog-cron.sh   # 09:05
+```
+
+## Manuel test
+
+```bash
+python3 execution/publish-daily-geo.py --dry-run
+python3 execution/publish-daily-geo.py
+python3 execution/publish-daily-geo.py --skip-notify
+python3 execution/send-geo-weekly-reminder.py --dry-run
+
+# Public smoke
+curl -sI https://nefalix.com/geo
+curl -sI https://nefalix.com/geo/$(date +%F)
+```
+
+Log: `/var/log/nefalix-geo.log`
+
+Mail subject satırında paket adı; body’de **Public URL** zorunlu.
+
+## Haftalık ölçüm
+
+`docs/geo-prompt-baseline.md` — 25 sabit prompt.
+
+Her satır: motor · mention · URL · rakip. İlk sürüm manuel; Pazar maili hatırlatır.
+Ölçümde URL olarak `/geo/YYYY-MM-DD` veya ilgili blog slug kullan.
+
+## Edge case
+
+| Durum | Çözüm |
+|-------|--------|
+| `ACCESS_TOKEN_EXPIRED` | `vertex_gemini` SA mint; blog 09:05 / geo 09:15 |
+| Aynı gün çift GEO | `geo_daily_runs` run_date unique → skip |
+| Mail yok | `BLOG_SMTP_*` / `GEO_NOTIFY_TO` |
+| Paket DB’de var ama site 404 | Landing deploy / proxy; migration VPS’te mi? |
+| Landing şema | FAQPage (görünür SSS = schema), SoftwareApplication, BlogPosting, llms.txt |
+
+## İlgili dosyalar
+
+| Dosya | Rol |
+|-------|-----|
+| `execution/publish-daily-geo.py` | Günlük GEO paketi + public_url mail |
+| `execution/geo-topics.json` | Alıcı soru bankası |
+| `execution/setup-geo-cron.sh` | Cron 09:15 + Pazar 10:00 |
+| `execution/send-geo-weekly-reminder.py` | Citation checklist mail |
+| `docs/geo-prompt-baseline.md` | 25 prompt skor şablonu |
+| `directives/daily_blog.md` | Blog (GEO gövde) |
+| `nefalix-landing/api/blog.js` | Public GEO list / render / sitemap (geo-* actions) |
+| `nefalix-landing/geo.html` | İndeks sayfası |
+| `nefalix-landing/llms.txt` | AI crawler özeti |

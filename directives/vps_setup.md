@@ -3,16 +3,16 @@
 ## Hedef
 Mac + geçici Cloudflare tunnel yerine **7/24 Türkiye lokasyonlu sunucu**: n8n, Evolution (WhatsApp), **Supabase (self-host)** — hasta verisi Türkiye'de kalır.
 
-Dashboard arayüzü (`nefalixai.com`) Vercel'de kalabilir; **kişisel veri Supabase Postgres'te TR sunucusunda** tutulur. Vercel yalnızca oturum + API proxy (JSON geçişi); asıl veri katmanı TR.
+Dashboard arayüzü (`nefalix.com`) Vercel'de kalabilir; **kişisel veri Supabase Postgres'te TR sunucusunda** tutulur. Vercel yalnızca oturum + API proxy (JSON geçişi); asıl veri katmanı TR.
 
 ## Mimari (veri Türkiye'de)
 
 ```
-nefalixai.com (Vercel — sadece UI + auth proxy)
-    └── /api/dashboard → https://api.nefalixai.com/webhook/...  (VPS TR)
+nefalix.com (Vercel — sadece UI + auth proxy)
+    └── /api/dashboard → https://api.nefalix.com/webhook/...  (VPS TR)
 
 VPS — İstanbul veri merkezi (Docker)
-    ├── Caddy/Nginx (TLS, api.nefalixai.com)
+    ├── Caddy/Nginx (TLS, api.nefalix.com)
     ├── n8n
     ├── Evolution API (WhatsApp)
     └── Supabase self-host (Postgres + Kong REST)
@@ -49,7 +49,7 @@ Yönetilen Supabase'in TR bölgesi yok. KVKK açısından hasta/ad/telefon/yorum
 
 1. **Lokasyon: İstanbul / Türkiye** seç (Almanya/ABD seçme)
 2. Ubuntu 24.04, SSH key
-3. Sabit IPv4 → DNS: `api.nefalixai.com` A kaydı
+3. Sabit IPv4 → DNS: `api.nefalix.com` A kaydı
 4. Sağlayıcıdan **veri merkezinin Türkiye sınırları içinde** olduğunu teyit et (sözleşme / teknik doküman)
 
 ## Kurulum (tek komut — Mac'ten)
@@ -57,9 +57,9 @@ Yönetilen Supabase'in TR bölgesi yok. KVKK açısından hasta/ad/telefon/yorum
 1. VPS satın al (Ubuntu 24.04, İstanbul, 12 GB RAM önerilir)
 2. SSH key ekle
 3. DNS (VPS IP alındıktan sonra):
-   - `api.nefalixai.com` → A → VPS IP
-   - `evo.nefalixai.com` → A → VPS IP
-   - `v2.nefalixai.com` → A → VPS IP (yeni site canlı önizleme)
+   - `api.nefalix.com` → A → VPS IP
+   - `evo.nefalix.com` → A → VPS IP
+   - `v2.nefalix.com` → A → VPS IP (yeni site canlı önizleme)
 4. Mac'ten deploy:
    ```bash
    cd ~/n8n-repo
@@ -89,7 +89,7 @@ bash execution/deploy-v2-site.sh root@VPS_IP
 Canlı adres için DNS:
 
 ```text
-v2.nefalixai.com  A  VPS_IP
+v2.nefalix.com  A  VPS_IP
 ```
 
 ## Workflow Supabase URL
@@ -100,8 +100,8 @@ v2.nefalixai.com  A  VPS_IP
 ## Vercel (tunnel kalkar)
 
 ```env
-N8N_DASHBOARD_URL=https://api.nefalixai.com/webhook/nefalix/dashboard/data
-N8N_INBOX_SEND_URL=https://api.nefalixai.com/webhook/nefalix/inbox/send
+N8N_DASHBOARD_URL=https://api.nefalix.com/webhook/nefalix/dashboard/data
+N8N_INBOX_SEND_URL=https://api.nefalix.com/webhook/nefalix/inbox/send
 
 # PayTR (public pricing page)
 PAYTR_MERCHANT_ID=
@@ -109,8 +109,8 @@ PAYTR_MERCHANT_KEY=
 PAYTR_MERCHANT_SALT=
 PAYTR_TEST_MODE=0
 PAYTR_DEBUG=1
-PAYTR_OK_URL=https://nefalixai.com/fiyatlar?payment=success
-PAYTR_FAIL_URL=https://nefalixai.com/fiyatlar?payment=failed
+PAYTR_OK_URL=https://nefalix.com/fiyatlar?payment=success
+PAYTR_FAIL_URL=https://nefalix.com/fiyatlar?payment=failed
 ```
 
 `execution/setup-dashboard-tunnel.sh` artık gerekmez.
@@ -118,7 +118,7 @@ PAYTR_FAIL_URL=https://nefalixai.com/fiyatlar?payment=failed
 PayTR panelindeki bildirim / callback adresi:
 
 ```text
-https://nefalixai.com/api/billing?action=paytr-callback
+https://nefalix.com/api/billing?action=paytr-callback
 ```
 
 ## KVKK notları (özet — hukuk danışmanı onayı)

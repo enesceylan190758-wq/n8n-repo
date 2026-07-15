@@ -23,15 +23,20 @@ function parseArgs(argv) {
   }
 
   let puppeteer;
+  const local = path.resolve(__dirname, '..', '.tmp', 'sosyal_medya_postlar', 'node_modules', 'puppeteer');
   try {
     puppeteer = require('puppeteer');
   } catch {
-    const local = path.resolve(__dirname, '..', '.tmp', 'sosyal_medya_postlar', 'node_modules', 'puppeteer');
-    puppeteer = require(local);
+    try {
+      puppeteer = require(local);
+    } catch {
+      console.error('Puppeteer yok — bash execution/setup-social-render-deps.sh');
+      process.exit(1);
+    }
   }
 
   const browser = await puppeteer.launch({
-    executablePath: chrome || process.env.CHROME_PATH || '/usr/local/bin/google-chrome',
+    executablePath: chrome || process.env.CHROME_PATH || '/usr/bin/google-chrome-stable',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   const page = await browser.newPage();

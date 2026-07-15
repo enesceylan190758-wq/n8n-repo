@@ -15,7 +15,8 @@ from vertex_gemini import _access_token, _load_service_account  # noqa: E402
 def main() -> int:
     try:
         sa = _load_service_account()
-        token = _access_token(sa)
+        # n8n .env için taze mint; env'deki bayat token'ı kör kullanma
+        token = _access_token(sa, prefer_env=False)
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1

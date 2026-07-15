@@ -33,8 +33,15 @@ DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
 LOCAL_DIR = REPO / ".tmp" / "social-ready"
 
 
-def sb(method: str, path: str, body: dict | None = None) -> list | dict:
+def sb_base() -> str:
     base = os.environ.get("SUPABASE_URL", "http://127.0.0.1:54321").rstrip("/")
+    if "host.docker.internal" in base:
+        base = "http://127.0.0.1:54321"
+    return base
+
+
+def sb(method: str, path: str, body: dict | None = None) -> list | dict:
+    base = sb_base()
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
     if not key:
         raise SystemExit("SUPABASE_SERVICE_ROLE_KEY eksik")
@@ -140,7 +147,7 @@ def build_caption_text(post: dict, template: dict) -> str:
         "",
         "=== NOT ===",
         "Görseli Instagram planlayıcıya yükle, caption'ı yapıştır.",
-        "Tel no ekleme. Mail: nefalixai@gmail.com",
+        "Tel no ekleme. Mail: info@nefalix.com",
     ]
     return "\n".join(lines)
 
@@ -156,6 +163,7 @@ def save_local(package_dir: Path, image_path: Path, caption_text: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--post-id", required=True)
+    parser.add_argument("--status", default="ready", help="Kayıt sonrası status (ready|draft|pending_approval)")
     args = parser.parse_args()
 
     rows = sb("GET", f"social_posts?id=eq.{args.post_id}&select=*,social_post_templates(*)&limit=1")
@@ -198,7 +206,7 @@ def main() -> None:
     if isinstance(meta, str):
         meta = json.loads(meta)
     sb("PATCH", f"social_posts?id=eq.{args.post_id}", {
-        "status": "ready",
+        "status": args.status,
         "metadata": {
             **meta,
             "delivery": "drive",
@@ -215,7 +223,7 @@ def main() -> None:
         "package_name": package_name,
         "local_path": local_path,
         "drive": drive_links,
-        "status": "ready",
+        "status": args.status,
     }, ensure_ascii=False, indent=2))
 
 

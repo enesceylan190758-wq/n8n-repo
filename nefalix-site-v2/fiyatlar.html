@@ -85,40 +85,51 @@
     </div>
 
     <!-- ADIM 1: SEKTÖR -->
-    <div class="reveal" style="margin-bottom:36px;">
+    <div class="reveal pricing-step-block" data-step="1" style="margin-bottom:36px;">
       <h3 style="font-size:16px; color:var(--purple-deep); margin-bottom:14px;">1. Sektörünüzü Seçin</h3>
-      <div class="mod-grid">
-        <div class="mod-card featured pricing-sector-card" data-sector="health" style="text-align:center;"><div class="mod-icon" style="margin:0 auto 12px auto;">🏥</div><h3>Sağlık Kurumu</h3></div>
-        <div class="mod-card pricing-sector-card" data-sector="hotel" style="text-align:center;"><div class="mod-icon" style="margin:0 auto 12px auto;">🏨</div><h3>Otel</h3></div>
-        <div class="mod-card pricing-sector-card" data-sector="auto" style="text-align:center;"><div class="mod-icon" style="margin:0 auto 12px auto;">🔧</div><h3>Auto Servis</h3></div>
+      <div class="pricing-staff-tabs pricing-sector-tabs">
+        <button type="button" class="pricing-staff-tab pricing-sector-tab active" data-sector="health">🏥 Sağlık</button>
+        <button type="button" class="pricing-staff-tab pricing-sector-tab" data-sector="auto">🔧 Otoservis</button>
+        <button type="button" class="pricing-staff-tab pricing-sector-tab" data-sector="hotel">🏨 Otel</button>
+      </div>
+      <div id="pricing-health-subs" class="pricing-health-subs is-open">
+        <p class="pricing-subs-label">Sağlık alt sektörünüzü seçin</p>
+        <div class="pricing-staff-tabs">
+          <button type="button" class="pricing-health-tab active" data-health-sub="dental">🦷 Diş Klinikleri</button>
+          <button type="button" class="pricing-health-tab" data-health-sub="hair">💇 Saç Ekimi Merkezleri</button>
+          <button type="button" class="pricing-health-tab" data-health-sub="aesthetic">✨ Estetik/Plastik Cerrahi</button>
+          <button type="button" class="pricing-health-tab" data-health-sub="eye">👁 Göz Tedavi Merkezi</button>
+        </div>
       </div>
     </div>
 
+    <div id="pricing-config-panel" class="pricing-config-panel">
+
     <!-- ADIM 2: ŞUBE SAYISI -->
-    <div class="reveal" style="margin-bottom:36px;">
+    <div class="reveal pricing-step-block" data-step="2" style="margin-bottom:36px;">
       <h3 style="font-size:16px; color:var(--purple-deep); margin-bottom:14px;">2. Kaç Şubeniz / Lokasyonunuz Var?</h3>
       <div class="counter-box">
-        <div class="counter-btn counter-minus">−</div>
+        <button type="button" class="counter-btn counter-minus" aria-label="Şube azalt">−</button>
         <div class="counter-val" id="pricing-branches">1</div>
-        <div class="counter-btn counter-plus">+</div>
+        <button type="button" class="counter-btn counter-plus" aria-label="Şube artır">+</button>
         <span style="font-size:13px; color:var(--grey);">şube</span>
       </div>
       <p id="pricing-branch-hint" style="font-size:12px; color:var(--grey); margin-top:10px;">2+ şubede otomatik olarak "Kurumsal" paket önerilir.</p>
     </div>
 
     <!-- ADIM 3: ÇALIŞAN SAYISI -->
-    <div class="reveal" style="margin-bottom:36px;">
+    <div class="reveal pricing-step-block" data-step="3" style="margin-bottom:36px;">
       <h3 style="font-size:16px; color:var(--purple-deep); margin-bottom:14px;">3. Çalışan Sayınız Nedir?</h3>
       <div class="pricing-staff-tabs">
-        <div class="pricing-staff-tab active" data-staff="1-5">1-5</div>
-        <div class="pricing-staff-tab" data-staff="6-15">6-15</div>
-        <div class="pricing-staff-tab" data-staff="16-30">16-30</div>
-        <div class="pricing-staff-tab" data-staff="30+">30+</div>
+        <button type="button" class="pricing-staff-tab active" data-staff="1-5">1-5</button>
+        <button type="button" class="pricing-staff-tab" data-staff="6-15">6-15</button>
+        <button type="button" class="pricing-staff-tab" data-staff="16-30">16-30</button>
+        <button type="button" class="pricing-staff-tab" data-staff="30+">30+</button>
       </div>
     </div>
 
     <!-- ADIM 4: MODÜL SEÇİMİ -->
-    <div class="reveal" style="margin-bottom:36px;">
+    <div class="reveal pricing-step-block" data-step="4" style="margin-bottom:36px;">
       <h3 style="font-size:16px; color:var(--purple-deep); margin-bottom:14px;">4. Modülleri Seçin</h3>
       <div class="module-check">
         <div class="mcheck checked pricing-module" data-module="feedback"><div class="cb">✓</div><b>Akıllı Geri Bildirim</b></div>
@@ -127,13 +138,14 @@
         <div class="mcheck checked pricing-module" data-module="enps"><div class="cb">✓</div><b>Çalışan Deneyimi</b></div>
         <div class="mcheck premium pricing-module" data-module="sentinel"><div class="cb"></div><b>Sentinel (+3.500 TL/ay)</b></div>
         <div class="mcheck premium pricing-module" data-module="recall"><div class="cb"></div><b>Recall (+2.500 TL/ay)</b></div>
+        <div class="mcheck pilot pricing-module" data-module="pilot"><div class="cb"></div><div><b>Pilot Klinik</b><span class="mcheck-sub">Profesyonel · 9.900 TL/ay · 6 ay sabit · kurulum ücretsiz</span></div></div>
       </div>
     </div>
 
     <!-- ADIM 5: SONUÇ PAKETLERİ -->
-    <div class="reveal">
+    <div class="reveal pricing-step-block" data-step="5">
       <h3 style="font-size:16px; color:var(--purple-deep); margin-bottom:18px;">5. Önerilen Paketiniz</h3>
-      <div id="pricing-summary" class="pricing-summary">Hesaplanıyor…</div>
+      <div id="pricing-summary" class="pricing-summary">Sektörünüzü seçerek başlayın — fiyat anında hesaplanır.</div>
       <div class="price-grid">
         <div class="price-card" data-package="starter">
           <div class="price-name">Başlangıç</div>
@@ -175,6 +187,8 @@
         </div>
       </div>
     </div>
+
+    </div><!-- /pricing-config-panel -->
 
     <!-- DİĞER PAKETLER -->
     <div class="reveal" style="margin-top:40px;">

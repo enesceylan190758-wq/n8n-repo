@@ -162,6 +162,7 @@ function initPricingPage() {
 
   const state = {
     sector: 'health',
+    healthSub: 'dental',
     branches: 1,
     staff: '1-5',
     modules: {
@@ -171,10 +172,13 @@ function initPricingPage() {
       enps: true,
       sentinel: false,
       recall: false,
+      pilot: false,
     },
   };
 
-  const sectorCards = root.querySelectorAll('.pricing-sector-card');
+  const sectorTabs = root.querySelectorAll('.pricing-sector-tab');
+  const healthSubsEl = root.querySelector('#pricing-health-subs');
+  const healthTabs = root.querySelectorAll('.pricing-health-tab');
   const staffTabs = root.querySelectorAll('.pricing-staff-tab');
   const branchVal = root.querySelector('#pricing-branches');
   const branchHint = root.querySelector('#pricing-branch-hint');
@@ -187,6 +191,7 @@ function initPricingPage() {
   };
 
   const sectorMult = { health: 1, hotel: 0.92, auto: 0.88 };
+  const healthSubMult = { dental: 1, hair: 1.04, aesthetic: 1.08, eye: 1.02 };
   const staffMult = { '1-5': 1, '6-15': 1.12, '16-30': 1.28, '30+': 1.45 };
   const base = {
     starter: { monthly: 9500, setup: 25000 },
@@ -194,12 +199,14 @@ function initPricingPage() {
     enterprise: { monthly: 45000, setup: null },
   };
   const premiumAdd = { sentinel: 3500, recall: 2500 };
+  const PILOT_MONTHLY = 9900;
 
   function activeModules() {
-    return Object.values(state.modules).filter(Boolean).length;
+    return ['feedback', 'inbox', 'reviews', 'enps', 'sentinel', 'recall'].filter(k => state.modules[k]).length;
   }
 
   function recommendPackage() {
+    if (state.modules.pilot) return 'pro';
     if (state.branches >= 2 || state.staff === '30+') return 'enterprise';
     if (state.staff === '16-30' || state.modules.sentinel || state.modules.recall) return 'pro';
     if (activeModules() <= 2 && state.branches === 1 && state.staff === '1-5') return 'starter';
@@ -207,7 +214,9 @@ function initPricingPage() {
   }
 
   function calcMonthly(pkg) {
+    if (state.modules.pilot && pkg === 'pro') return PILOT_MONTHLY;
     let m = base[pkg].monthly * (sectorMult[state.sector] || 1) * (staffMult[state.staff] || 1);
+    if (state.sector === 'health') m *= healthSubMult[state.healthSub] || 1;
     if (state.branches > 1) m *= 1 + (state.branches - 1) * 0.18;
     if (pkg !== 'starter') {
       if (state.modules.sentinel) m += premiumAdd.sentinel;
@@ -216,12 +225,23 @@ function initPricingPage() {
     return m;
   }
 
+  function syncModuleUi() {
+    root.querySelectorAll('.pricing-module').forEach(item => {
+      const key = item.dataset.module;
+      if (!key) return;
+      const on = !!state.modules[key];
+      item.classList.toggle('checked', on);
+      const cb = item.querySelector('.cb');
+      if (cb) cb.textContent = on ? '✓' : '';
+    });
+  }
+
   function updateSteps() {
     const done = [
       true,
-      state.sector !== 'health' || state.branches !== 1,
+      state.branches !== 1,
       state.staff !== '1-5',
-      state.modules.sentinel || state.modules.recall || activeModules() < 4,
+      state.modules.sentinel || state.modules.recall || state.modules.pilot || activeModules() < 4,
       true,
     ];
     steps.forEach((step, i) => {
@@ -232,6 +252,7 @@ function initPricingPage() {
 
   function render() {
     const rec = recommendPackage();
+
     Object.entries(cards).forEach(([key, card]) => {
       if (!card) return;
       const monthly = calcMonthly(key);
@@ -239,16 +260,22 @@ function initPricingPage() {
       const setup = card.querySelector('.price-setup');
       const badge = card.querySelector('.pop-badge');
       if (amt) {
-        amt.innerHTML = key === 'enterprise' && rec === 'enterprise'
+        amt.innerHTML = key === 'enterprise' && rec === 'enterprise' && !state.modules.pilot
           ? `${formatTl(monthly)} TL<span>+ /ay</span>`
           : `${formatTl(monthly)} TL<span> /ay</span>`;
       }
-      if (setup && base[key].setup) {
-        setup.textContent = `+ ${formatTl(base[key].setup)} TL kurulum (tek sefer)`;
+      if (setup) {
+        if (state.modules.pilot && key === 'pro') {
+          setup.textContent = 'Kurulum ücreti yok · 6 ay sabit fiyat';
+        } else if (base[key].setup) {
+          setup.textContent = `+ ${formatTl(base[key].setup)} TL kurulum (tek sefer)`;
+        } else {
+          setup.textContent = 'Kurulum bedeli teklif ile';
+        }
       }
       card.classList.toggle('pop', key === rec);
       if (badge) {
-        badge.textContent = key === rec ? 'ÖNERİLEN' : '';
+        badge.textContent = key === rec ? (state.modules.pilot ? 'PİLOT' : 'ÖNERİLEN') : '';
         badge.style.display = key === rec ? '' : 'none';
       }
     });
@@ -261,16 +288,32 @@ function initPricingPage() {
 
     if (summaryEl) {
       const names = { starter: 'Başlangıç', pro: 'Profesyonel', enterprise: 'Kurumsal' };
-      summaryEl.innerHTML = `Size önerilen paket: <strong>${names[rec]}</strong> · Tahmini <strong>${formatTl(calcMonthly(rec))} TL/ay</strong> · Pilot: ilk 3 ay <strong>5.000 TL</strong>`;
+      if (state.modules.pilot) {
+        summaryEl.innerHTML = `Pilot Klinik: <strong>Profesyonel</strong> paket · <strong>${formatTl(PILOT_MONTHLY)} TL/ay</strong> · <strong>6 ay sabit fiyat</strong> · kurulum ücretsiz`;
+      } else {
+        summaryEl.innerHTML = `Size önerilen paket: <strong>${names[rec]}</strong> · Tahmini <strong>${formatTl(calcMonthly(rec))} TL/ay</strong> · Pilot: ilk 3 ay <strong>5.000 TL</strong>`;
+      }
     }
+
+    if (healthSubsEl) healthSubsEl.classList.toggle('is-open', state.sector === 'health');
+    sectorTabs.forEach(t => t.classList.toggle('active', t.dataset.sector === state.sector));
+    staffTabs.forEach(t => t.classList.toggle('active', t.dataset.staff === state.staff));
+    healthTabs.forEach(t => t.classList.toggle('active', t.dataset.healthSub === state.healthSub));
 
     updateSteps();
   }
 
-  sectorCards.forEach(card => {
-    card.addEventListener('click', () => {
-      state.sector = card.dataset.sector || 'health';
-      sectorCards.forEach(c => c.classList.toggle('featured', c === card));
+  sectorTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.sector = tab.dataset.sector || 'health';
+      render();
+    });
+  });
+
+  healthTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.healthSub = tab.dataset.healthSub || 'dental';
+      state.sector = 'health';
       render();
     });
   });
@@ -278,7 +321,6 @@ function initPricingPage() {
   staffTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       state.staff = tab.dataset.staff || '1-5';
-      staffTabs.forEach(t => t.classList.toggle('active', t === tab));
       render();
     });
   });
@@ -288,14 +330,12 @@ function initPricingPage() {
       const key = item.dataset.module;
       if (!key) return;
       const isPremium = item.classList.contains('premium');
-      if (!isPremium) {
-        const checked = item.classList.contains('checked');
-        if (checked && activeModules() <= 1) return;
+      const isPilot = key === 'pilot';
+      if (!isPremium && !isPilot) {
+        if (state.modules[key] && activeModules() <= 1) return;
       }
-      item.classList.toggle('checked');
-      state.modules[key] = item.classList.contains('checked');
-      const cb = item.querySelector('.cb');
-      if (cb) cb.textContent = item.classList.contains('checked') ? '✓' : '';
+      state.modules[key] = isPilot ? !state.modules.pilot : !state.modules[key];
+      syncModuleUi();
       render();
     });
   });
@@ -319,5 +359,6 @@ function initPricingPage() {
     });
   }
 
+  syncModuleUi();
   render();
 }

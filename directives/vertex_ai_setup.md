@@ -91,3 +91,5 @@ python3 execution/import-workflows.py
 - `gemini-1.5-flash` bölgede yoksa → `gemini-2.0-flash` veya `gemini-2.5-flash` dene (`VERTEX_GEMINI_MODEL`).
 - 403 Vertex → API enable + service account rolü kontrol.
 - Boş AI yanıt → safety filter; prompt'ta teşhis iddiası azalt.
+- **`ACCESS_TOKEN_EXPIRED` / 401:** `execution/vertex_gemini.py` varsayılan olarak SA JWT mint eder; `.env` içindeki `GCP_ACCESS_TOKEN` kör kullanılmaz. 401 olursa bir kez yeniden mint. Blog/sosyal cron'lar `0 * * * *` refresh ile aynı dakikaya konmasın (blog **09:05**).
+- n8n wf-10 hâlâ `$env.GCP_ACCESS_TOKEN` kullanır → saatlik `refresh-gcp-access-token.py` zorunlu kalır.

@@ -15,12 +15,12 @@ bash execution/setup-evolution.sh
 
 ### Dashboard (önerilen — SSH gerekmez)
 
-1. [Dashboard](https://nefalixai.com/dashboard) → **Firmalar** → firma düzenle
+1. [Dashboard](https://nefalix.com/dashboard) → **Firmalar** → firma düzenle
 2. **Evolution instance adı** girin (ör. `medident-pilot`)
 3. **Kaydet** → **QR oluştur**
 4. Telefonda **WhatsApp → Bağlı cihazlar → Cihaz bağla** ile okutun
 
-Vercel ortam değişkenleri: `EVOLUTION_API_KEY`, `EVOLUTION_API_URL` (varsayılan `https://evo.nefalixai.com`).
+Vercel ortam değişkenleri: `EVOLUTION_API_KEY`, `EVOLUTION_API_URL` (varsayılan `https://evo.nefalix.com`).
 
 **Supabase Vercel'de yok** — DB VPS'te kapalı portta. Dashboard API'leri VPS n8n proxy üzerinden gider:
 - `N8N_WHATSAPP_CONNECT_URL` → wf-15

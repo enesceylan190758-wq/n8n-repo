@@ -19,12 +19,12 @@ export function normalizeInstanceName(raw) {
 }
 
 export function evolutionConfig() {
-  const base = (process.env.EVOLUTION_API_URL || 'https://evo.nefalixai.com').replace(/\/$/, '');
+  const base = (process.env.EVOLUTION_API_URL || 'https://evo.nefalix.com').replace(/\/$/, '');
   const apiKey = process.env.EVOLUTION_API_KEY;
   if (!apiKey) throw new Error('EVOLUTION_API_KEY tanımlı değil (Vercel env)');
   const inboxWebhook =
     process.env.N8N_INBOX_INCOMING_URL ||
-    'https://api.nefalixai.com/webhook/nefalix/inbox/incoming';
+    'https://api.nefalix.com/webhook/nefalix/inbox/incoming';
   return { base, apiKey, inboxWebhook };
 }
 

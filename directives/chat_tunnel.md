@@ -1,11 +1,11 @@
 # Site Chat (Sabit VPS URL)
 
 ## Hedef
-nefalixai.com chatbot → `api.nefalixai.com` üzerinden n8n Web Chatbot workflow.
+nefalix.com chatbot → `api.nefalix.com` üzerinden n8n Web Chatbot workflow.
 
 ## Akış
 ```
-nefalixai.com (Vercel) → api.nefalixai.com/webhook/{id}/chat → Nefalix AI - Web Chatbot
+nefalix.com (Vercel) → api.nefalix.com/webhook/{id}/chat → Nefalix AI - Web Chatbot
 ```
 
 ## Kurulum
@@ -18,7 +18,7 @@ nefalixai.com (Vercel) → api.nefalixai.com/webhook/{id}/chat → Nefalix AI - 
 
 2. Landing + Vercel:
    ```bash
-   export N8N_CHAT_WEBHOOK_URL='https://api.nefalixai.com/webhook/....../chat'
+   export N8N_CHAT_WEBHOOK_URL='https://api.nefalix.com/webhook/....../chat'
    bash execution/update-vercel-vps-urls.sh
    ```
 
@@ -37,7 +37,7 @@ Yanıtta `"output"` olmalı.
 | Sorun | Çözüm |
 |-------|--------|
 | 404 webhook not registered | `import-web-chatbot.py` + workflow active |
-| CORS | Chat trigger `allowedOrigins` nefalixai.com içerir |
+| CORS | Chat trigger `allowedOrigins` nefalix.com içerir |
 | Model hatası | Vertex credential + `GCP_PROJECT_ID` VPS .env |
 
 ## Eski (tunnel) — kullanmayın

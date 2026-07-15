@@ -47,9 +47,10 @@
   }
   .logo-circle {
     width: 52px; height: 52px; border: 1.5px solid #C9A96E; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: #C9A96E; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    background: rgba(201,169,110,0.08);
   }
+  .logo-circle img { width: 36px; height: 36px; object-fit: contain; }
   .body {
     flex: 1; display: flex; flex-direction: column; justify-content: center;
     position: relative; z-index: 10; padding: 40px 0;
@@ -103,7 +104,7 @@
         <div class="logo-wordmark">Nefalix<span>AI</span></div>
         <div class="logo-sub">Hasta Deneyimi & İtibar</div>
       </div>
-      <div class="logo-circle">N</div>
+      <div class="logo-circle"><img src="{{LOGO_PATH}}" alt="Nefalix"></div>
     </div>
   </div>
   <div class="body">
@@ -116,8 +117,8 @@
     <div class="bottom-line"></div>
     <div class="footer">
       <div>
-        <div class="contact-mail">nefalixai@gmail.com</div>
-        <div class="contact-web">nefalixai.com</div>
+        <div class="contact-mail">info@nefalix.com</div>
+        <div class="contact-web">nefalix.com</div>
       </div>
       <div class="footer-tag">Post {{POST_NUMBER}} / 10</div>
     </div>

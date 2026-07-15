@@ -15,8 +15,8 @@ Nefalix, klinik/hizmet işletmeleri için WhatsApp-first hasta deneyimi ve itiba
 Canlı bileşenler:
 
 - VPS: `93.127.186.45`, repo path: `/opt/nefalix`
-- Public API: `https://api.nefalixai.com`
-- Dashboard: `https://nefalixai.com/dashboard`
+- Public API: `https://api.nefalix.com`
+- Dashboard: `https://nefalix.com/dashboard`
 - Local workspace: `/Users/enesceylan/n8n-repo`
 - Landing/dashboard repo: `/Users/enesceylan/nefalix-landing`
 - Pilot klinik: MediDent Kartal

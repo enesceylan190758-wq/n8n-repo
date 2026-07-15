@@ -1,0 +1,42 @@
+{
+  "references": [
+    "@nefalix_ — Türkçe klinik SaaS, Figma kalitesi infografik",
+    "@swell_cx — ABD healthcare reputation SaaS, eğitici carousel, temiz tipografi, UI mockup"
+  ],
+  "quality_bar": [
+    "Canva Pro / Figma export kalitesi — asla generic AI poster değil",
+    "Sol üst: mor daire logo (N + yeşil nokta) + lowercase nefalix wordmark HER ZAMAN",
+    "Başlık kısa, güçlü, sans-serif — Swell/Nefalix gibi benefit-first",
+    "Ana alan: infografik adımlar VEYA UI mockup VEYA karşılaştırma tablosu — en büyük katman",
+    "Footer en altta: globe + nefalix.com (info@nefalix.com sadece footer satırında)",
+    "Beyaz veya mor gradient arka plan — koyu altın serif poster YASAK",
+    "İkonlar renkli daireler içinde (mor, mavi, yeşil, teal)",
+    "Okunaklı Türkçe, doğru yazım, telefon numarası yok"
+  ],
+  "layout_specs": {
+    "flow_infographic": {
+      "reference": "@nefalix_ 'Yorum Toplamak Çok Kolay' postu",
+      "background": "Beyaz zemin, köşelerde hafif pastel mor/mavi/yeşil gradient blob'lar, ince kesik çizgi dekor",
+      "structure": "Logo üst sol → büyük headline + alt subtitle sol veya üst → sağda veya ortada dikey/zigzag 4-5 adım kartları (yuvarlak köşe, hafif gölge) → her kartta renkli daire ikon + numara + Türkçe adım → adımlar arası ok/kesik ok → son adımda Google yıldızları veya onay ikonu",
+      "headline_examples": ["Yorum Toplamak Çok Kolay", "Randevular Cebinizde", "Yorum Yanıtlamak Artık Kolay"],
+      "swell_parallel": "Swell carousel: eğitici adım adım süreç, minimal metin, güçlü görsel hiyerarşi"
+    },
+    "split_ui_photo": {
+      "reference": "@nefalix_ WhatsApp randevu hatırlatma postu",
+      "background": "Beyaz, hafif teal dalga çizgileri",
+      "structure": "Logo üst sol → sol yarı: büyük headline (son kelime teal vurgu) + subtitle + gerçekçi WhatsApp chat mockup (yeşil balon, Türkçe mesaj, onay chip) → sağ yarı: dairesel crop profesyonel diş hekimi/klinik fotoğrafı → footer globe + nefalix.com",
+      "swell_parallel": "Swell: product screenshot + human element, trust-building"
+    },
+    "comparison_table": {
+      "reference": "@nefalix_ Manuel vs Nefalix tablosu",
+      "background": "Koyu mor-lacivert gradient, hafif dalga/ışık efekti",
+      "structure": "Logo üst sol → ortada 3 sütun tablo: özellik ikonlu satır etiketleri | MANUEL (gri, X işaretleri) | NEFALIX (mor glow border, checkmark'lar) → alt büyük headline 'Kliniğinizi Geleceğe Taşıyın' → footer globe + nefalix.com",
+      "swell_parallel": "Swell: before/after, manual vs automated value prop"
+    }
+  },
+  "caption_style": {
+    "tone": "Kurumsal ama sıcak, Swell/Nefalix gibi fayda odaklı",
+    "structure": "Hook cümle → 3-4 madde fayda → CTA info@nefalix.com",
+    "language": "Türkçe"
+  }
+}

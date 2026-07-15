@@ -1,0 +1,15 @@
+[Unit]
+Description=Nefalix Social Publish Webhook
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/nefalix
+EnvironmentFile=/opt/nefalix/.env
+Environment=SOCIAL_WEBHOOK_PORT=8791
+ExecStart=/usr/bin/python3 -u /opt/nefalix/execution/social-publish-webhook.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

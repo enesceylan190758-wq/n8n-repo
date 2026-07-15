@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Pick next social template → GPT görsel → caption → Drive/local paket.
+"""Pick next social template → YZ içerik → OpenAI görsel → Storage.
 
-Instagram yüklemesi manuel (planlayıcı). WhatsApp / Meta API yok.
+Instagram yüklemesi manuel (mail eki). Meta API opsiyonel.
 
 Usage:
   python3 execution/social-generate-next.py
@@ -25,8 +25,15 @@ import urllib.error
 import urllib.request
 
 
-def sb(method: str, path: str, body: dict | None = None) -> list | dict:
+def sb_base() -> str:
     base = os.environ.get("SUPABASE_URL", "http://127.0.0.1:54321").rstrip("/")
+    if "host.docker.internal" in base:
+        base = "http://127.0.0.1:54321"
+    return base
+
+
+def sb(method: str, path: str, body: dict | None = None) -> list | dict:
+    base = sb_base()
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
     if not key:
         raise SystemExit("SUPABASE_SERVICE_ROLE_KEY eksik")
@@ -79,7 +86,7 @@ def create_post(template: dict) -> dict:
         {
             "template_id": template["id"],
             "status": "draft",
-            "platform": "instagram",
+            "platform": "both",
             "headline": template.get("headline_html", "").replace("<br/>", " ").replace("<em>", "").replace("</em>", ""),
             "caption": (template.get("caption_template") or "").strip(),
             "hashtags": (template.get("hashtags") or "").strip(),
@@ -95,9 +102,11 @@ def main() -> None:
     parser.add_argument("--slug")
     parser.add_argument("--post-number", type=int)
     parser.add_argument("--skip-render", action="store_true")
+    parser.add_argument("--skip-ai", action="store_true", help="YZ içerik üretimini atla")
     parser.add_argument("--skip-upload", action="store_true")
     parser.add_argument("--provider", choices=["openai", "html", "auto"], default="auto")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--skip-storage", action="store_true", help="Supabase Storage upload atla")
     args = parser.parse_args()
 
     template = pick_template(args.slug, args.post_number)
@@ -107,28 +116,37 @@ def main() -> None:
 
     post = create_post(template)
 
+    if not args.skip_ai:
+        ai_cmd = [sys.executable, str(ROOT / "execution" / "social-ai-generate.py"), "--post-id", post["id"]]
+        subprocess.run(ai_cmd, check=True, cwd=str(ROOT), capture_output=True, text=True)
+
     if not args.skip_render:
-        render_cmd = [
-            sys.executable,
-            str(ROOT / "execution" / "render-social-image.py"),
-            "--post-id",
-            post["id"],
-        ]
-        if args.provider != "auto":
-            render_cmd.extend(["--provider", args.provider])
-        subprocess.run(render_cmd, check=True, cwd=str(ROOT))
+        subprocess.run(
+            [sys.executable, str(ROOT / "execution" / "render-social-image.py"), "--post-id", post["id"]],
+            check=True, cwd=str(ROOT), capture_output=True, text=True,
+        )
 
     result = {"post_id": post["id"], "slug": template["slug"], "post_number": template["post_number"]}
 
     if not args.skip_upload:
         upload = subprocess.run(
-            [sys.executable, str(ROOT / "execution" / "social-upload-drive.py"), "--post-id", post["id"]],
+            [sys.executable, str(ROOT / "execution" / "social-upload-drive.py"), "--post-id", post["id"], "--status", "draft"],
             check=True,
             cwd=str(ROOT),
             capture_output=True,
             text=True,
         )
         result["upload"] = json.loads(upload.stdout)
+
+    if not args.skip_storage:
+        storage = subprocess.run(
+            [sys.executable, str(ROOT / "execution" / "social-upload-storage.py"), "--post-id", post["id"]],
+            check=True,
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+        )
+        result["storage"] = json.loads(storage.stdout)
 
     refreshed = sb("GET", f"social_posts?id=eq.{post['id']}&limit=1")
     if refreshed:

@@ -1,0 +1,90 @@
+{
+  "name": "Nefalix - Günlük Blog",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Günlük Blog\n\n**Her gün 09:00** (Europe/Istanbul) veya `POST /webhook/nefalix/blog/publish`\n→ Vertex Gemini yazı üretir\n→ Supabase `blog_posts`\n→ Site: nefalix.com/kaynaklar + /blog/:slug\n\nEnv: `SUPABASE_*`, GCP service account (Vertex)",
+        "height": 180,
+        "width": 420,
+        "color": 4
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 40]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Her Gün 09:00 TR",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/blog/publish",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel Blog Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 480],
+      "webhookId": "nefalix-blog-publish"
+    },
+    {
+      "parameters": {
+        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/publish-daily-blog.py'];\nif (body.dry_run) parts.push('--dry-run');\nreturn [{ json: { command: parts.join(' ') } }];"
+      },
+      "name": "Blog Komutu Hazırla",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 390]
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "name": "Blog Üret",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [740, 390]
+    },
+    {
+      "parameters": {
+        "jsCode": "let parsed = {};\ntry {\n  parsed = JSON.parse($json.stdout || '{}');\n} catch (e) {\n  parsed = { raw: $json.stdout, stderr: $json.stderr };\n}\nreturn [{ json: { ok: true, ...parsed } }];"
+      },
+      "name": "Sonuç",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 390]
+    }
+  ],
+  "connections": {
+    "Her Gün 09:00 TR": {
+      "main": [[{ "node": "Blog Komutu Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Manuel Blog Webhook": {
+      "main": [[{ "node": "Blog Komutu Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Blog Komutu Hazırla": {
+      "main": [[{ "node": "Blog Üret", "type": "main", "index": 0 }]]
+    },
+    "Blog Üret": {
+      "main": [[{ "node": "Sonuç", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

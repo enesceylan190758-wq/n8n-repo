@@ -1,0 +1,117 @@
+{
+  "brand": {
+    "logo_description": "Modern, stilize edilmiş 'N' harfi, genellikle mor renkli yuvarlak bir arka plan içinde yer alır. Marka adı 'nefalix' ise küçük harflerle, koyu gri/lacivert renkte, modern ve okunaklı bir sans-serif fontuyla yazılmıştır.",
+    "wordmark": "nefalix",
+    "primary_colors": [
+      "#6B48FF",
+      "#2D3748",
+      "#2ECC71",
+      "#4A90E2",
+      "#FFFFFF",
+      "#F0F2F5"
+    ],
+    "background_styles": [
+      "Saf beyaz zemin",
+      "Hafif, soyut ve yumuşak geçişli mor/mavi/yeşil tonlarında gradient şekiller içeren beyaz zemin",
+      "Ürüne veya konuya uygun, hafif bulanıklaştırılmış arka plan görselleri"
+    ],
+    "typography": "Tüm metinlerde modern, geometrik ve okunaklı sans-serif fontlar kullanılır. Başlıklar kalın ve büyük, alt başlıklar ve gövde metinleri daha ince ve orta büyüklüktedir. Serif font kesinlikle kullanılmaz.",
+    "footer_pattern": "Sayfanın sol alt köşesinde, koyu gri/lacivert renkte bir dünya (globe) ikonu ve hemen yanında 'nefalix.com' metni bulunur. Bu elementler her gönderide tutarlıdır."
+  },
+  "quality_signals": [
+    "Tutarlı marka kimliği ve görsel dil",
+    "Net ve güçlü görsel hiyerarşi",
+    "Temiz, modern ve minimalist tasarım estetiği",
+    "Etkili beyaz alan kullanımı",
+    "Yüksek çözünürlüklü, profesyonel stok görseller ve UI mockupları",
+    "İkonların ve illüstrasyonların anlamlı ve tutarlı kullanımı",
+    "Belirgin ve okunaklı tipografi",
+    "Fayda odaklı ve ilgi çekici başlıklar",
+    "Her gönderide net bir değer önerisi veya mesaj",
+    "Renk paletinin dengeli ve stratejik kullanımı",
+    "Süreçleri ve bilgiyi basitleştiren infografik yaklaşımlar",
+    "Profesyonel ve güven veren genel izlenim"
+  ],
+  "avoid": [
+    "Serif fontların kullanımı",
+    "Karmaşık, dağınık veya aşırı detaylı tasarımlar",
+    "Düşük çözünürlüklü veya kalitesiz görseller",
+    "Marka renk paleti dışındaki ana renklerin kullanımı",
+    "Aşırı metin içeren, okunması zor gönderiler",
+    "Koyu, ağır veya dikkat dağıtıcı arka planlar",
+    "Koyu lacivert ve altın renk kombinasyonu",
+    "Markanın profesyonel ve modern imajına uymayan stok fotoğraflar",
+    "Görsel hiyerarşinin bozulması, önemli bilgilerin kaybolması"
+  ],
+  "layout_archetypes": {
+    "flow_infographic": {
+      "description": "Adım adım bir süreci veya iş akışını görselleştiren infografik düzen. Genellikle numaralandırılmış adımlar, ikonlar ve yönlendirme okları ile bir akışı temsil eder.",
+      "visual_elements": [
+        "Büyük, koyu renkli başlık",
+        "Daha küçük, açıklayıcı alt başlık",
+        "Yuvarlatılmış köşeli kartlar içinde numaralandırılmış adımlar",
+        "Her adım için ilgili ikonlar (mor, yeşil, mavi tonlarında)",
+        "Adımlar arasında yönlendirme okları veya kesik çizgiler",
+        "Beyaz zemin üzerinde hafif, soyut mor/mavi/yeşil gradient şekiller"
+      ],
+      "best_for_topics": [
+        "Ürün veya hizmetin kullanım adımları",
+        "Müşteri yolculukları",
+        "Otomasyon süreçlerinin açıklanması",
+        "Karmaşık iş akışlarının basitleştirilmesi"
+      ],
+      "openai_prompt_template": "Create an Instagram post image for Nefalix using a 'flow infographic' layout. The image should feature a clean, modern design with a white background subtly enhanced by abstract, soft-gradient shapes in light blue, purple, and green. The main headline, '{headline}', should be large, bold, and in a dark sans-serif font, positioned prominently at the top or center-left. Below it, a concise subtitle, '{subtitle}', in a regular-weight sans-serif font. The core of the infographic is a series of numbered steps, '{steps}', presented as rounded rectangular cards. Each card should contain a distinct, colorful icon (using Nefalix's primary purple, green, or light blue) and a brief, clear description of the step. These cards should be visually connected by arrows or dotted lines, illustrating a clear progression. Ensure excellent visual hierarchy and readability. The footer must include the globe icon and 'nefalix.com' in the bottom-left corner."
+    },
+    "split_ui_photo": {
+      "description": "Bir tarafında yüksek kaliteli bir insan fotoğrafı (genellikle bir profesyonel veya müşteri) ve diğer tarafında ürünün kullanıcı arayüzü (UI) veya ana mesajların yer aldığı bölünmüş düzen.",
+      "visual_elements": [
+        "Yüksek kaliteli, profesyonel stok fotoğraf (doktor, hasta, kullanıcı vb.)",
+        "Ürün UI mockupları (telefon, tablet ekranları, uygulama arayüzleri)",
+        "Büyük, dikkat çekici başlık (koyu renkli veya vurgu rengiyle)",
+        "Açıklayıcı alt başlık veya kısa metin blokları",
+        "Beyaz zemin üzerinde hafif, soyut mor/mavi/yeşil gradient şekiller"
+      ],
+      "best_for_topics": [
+        "Ürün faydalarını ve kullanım senaryolarını gösterme",
+        "Kullanıcı deneyimini vurgulama",
+        "Duygusal bağ kurma",
+        "Yeni özelliklerin tanıtımı"
+      ],
+      "openai_prompt_template": "Generate an Instagram post image for Nefalix using a 'split UI photo' layout. The design should be clean and modern, with a white background featuring subtle, abstract light blue, purple, and green gradient shapes. One prominent section of the image should display a high-quality, professional stock photo of a person (e.g., a doctor interacting with a tablet, a smiling patient, a user looking at a phone), relevant to the topic. The other section should showcase a realistic UI mockup (e.g., a phone screen displaying a WhatsApp message, a tablet showing an app interface, or a rating system). The main headline, '{headline}', should be large, bold, and in a dark sans-serif font, potentially using an accent color like green for emphasis. A concise subtitle or descriptive text, '{subtitle}', should accompany the headline or UI element. Ensure the photo and UI elements are seamlessly integrated and visually balanced. The footer must include the globe icon and 'nefalix.com' in the bottom-left corner."
+    },
+    "comparison_table": {
+      "description": "İki farklı yaklaşımı (genellikle 'Manuel' ve 'Nefalix') yan yana karşılaştıran, ürünün avantajlarını vurgulayan tablo bazlı düzen.",
+      "visual_elements": [
+        "İki ana sütundan oluşan bir tablo yapısı ('Manuel' ve 'Nefalix')",
+        "Sütun başlıkları belirgin, 'Nefalix' sütunu genellikle mor gibi bir vurgu rengiyle arka planlı",
+        "Kriterleri listeleyen satırlar",
+        "Her hücrede kısa açıklamalar, onay işaretleri (yeşil tik) veya çarpı işaretleri (kırmızı X)",
+        "Tablonun altında büyük, koyu renkli başlık",
+        "Başlığın altında daha küçük, açıklayıcı alt başlık",
+        "Beyaz zemin üzerinde hafif, soyut mor/mavi/yeşil gradient şekiller"
+      ],
+      "best_for_topics": [
+        "Ürün özelliklerinin karşılaştırmalı analizi",
+        "Değer önerisinin vurgulanması",
+        "Problem-çözüm senaryolarının sunulması",
+        "Manuel süreçlerin zorluklarını ve otomasyonun faydalarını gösterme"
+      ],
+      "openai_prompt_template": "Design an Instagram post image for Nefalix featuring a 'comparison table' layout. The background should be white with subtle, abstract light blue, purple, and green gradient shapes. The central element is a clear, two-column table comparing 'Manuel' (manual processes) and 'Nefalix' (the automated solution). The 'Nefalix' column header should be highlighted with a solid purple background, while 'Manuel' can have a lighter background. The table rows should list various criteria, with each cell containing a brief description. Use green checkmarks for Nefalix's advantages and red 'X' marks for the disadvantages of manual processes. Below the table, place a large, bold, dark sans-serif headline, '{headline}', followed by a smaller, regular-weight sans-serif subtitle, '{subtitle}', emphasizing the core message. Ensure the table is easy to read and visually impactful. The footer must include the globe icon and 'nefalix.com' in the bottom-left corner."
+    }
+  },
+  "caption_style": {
+    "tone": "Profesyonel, bilgilendirici, çözüm odaklı, modern ve samimi. Markanın uzmanlığını ve yenilikçi ruhunu yansıtır.",
+    "structure": "Genellikle kısa ve öz, ana mesajı vurgulayan bir giriş cümlesiyle başlar. Ardından faydaları veya özellikleri açıklayan maddeler veya kısa paragraflar gelir. Sonunda her zaman net bir harekete geçirici mesaj (call-to-action) bulunur.",
+    "emoji_usage": "Metni zenginleştirmek ve okunabilirliği artırmak için ilgili ve ölçülü emoji kullanımı. Aşırıya kaçılmaz, profesyonel tonu destekler (örneğin, ✅, 🚀, ✨, 💡)."
+  },
+  "_analyzed_by": "gemini",
+  "version": 1,
+  "analyzed_at": "2026-07-10T08:28:45.031601+00:00",
+  "reference_images": [
+    "nefalix_final_reviews_v8-f15c8f08-4050-463f-8af6-55b4150dc9b8.png",
+    "nefalix_final_wa_v7-9f33979c-c6c7-476c-b21f-d37a6a64967d.png",
+    "nefalix_final_vs_v8-f9983383-f318-4668-b998-80661f0dc19a.png",
+    "nefalix_final_nps_v6-c449cfb7-251e-431b-9864-7b7522d3627c.png",
+    "nefalix_final_automation_v6-0740bc54-b470-4a17-9645-6e993d243133.png"
+  ]
+}

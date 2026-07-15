@@ -299,7 +299,7 @@
             {
               "id": "1",
               "name": "managerAlertText",
-              "value": "=📊 *Nefalix Sentinel* — İtibar analizi\n\nFirma: {{ $('Mention Normalize').item.json.brandName }}\nKaynak: {{ $('Mention Normalize').item.json.source }}\nDuygu: {{ $json.output.sentiment }} | Risk: {{ $json.output.riskScore }}/10\n\n{{ $json.output.managerBrief || $json.output.summary }}\n\nÖneri: {{ $json.output.recommendedAction }}\n{{ $('Mention Normalize').item.json.url ? '🔗 ' + $('Mention Normalize').item.json.url : '' }}\n\nİncelemeniz önerilir → nefalixai.com/dashboard",
+              "value": "=📊 *Nefalix Sentinel* — İtibar analizi\n\nFirma: {{ $('Mention Normalize').item.json.brandName }}\nKaynak: {{ $('Mention Normalize').item.json.source }}\nDuygu: {{ $json.output.sentiment }} | Risk: {{ $json.output.riskScore }}/10\n\n{{ $json.output.managerBrief || $json.output.summary }}\n\nÖneri: {{ $json.output.recommendedAction }}\n{{ $('Mention Normalize').item.json.url ? '🔗 ' + $('Mention Normalize').item.json.url : '' }}\n\nİncelemeniz önerilir → nefalix.com/dashboard",
               "type": "string"
             }
           ]

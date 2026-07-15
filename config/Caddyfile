@@ -2,8 +2,14 @@
 	email {$ACME_EMAIL}
 }
 
-{$N8N_PUBLIC_HOST} {
+api.nefalix.com, api.nefalixai.com {
 	encode gzip
+	handle_path /internal/social/* {
+		reverse_proxy social-webhook:8791
+	}
+	handle_path /internal/crm/* {
+		reverse_proxy social-webhook:8791
+	}
 	handle_path /v2* {
 		root * /srv/nefalix-site-v2
 		file_server
@@ -13,12 +19,12 @@
 	}
 }
 
-{$EVOLUTION_PUBLIC_HOST} {
+evo.nefalix.com, evo.nefalixai.com {
 	encode gzip
 	reverse_proxy evolution-api:8080
 }
 
-{$V2_SITE_HOST:v2.nefalixai.com} {
+{$V2_SITE_HOST:v2.nefalix.com} {
 	encode gzip
 	root * /srv/nefalix-site-v2
 	file_server

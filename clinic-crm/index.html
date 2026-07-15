@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nefalix Clinic CRM — Mock</title>
+<style>
+  :root{
+    --nx-navy:#0e2a47;
+    --nx-navy-2:#123a63;
+    --nx-blue:#1f6feb;
+    --nx-gold:#c9a24b;
+    --nx-bg:#f4f6f9;
+    --nx-card:#ffffff;
+    --nx-border:#e3e8ef;
+    --nx-text:#1c2733;
+    --nx-muted:#6b7a8c;
+    --nx-green:#1a9c6b;
+    --nx-red:#d64545;
+    --nx-orange:#e08a2e;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--nx-bg);color:var(--nx-text);font-size:14px}
+  a{color:var(--nx-blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ===== Top bar ===== */
+  .topbar{background:var(--nx-navy);color:#fff;display:flex;align-items:center;gap:16px;padding:10px 20px}
+  .topbar .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;white-space:nowrap}
+  .topbar .brand .dot{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--nx-blue),var(--nx-gold));display:inline-block}
+  .topbar .search{flex:1;max-width:520px;margin:0 auto}
+  .topbar .search input{width:100%;padding:8px 14px;border-radius:20px;border:none;background:rgba(255,255,255,.14);color:#fff;outline:none}
+  .topbar .search input::placeholder{color:rgba(255,255,255,.65)}
+  .topbar .icons{display:flex;gap:14px;align-items:center;font-size:16px}
+  .topbar .icons span{cursor:pointer;opacity:.85}
+  .topbar .icons .lang{border:1px solid rgba(255,255,255,.4);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:11px}
+
+  /* ===== Main nav ===== */
+  nav.mainnav{background:var(--nx-navy-2);display:flex;padding:0 12px;flex-wrap:wrap}
+  nav.mainnav .navitem{position:relative}
+  nav.mainnav .navitem>button{background:none;border:none;color:#d6e2f0;padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.4px}
+  nav.mainnav .navitem>button:hover,nav.mainnav .navitem.active>button{background:rgba(255,255,255,.1);color:#fff}
+  nav.mainnav .navitem.active>button{box-shadow:inset 0 -3px 0 var(--nx-gold)}
+  nav.mainnav .dropdown{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:230px;box-shadow:0 8px 24px rgba(14,42,71,.18);border-radius:0 0 8px 8px;z-index:60;padding:6px 0}
+  nav.mainnav .navitem:hover .dropdown{display:block}
+  nav.mainnav .dropdown a{display:block;padding:9px 16px;color:var(--nx-text);font-size:13px}
+  nav.mainnav .dropdown a:hover{background:var(--nx-bg);text-decoration:none}
+  nav.mainnav .dropdown a.disabled{color:#b6c1cd;pointer-events:none}
+
+  /* ===== Layout ===== */
+  main{padding:18px;max-width:1400px;margin:0 auto}
+  .view{display:none}
+  .view.active{display:block}
+  .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+  .page-head h1{font-size:18px;font-weight:700}
+  .card{background:var(--nx-card);border:1px solid var(--nx-border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .toolbar .spacer{flex:1}
+
+  /* ===== Buttons ===== */
+  .btn{border:1px solid var(--nx-border);background:#fff;color:var(--nx-text);padding:7px 14px;border-radius:7px;font-size:13px;cursor:pointer;font-weight:500}
+  .btn:hover{border-color:#c6d0dc}
+  .btn.primary{background:var(--nx-blue);border-color:var(--nx-blue);color:#fff}
+  .btn.primary:hover{background:#1a5fd0}
+  .btn.success{background:var(--nx-green);border-color:var(--nx-green);color:#fff}
+  .btn.danger-outline{color:var(--nx-red);border-color:#f0c4c4}
+  .btn.sm{padding:4px 10px;font-size:12px}
+  .btn.block{width:100%;margin-bottom:6px;text-align:center}
+
+  /* ===== Tables ===== */
+  table.grid{width:100%;border-collapse:collapse;background:#fff}
+  table.grid th{font-size:12px;text-transform:none;color:var(--nx-muted);font-weight:600;text-align:left;padding:10px 10px;border-bottom:2px solid var(--nx-border);white-space:nowrap}
+  table.grid td{padding:10px;border-bottom:1px solid var(--nx-border);vertical-align:middle;white-space:nowrap}
+  table.grid tr:hover td{background:#f7fafd}
+  .flag{font-size:16px}
+  .row-actions{display:flex;gap:6px}
+  .icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--nx-border);background:#fff;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+  .icon-btn.green{background:var(--nx-green);border-color:var(--nx-green);color:#fff}
+
+  /* ===== Badges / segments ===== */
+  .seg{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:14px;font-size:12px;font-weight:600;background:#eef2f7;color:var(--nx-text)}
+  .seg.dynamic{background:#e7f0fd;color:#1a5fd0}
+  .seg.closed{background:#eee;color:#777}
+  .seg.hot{background:#fdeee2;color:#c46a12}
+  .seg.sold{background:#e3f6ed;color:#15804f}
+  .seg.unreached{background:#fdeaea;color:#b23a3a}
+  .badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.potansiyel{background:#fff4dd;color:#a97d18;border:1px solid #ecd9a6}
+  .badge.status{background:#e7f0fd;color:#1a5fd0}
+
+  /* ===== Client card layout ===== */
+  .client-header{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--nx-border);border-radius:var(--radius);padding:16px;margin-bottom:16px;flex-wrap:wrap}
+  .avatar{width:56px;height:56px;border-radius:50%;background:#dde5ee;display:flex;align-items:center;justify-content:center;font-size:24px;color:#8organizasyon}
+  .client-header .who h2{font-size:18px;display:flex;align-items:center;gap:8px}
+  .client-header .who .meta{color:var(--nx-muted);font-size:13px;margin-top:2px}
+  .client-header .quick{margin-left:auto;position:relative}
+  .quick-menu{position:absolute;right:0;top:110%;background:#fff;border:1px solid var(--nx-border);border-radius:8px;box-shadow:0 8px 24px rgba(14,42,71,.15);min-width:180px;z-index:50;display:none}
+  .quick-menu.open{display:block}
+  .quick-menu a{display:block;padding:9px 14px;color:var(--nx-text);font-size:13px}
+  .quick-menu a:hover{background:var(--nx-bg);text-decoration:none}
+
+  .client-grid{display:grid;grid-template-columns:210px 1fr 1fr 1.2fr;gap:14px;align-items:start}
+  @media(max-width:1100px){.client-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:700px){.client-grid{grid-template-columns:1fr}}
+  .side-menu{background:#fff;border:1px solid var(--nx-border);border-radius:var(--radius);overflow:hidden}
+  .side-menu a{display:flex;gap:8px;align-items:center;padding:10px 14px;font-size:13px;color:var(--nx-text);border-left:3px solid transparent}
+  .side-menu a:hover{background:var(--nx-bg);text-decoration:none}
+  .side-menu a.active{background:#eaf6f0;border-left-color:var(--nx-green);font-weight:600}
+  .side-menu a.later{color:#b6c1cd;pointer-events:none}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--nx-border);font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--nx-muted)}
+  .kv .v{font-weight:600;text-align:right}
+  .section-title{background:var(--nx-bg);border-radius:6px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--nx-muted);margin:12px 0 6px;text-align:center}
+  .stat-row{display:flex;gap:10px;margin-top:12px}
+  .stat{flex:1;text-align:center;border:1px solid var(--nx-border);border-radius:8px;padding:10px}
+  .stat .num{font-size:18px;font-weight:700}
+  .stat .lbl{font-size:11px;color:var(--nx-muted);margin:4px 0 8px}
+
+  /* Notes */
+  .note-form textarea{width:100%;min-height:70px;border:1px solid var(--nx-border);border-radius:7px;padding:8px;font-family:inherit;font-size:13px;resize:vertical}
+  .note-form .row{display:flex;gap:8px;margin-top:8px}
+  .note-form input[type=date],.note-form select{flex:1;border:1px solid var(--nx-border);border-radius:7px;padding:7px;font-size:13px;background:#fff}
+  .note-item{border-left:3px solid var(--nx-gold);background:#fbfcfe;border-radius:0 8px 8px 0;padding:10px 12px;margin-top:10px;font-size:12.5px}
+  .note-item .meta{color:var(--nx-muted);font-size:11.5px;margin-top:6px;display:flex;gap:10px;flex-wrap:wrap}
+
+  /* Bottom shells */
+  .shell-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+  @media(max-width:900px){.shell-grid{grid-template-columns:repeat(2,1fr)}}
+  .shell-box{background:#fff;border:1px solid var(--nx-border);border-radius:var(--radius);padding:14px;min-height:120px}
+  .shell-box h4{font-size:13px;margin-bottom:10px}
+  .shell-box .empty{color:#b6c1cd;font-size:12px;text-align:center;padding:24px 0}
+
+  /* ===== Calendar ===== */
+  .cal-chrome{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .cal-chrome .month{flex:1;text-align:center;font-weight:700;font-size:16px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--nx-border);border-radius:var(--radius);overflow:hidden;background:#fff}
+  .cal-grid .dow{background:var(--nx-bg);padding:8px;text-align:center;font-size:12px;font-weight:700;color:var(--nx-muted);border-bottom:1px solid var(--nx-border)}
+  .cal-cell{min-height:96px;border-right:1px solid var(--nx-border);border-bottom:1px solid var(--nx-border);padding:6px;font-size:12px;position:relative}
+  .cal-cell:nth-child(7n){border-right:none}
+  .cal-cell .day{color:var(--nx-muted);font-weight:600}
+  .cal-cell.today{background:#fdf9ee}
+  .appt{display:block;margin-top:4px;padding:3px 6px;border-radius:4px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .appt.done{background:var(--nx-green)}
+  .appt.waiting{background:var(--nx-orange)}
+  .appt.meeting{background:var(--nx-blue)}
+
+  /* ===== Modal ===== */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(14,42,71,.45);display:none;align-items:flex-start;justify-content:center;padding:60px 16px;z-index:100}
+  .modal-backdrop.open{display:flex}
+  .modal{background:#fff;border-radius:12px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+  .modal .m-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--nx-border)}
+  .modal .m-head select{border:1px solid var(--nx-border);border-radius:7px;padding:6px 10px;font-size:13px}
+  .modal .m-head .spacer{flex:1}
+  .modal .m-body{padding:16px}
+  .modal .m-foot{padding:12px 16px;border-top:1px solid var(--nx-border);text-align:center}
+  .modal .person{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+  .modal .person .kvs{flex:1}
+
+  /* ===== Cash summary ===== */
+  .sum-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+  @media(max-width:700px){.sum-cards{grid-template-columns:1fr}}
+  .sum-card{background:#fff;border:1px solid var(--nx-border);border-radius:var(--radius);padding:16px;text-align:center}
+  .sum-card .t{font-size:13px;color:var(--nx-muted);font-weight:600}
+  .sum-card .v{font-size:20px;font-weight:800;margin-top:6px}
+  .sum-card .v2{font-size:13px;color:var(--nx-muted);margin-top:2px}
+  .sum-card.income .v{color:var(--nx-green)}
+  .sum-card.expense .v{color:var(--nx-red)}
+  .pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff}
+  .pill.in{background:var(--nx-green)}
+  .pill.out{background:var(--nx-red)}
+
+  /* ===== Forms ===== */
+  .form-grid{display:grid;grid-template-columns:180px 1fr;gap:12px 16px;align-items:center;max-width:720px}
+  .form-grid label{font-size:13px;color:var(--nx-muted);font-weight:600}
+  .form-grid input,.form-grid select,.form-grid textarea{width:100%;border:1px solid var(--nx-border);border-radius:7px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff}
+  .form-grid textarea{min-height:80px;resize:vertical}
+  .form-actions{grid-column:2;display:flex;gap:8px;justify-content:flex-end}
+  .inline-2{display:flex;gap:8px}
+  .inline-2>*{flex:1}
+
+  /* ===== Report / stub cards ===== */
+  .report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:900px){.report-grid{grid-template-columns:1fr}}
+  .report-card h3{font-size:14px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--nx-border)}
+  .report-card a{display:block;padding:5px 0;font-size:13px}
+
+  .muted{color:var(--nx-muted)}
+  .empty-note{color:#b6c1cd;text-align:center;padding:30px;font-size:13px}
+  footer{padding:16px 20px;color:var(--nx-muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- ===== Top bar ===== -->
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Nefalix Clinic CRM</div>
+  <div class="search"><input type="text" placeholder="Ara (Medident İstanbul)"></div>
+  <div class="icons">
+    <span title="WhatsApp">🟢</span>
+    <span title="Bildirimler">🔔</span>
+    <span title="Ana sayfa" onclick="go('home')">🏠</span>
+    <span class="lang">TR</span>
+    <span title="Profil">👤</span>
+  </div>
+</div>
+
+<!-- ===== Main nav ===== -->
+<nav class="mainnav" id="mainnav">
+  <div class="navitem" data-view="home"><button onclick="go('home')">🏠</button></div>
+  <div class="navitem" data-view="crm">
+    <button onclick="go('dynamic')">CRM ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('leads');return false">Yeni Lead</a>
+      <a href="#" onclick="go('leads');return false">Lead Listesi</a>
+      <a href="#" class="disabled">Salesline</a>
+      <a href="#" onclick="go('dynamic');return false"><b>Dinamik Arama</b></a>
+      <a href="#" onclick="go('dynamicPool');return false">Dinamik Arama – Havuz</a>
+      <a href="#" class="disabled">Lead Dönüşüm Geçmişi</a>
+      <a href="#" class="disabled">Lead Takibi</a>
+      <a href="#" class="disabled">CRM Ayarları</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="clients">
+    <button onclick="go('clients')">DANIŞAN ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('client');return false">Yeni Danışan</a>
+      <a href="#" onclick="go('clients');return false">Danışan Listesi</a>
+      <a href="#" class="disabled">Yeni Teklif</a>
+      <a href="#" class="disabled">Teklifler</a>
+      <a href="#" class="disabled">Notlar &amp; Görevler</a>
+      <a href="#" class="disabled">Şikayetler</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="calendar">
+    <button onclick="go('calendar')">RANDEVU ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('calendar');return false">Yeni Randevu</a>
+      <a href="#" onclick="go('calendar');return false"><b>Takvim</b></a>
+      <a href="#" class="disabled">Randevu Listesi</a>
+      <a href="#" class="disabled">Etkinlikler</a>
+      <a href="#" class="disabled">Transfer Takvimi</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="cash">
+    <button onclick="go('cash')">GELİRLER ▾</button>
+    <div class="dropdown">
+      <a href="#" class="disabled">Yeni Satış</a>
+      <a href="#" onclick="go('cash');return false"><b>Kasa</b></a>
+      <a href="#" class="disabled">Satış Listesi</a>
+      <a href="#" class="disabled">Bakiye Listesi</a>
+      <a href="#" class="disabled">Banka Özet</a>
+      <a href="#" class="disabled">Faturalar</a>
+      <a href="#" class="disabled">Gelirler</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="expense">
+    <button onclick="go('expense')">GİDERLER ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('expense');return false">Gider Kaydet</a>
+      <a href="#" class="disabled">Yeni Firma</a>
+      <a href="#" class="disabled">Firma Listesi</a>
+      <a href="#" class="disabled">Ödenecekler</a>
+      <a href="#" class="disabled">Onaylar</a>
+      <a href="#" class="disabled">Giderler</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="whatsapp">
+    <button onclick="go('whatsapp')">WHATSAPP ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('whatsapp');return false">WhatsApp Yönetim Paneli</a>
+      <a href="#" class="disabled">WhatsApp Raporları</a>
+      <a href="#" class="disabled">Meta Yönetim Paneli</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="reports">
+    <button onclick="go('reports')">RAPOR ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('reports');return false">Tüm Raporlar</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="system">
+    <button onclick="go('system')">SİSTEM ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('system');return false">Ayarlar</a>
+      <a href="#" class="disabled">Yetki</a>
+      <a href="#" class="disabled">Güvenlik Ayarları</a>
+      <a href="#" class="disabled">Personel</a>
+      <a href="#" class="disabled">Prim Ayarlamaları</a>
+      <a href="#" class="disabled">Entegrasyonlar</a>
+      <a href="#" class="disabled">Api Yönetimi</a>
+      <a href="#" class="disabled">Hizmet</a>
+      <a href="#" class="disabled">Paket</a>
+      <a href="#" class="disabled">Ürün</a>
+      <a href="#" class="disabled">Tanımlamalar</a>
+      <a href="#" class="disabled">Toplu SMS Gönderim Onayları</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="support">
+    <button onclick="go('support')">DESTEK ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="go('support');return false">Kayıtlarım</a>
+      <a href="#" onclick="go('support');return false">Yeni Destek Kaydı</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<section class="view" id="view-home">
+  <div class="page-head"><h1>Ana Sayfa — Özet</h1></div>
+  <div class="sum-cards">
+    <div class="sum-card"><div class="t">Bugünkü Dinamik Arama</div><div class="v">11</div><div class="v2">3 ulaşılamadı yeniden düştü</div></div>
+    <div class="sum-card"><div class="t">Bugünkü Randevu</div><div class="v">4</div><div class="v2">1 beklemede</div></div>
+    <div class="sum-card"><div class="t">Yeni Lead (bugün)</div><div class="v">6</div><div class="v2">2 atanmamış (havuzda)</div></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;font-size:14px">Hızlı erişim</h3>
+    <div class="toolbar">
+      <button class="btn primary" onclick="go('dynamic')">Dinamik Arama</button>
+      <button class="btn" onclick="go('leads')">Lead Listesi</button>
+      <button class="btn" onclick="go('clients')">Danışan Listesi</button>
+      <button class="btn" onclick="go('calendar')">Takvim</button>
+      <button class="btn" onclick="go('cash')">Kasa</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPEC-1: DINAMIK ARAMA ============ -->
+<section class="view" id="view-dynamic">
+  <div class="page-head">
+    <h1 id="dynamic-title">Dinamik Arama</h1>
+    <button class="btn">İşlemler ▾</button>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <button class="btn">🔍 Arama kriterleri</button>
+      <div class="spacer"></div>
+      <button class="btn">✉ SMS gönder</button>
+      <button class="btn">@ E-Posta gönder</button>
+      <button class="btn primary">🔍 Ara</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Dosya no</th><th>Ülke</th><th>Danışan</th><th>Telefon</th><th>Segment</th>
+            <th>Satış temsilcisi</th><th>Referans kaynağı</th><th>Kayıt tarihi</th><th>Değişiklik tarihi</th><th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody id="dynamic-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEAD LISTESI ============ -->
+<section class="view" id="view-leads">
+  <div class="page-head">
+    <h1>Leadler</h1>
+    <button class="btn">İşlemler ▾</button>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <button class="btn">🔍 Arama kriterleri</button>
+      <div class="spacer"></div>
+      <button class="btn primary">🔍 Ara</button>
+      <button class="btn">Kolonları filtrele</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr><th><input type="checkbox"></th><th>Kayıt tarihi</th><th>Ülke</th><th>Lead</th><th>Telefon</th><th>İşlemler</th></tr>
+        </thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DANIŞAN LISTESI ============ -->
+<section class="view" id="view-clients">
+  <div class="page-head">
+    <h1>Danışanlar</h1>
+    <button class="btn">İşlemler ▾</button>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <button class="btn">🔍 Arama kriterleri</button>
+      <div class="spacer"></div>
+      <button class="btn">✉ SMS gönder</button>
+      <button class="btn">@ E-Posta gönder</button>
+      <button class="btn primary">🔍 Ara</button>
+      <button class="btn">Kolonları filtrele</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th><th>ID</th><th>Ad</th><th>Ülke</th><th>Telefon</th><th>Segment</th>
+            <th>Satış Temsilcisi</th><th>Referans kaynağı</th><th>Değişiklik tarihi</th><th>Kayıt tarihi</th><th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody id="clients-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPEC-2: DANIŞAN KARTI ============ -->
+<section class="view" id="view-client">
+  <div class="client-header">
+    <div class="avatar">👤</div>
+    <div class="who">
+      <h2>🇩🇪 ARİF <span style="color:var(--nx-gold)">●</span></h2>
+      <div class="meta">[ # 11141 ] &nbsp;·&nbsp; 📞 +4917661857475</div>
+    </div>
+    <div class="quick">
+      <button class="btn primary" onclick="toggleQuick(event)">⚡ Hızlı İşlemler ▾</button>
+      <div class="quick-menu" id="quick-menu">
+        <a href="#" onclick="return false">📝 Yeni Not/Görev</a>
+        <a href="#" onclick="return false">📄 Yeni Teklif</a>
+        <a href="#" onclick="go('calendar');return false">📅 Yeni Randevu</a>
+        <a href="#" onclick="return false">💰 Yeni Satış</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="client-grid">
+    <!-- Sol sidebar -->
+    <div class="side-menu">
+      <a href="#" class="active" onclick="return false">📋 Detaylar</a>
+      <a href="#" onclick="return false">✏️ Düzenle</a>
+      <a href="#" class="later">📑 Formlar</a>
+      <a href="#" onclick="return false">📄 Teklif</a>
+      <a href="#" onclick="go('calendar');return false">📅 Randevu</a>
+      <a href="#" onclick="return false">💬 Notlar</a>
+      <a href="#" class="later">🗂 İşlem Kartları</a>
+      <a href="#" onclick="return false">📁 Dosya &amp; Fotoğraf</a>
+      <a href="#" onclick="return false">💵 Satış &amp; Tahsilat</a>
+      <a href="#" class="later">🧾 Faturalar</a>
+      <a href="#" class="later">⭐ Puan</a>
+      <a href="#" class="later">📦 Paket Takibi</a>
+      <a href="#" onclick="return false">📞 İletişim</a>
+      <a href="#" class="later">🩺 Tanılar</a>
+      <a href="#" class="later">🚐 Transfer &amp; Konaklama</a>
+      <a href="#" class="later">🍎 Diyetisyen İzlem Formu</a>
+      <a href="#" class="later">⚖️ Obezite İzlem Formu</a>
+      <a href="#" class="later">💊 Reçete</a>
+      <a href="#" class="later">📋 Tıbbi Raporlar</a>
+      <a href="#" class="later">🦷 Diş Tedavisi</a>
+      <a href="#" class="later">👁 Göz Muayeneleri</a>
+      <a href="#" class="later">🧪 Tahliller</a>
+    </div>
+
+    <!-- Orta: İşlemler -->
+    <div class="card" style="margin-bottom:0">
+      <h3 style="font-size:14px;margin-bottom:12px">✨ İşlemler</h3>
+      <div style="text-align:center;margin-bottom:12px">
+        <div class="avatar" style="margin:0 auto 8px;width:72px;height:72px;font-size:30px">👤</div>
+        <span class="badge potansiyel">Potansiyel Hasta</span>
+      </div>
+      <button class="btn block">💬 Whatsapp sohbeti başlat</button>
+      <button class="btn block">🕘 Düzenleme geçmişi</button>
+      <button class="btn block">⬇ Medikal Kayıtları İndir</button>
+      <button class="btn block">🔁 Dosya No Değiştir</button>
+      <button class="btn block danger-outline">✖ Sil</button>
+
+      <div class="stat-row">
+        <div class="stat"><div class="num">–</div><div class="lbl">Randevu</div><button class="btn sm success">+ Yeni</button></div>
+        <div class="stat"><div class="num">–</div><div class="lbl">Satış</div><button class="btn sm success">+ Yeni</button></div>
+        <div class="stat"><div class="num">–</div><div class="lbl">Teklif</div><button class="btn sm success">+ Yeni</button></div>
+      </div>
+      <div class="section-title" style="margin-top:14px">🏷 Etiketler ▾</div>
+    </div>
+
+    <!-- Orta: Bilgi -->
+    <div class="card" style="margin-bottom:0">
+      <div class="section-title">👤 Kişisel Bilgi</div>
+      <div class="kv"><span class="k">Kayıt tarihi</span><span class="v">11.06.2026 18:25</span></div>
+      <div class="section-title">📍 Adres Bilgileri</div>
+      <div class="kv"><span class="k">Ülke</span><span class="v">Almanya</span></div>
+      <div class="section-title">📋 Diğer Bilgiler</div>
+      <div class="kv"><span class="k">Kayıt açan</span><span class="v">Enes Ceylan</span></div>
+      <div class="kv"><span class="k">Segment</span><span class="v"><span class="seg dynamic">★ Teklif Verildi</span></span></div>
+      <div class="kv"><span class="k">Referans kaynağı</span><span class="v">WHATSAPP TR-medident</span></div>
+      <div class="kv"><span class="k">Satış temsilcisi</span><span class="v">Enes Ceylan</span></div>
+      <div class="kv"><span class="k">Lead Kayıt Tarihi</span><span class="v">11.06.2026 18:25</span></div>
+      <div class="kv"><span class="k">Düzenleyen</span><span class="v">Enes Ceylan</span></div>
+      <div class="kv"><span class="k">Değişiklik tarihi</span><span class="v">11.06.2026 18:42</span></div>
+    </div>
+
+    <!-- Sağ: Notlar -->
+    <div class="card" style="margin-bottom:0">
+      <h3 style="font-size:14px;margin-bottom:12px">💬 Notlar</h3>
+      <div class="note-form">
+        <label style="font-size:12px;color:var(--nx-muted);font-weight:600">Hızlı Not</label>
+        <textarea id="note-body" placeholder="Notunuzu giriniz"></textarea>
+        <div class="row">
+          <input type="date" id="note-date">
+          <select id="note-segment"></select>
+          <button class="btn success" onclick="saveNote()">💾 Kaydet</button>
+        </div>
+      </div>
+      <div id="note-list"></div>
+    </div>
+  </div>
+
+  <!-- Alt sekmeler -->
+  <div class="shell-grid">
+    <div class="shell-box"><h4>İşlem Geçmişi</h4><div class="empty">Kayıt yok</div></div>
+    <div class="shell-box"><h4>Formlar</h4><div class="empty">Kayıt yok</div></div>
+    <div class="shell-box"><h4>Teklifler</h4><div class="empty">Kayıt yok</div></div>
+    <div class="shell-box"><h4>Tanılar</h4><div class="empty">Kayıt yok</div></div>
+  </div>
+</section>
+
+<!-- ============ SPEC-3: TAKVIM ============ -->
+<section class="view" id="view-calendar">
+  <div class="page-head"><h1>Randevu Takvimi</h1></div>
+  <div class="card">
+    <div class="cal-chrome">
+      <button class="btn">▾ Genel Takvim</button>
+      <button class="btn sm">‹</button>
+      <button class="btn sm">Bugün</button>
+      <button class="btn sm">›</button>
+      <div class="month">Temmuz 2026</div>
+      <button class="btn">▾ Takvim Gösterim Tipi</button>
+      <button class="btn">▾ Renk kaynağı</button>
+      <button class="btn">▾ İşlemler</button>
+    </div>
+    <div class="toolbar">
+      <select class="btn"><option>Randevu Durum</option><option>Beklemede</option><option>Tamamlandı</option><option>İptal</option></select>
+      <select class="btn"><option>Oda</option><option>DENTALZONE</option></select>
+      <select class="btn"><option>Personel</option><option>Enes Ceylan</option><option>Abdülkadir Yaşar</option></select>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+</section>
+
+<!-- ============ KASA ============ -->
+<section class="view" id="view-cash">
+  <div class="page-head">
+    <h1>Kasa</h1>
+    <button class="btn">İşlemler ▾</button>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <button class="btn">🔍 Arama kriterleri</button>
+      <button class="btn">☁ Aramayı kaydet</button>
+      <span class="muted">Tarih aralığı:</span>
+      <input type="text" class="btn" value="01.06.2026 - 30.06.2026" style="width:200px">
+      <div class="spacer"></div>
+      <button class="btn primary">🔍 Ara</button>
+    </div>
+  </div>
+  <div class="sum-cards">
+    <div class="sum-card income"><div class="t">↗ Gelir</div><div class="v">3.200 TRY</div><div class="v2">26.390 EUR</div></div>
+    <div class="sum-card expense"><div class="t">↘ Gider</div><div class="v">-256.876 TRY</div><div class="v2">-5.750 EUR</div></div>
+    <div class="sum-card"><div class="t">⚖ Net</div><div class="v">-253.676 TRY</div><div class="v2">20.640 EUR</div></div>
+  </div>
+  <div class="card">
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr><th>Ödeme tarihi</th><th>Danışan/Firma</th><th>İşlem tipi</th><th>Bilgi</th><th>Referans kodu</th><th>Ödeme Yöntemi</th><th>Not</th><th>Tutar</th><th>İşlemler</th></tr>
+        </thead>
+        <tbody id="cash-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GIDER KAYDET ============ -->
+<section class="view" id="view-expense">
+  <div class="page-head"><h1>Gider Kaydet</h1></div>
+  <div class="card">
+    <div class="form-grid">
+      <label>Kategori</label>
+      <select>
+        <option value="">Seçiniz…</option>
+        <option>Klinik Giderleri</option>
+        <option>Maaş ve Personel Giderleri</option>
+        <option>Otel Konaklama ve Transfer Giderleri</option>
+        <option>Rutin Şirket Giderleri</option>
+      </select>
+      <label>Gider Kalemi</label>
+      <select>
+        <option value="">Seçiniz…</option>
+        <option>Telefon Faturası</option>
+        <option>SGK Ödemesi</option>
+        <option>Muhasebe Ücreti</option>
+        <option>Cepten Harcamalar</option>
+        <option>Klinik Ödemesi</option>
+      </select>
+      <label>Fatura no/Ek Bilgi</label>
+      <input type="text" placeholder="">
+      <label>Gider tarihi</label>
+      <input type="date" value="2026-07-15">
+      <label>Tutar</label>
+      <div class="inline-2">
+        <input type="number" placeholder="0,00" step="0.01">
+        <select><option>TRY</option><option>EUR</option><option>USD</option></select>
+      </div>
+      <label>Ödeme Yöntemi</label>
+      <select><option>Nakit</option><option>Kredi Kartı</option><option>Havale/EFT</option></select>
+      <label>Notlar</label>
+      <textarea placeholder=""></textarea>
+      <div class="form-actions">
+        <button class="btn">← Vazgeç</button>
+        <button class="btn success" onclick="alert('Mock: gider kaydedildi')">Kaydet</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHATSAPP ============ -->
+<section class="view" id="view-whatsapp">
+  <div class="page-head"><h1>💬 Whatsapp Yönetim Paneli</h1></div>
+  <div class="card">
+    <div class="toolbar" style="border-bottom:1px solid var(--nx-border);padding-bottom:10px">
+      <button class="btn primary sm">📱 Whatsapp hesapları</button>
+      <button class="btn sm">✉ Template mesajlar</button>
+      <button class="btn sm">🎯 WhatsApp Template Tercihleri</button>
+      <button class="btn sm">🤖 Otomatik yanıtlayıcılar</button>
+      <button class="btn sm">🔀 Whatsapp otomatik atama kuralları</button>
+      <button class="btn sm">⚙ Ayarlar</button>
+      <div class="spacer"></div>
+      <button class="btn success sm">＋ Hesap Ekle</button>
+    </div>
+    <table class="grid">
+      <thead><tr><th>Ad</th><th>Telefon</th><th>Sağlayıcı</th><th>Varsayılan sender mı?</th><th>Durum</th><th>İşlemler</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>TR-medident</td><td>+90 5xx xxx xx xx</td><td>Evolution API</td><td>Evet</td>
+          <td><span class="pill in">Bağlı</span></td>
+          <td class="row-actions"><button class="icon-btn">✏</button><button class="icon-btn">🗑</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ RAPOR ============ -->
+<section class="view" id="view-reports">
+  <div class="page-head"><h1>Raporlar</h1></div>
+  <div class="report-grid">
+    <div class="card report-card">
+      <h3>⭐ Sık Kullanılanlar</h3>
+      <a href="#" onclick="return false">Danışan Bağlılığı Raporu</a>
+      <a href="#" onclick="return false">Çapraz Satış Raporu</a>
+      <a href="#" onclick="return false">Satış Raporu</a>
+      <a href="#" onclick="return false">Tahsilat Raporu</a>
+      <a href="#" onclick="return false">Satış Fiyat Analizi</a>
+    </div>
+    <div class="card report-card">
+      <h3>💰 Finansal Raporlar</h3>
+      <a href="#" onclick="return false">Satış Raporu</a>
+      <a href="#" onclick="return false">Hizmet Satış Adetleri</a>
+      <a href="#" onclick="return false">Ürün Satış Adetleri</a>
+      <a href="#" onclick="return false">Paket Satış Adetleri</a>
+      <a href="#" onclick="return false">Tahsilat Raporu</a>
+      <a href="#" onclick="return false">Çapraz Satış Raporu</a>
+      <a href="#" onclick="return false">Satış Fiyat Analizi</a>
+      <a href="#" onclick="return false">Prim Raporu</a>
+      <a href="#" onclick="return false">Kapora Raporu</a>
+      <a href="#" onclick="return false">Teklif Raporu</a>
+    </div>
+    <div class="card report-card">
+      <h3>👥 Danışan Raporları</h3>
+      <a href="#" onclick="return false">Danışan Bağlılığı Raporu</a>
+      <a href="#" onclick="return false">Danışan Performans Raporu</a>
+      <a href="#" onclick="return false">Referans Kaynağı Performans Raporu</a>
+      <a href="#" onclick="return false">Referans Getiren Kişi Performans Raporu</a>
+      <a href="#" onclick="return false">Gelmeyen Danışanlar Raporu</a>
+      <a href="#" onclick="return false">Danışan Temsilci &amp; Segment Raporu</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SISTEM ============ -->
+<section class="view" id="view-system">
+  <div class="page-head"><h1>Genel Ayarlar</h1></div>
+  <div class="card">
+    <div class="kv"><span class="k">Klinik adı</span><span class="v">Medident İstanbul</span></div>
+    <div class="kv"><span class="k">Renk</span><span class="v">#0E2A47</span></div>
+    <div class="kv"><span class="k">Şablon</span><span class="v">Nefalix</span></div>
+    <div class="kv"><span class="k">Saati geçen beklemedeki randevular otomatik tamamlandı olsun mu?</span><span class="v">Hayır</span></div>
+    <div class="kv"><span class="k">Randevudan ödeme oluşturulduğunda randevu durumu otomatik güncellensin mi?</span><span class="v">Hayır</span></div>
+    <div class="kv"><span class="k">Aynı saate randevu oluşturulmasına izin verilsin mi?</span><span class="v">Evet</span></div>
+    <div class="kv"><span class="k">Randevu hatırlatma mesajı gönderim saati</span><span class="v">16:45</span></div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:14px;margin-bottom:10px">Ayar bölümleri</h3>
+    <div class="toolbar">
+      <button class="btn sm">Danışan Kayıt Tercihleri</button>
+      <button class="btn sm">SMS Gönderim Tercihleri</button>
+      <button class="btn sm">WhatsApp Template Tercihleri</button>
+      <button class="btn sm">Anket Tercihleri</button>
+      <button class="btn sm">Form Tercihleri</button>
+      <button class="btn sm">Satış Modülü Tercihleri</button>
+      <button class="btn sm">Hedefler</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DESTEK ============ -->
+<section class="view" id="view-support">
+  <div class="page-head">
+    <h1>Destek Kayıtları</h1>
+    <button class="btn primary">＋ Yeni Destek Kaydı</button>
+  </div>
+  <div class="card"><div class="empty-note">Henüz destek kaydınız yok.</div></div>
+</section>
+
+</main>
+
+<!-- ============ RANDEVU MODAL ============ -->
+<div class="modal-backdrop" id="appt-modal">
+  <div class="modal">
+    <div class="m-head">
+      <select id="appt-status">
+        <option>Beklemede</option><option>Geldi</option><option>Tamamlandı</option><option>İptal</option><option>Gelmedi</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn sm primary">Hızlı Düzenle</button>
+      <button class="btn sm">▾ İşlemler</button>
+    </div>
+    <div class="m-body">
+      <div class="person">
+        <div class="avatar">👤</div>
+        <div class="kvs">
+          <div class="kv"><span class="k">Ad Soyad:</span><span class="v"><a href="#" onclick="go('client');closeModal();return false" id="m-name">Sevda Emel Korkmaz</a></span></div>
+          <div class="kv"><span class="k">Dosya no:</span><span class="v" id="m-fileno">MDİ-135</span></div>
+          <div class="kv"><span class="k">Telefon:</span><span class="v" id="m-phone">+4915563072884</span></div>
+        </div>
+      </div>
+      <div class="kv"><span class="k">Saat:</span><span class="v" id="m-time">17:00 - 18:30</span></div>
+      <div class="kv"><span class="k">Hizmet:</span><span class="v" id="m-service">PORSELEN DİŞ KAPLAMA</span></div>
+      <div class="kv"><span class="k">Personel:</span><span class="v" id="m-staff">Enes Ceylan</span></div>
+      <div class="kv"><span class="k">Oda:</span><span class="v" id="m-room">DENTALZONE Prova/Geçici Diş Randevusu</span></div>
+      <div class="kv"><span class="k">Randevu Tipi:</span><span class="v" id="m-type">2. Aşama Hastası</span></div>
+      <div class="kv"><span class="k">Not:</span><span class="v" id="m-note" style="font-weight:400;max-width:300px;white-space:normal">sorunlu hata imp yapmıştık şimdi kontrol yapıp karar vereceğiz. tekrar implant yapılabilir mi diye, ya da hareketli protez olacak</span></div>
+      <div class="kv"><span class="k">Kayıt tarihi:</span><span class="v">10.06.2026 10:22</span></div>
+      <div class="kv"><span class="k">Oluşturan:</span><span class="v">Enes Ceylan</span></div>
+      <div class="kv"><span class="k">Değişiklik tarihi:</span><span class="v">08.07.2026 18:29</span></div>
+      <div class="kv"><span class="k">Düzenleyen:</span><span class="v">Enes Ceylan</span></div>
+    </div>
+    <div class="m-foot"><button class="btn success" onclick="closeModal()">Kapat</button></div>
+  </div>
+</div>
+
+<footer>Nefalix Clinic CRM — HTML mock (API bağlı değil) · Kaynak plan: docs/nefalix-stella-crm-plan.md</footer>
+
+<script>
+/* ================= MOCK DATA ================= */
+const SEGMENTS = [
+  {code:"mesajlasiliyor", label:"Mesajlaşılıyor", dyn:true,  cls:"dynamic"},
+  {code:"orta_vadede", label:"Orta Vadede Düşünecek", dyn:true, cls:"dynamic"},
+  {code:"otel_satis", label:"Otel Satış", dyn:false, cls:"closed"},
+  {code:"potansiyel", label:"Potansiyel", dyn:true, cls:"dynamic"},
+  {code:"revizyon", label:"Revizyon", dyn:true, cls:"dynamic"},
+  {code:"rontgen_foto", label:"Röntgen ve Fotoğraf Gönderecek", dyn:true, cls:"dynamic"},
+  {code:"satildi", label:"Satıldı", dyn:false, cls:"sold"},
+  {code:"sicak", label:"Sıcak Alacak", dyn:true, cls:"hot"},
+  {code:"sureci_biten", label:"Süreci Biten", dyn:false, cls:"closed"},
+  {code:"takip", label:"Takip", dyn:true, cls:"dynamic"},
+  {code:"tedaviye_uygun_degil", label:"Tedaviye Uygun Değil", dyn:false, cls:"closed"},
+  {code:"teklif_verildi", label:"Teklif Verildi", dyn:true, cls:"dynamic"},
+  {code:"tekrar_gelen", label:"TEKRAR GELEN LEAD", dyn:true, cls:"hot"},
+  {code:"ulasilamadi", label:"Ulaşılamadı-Tekrar Aranacak", dyn:true, cls:"unreached"}
+];
+const segByCode = c => SEGMENTS.find(s=>s.code===c);
+const segHtml = c => { const s=segByCode(c); return s?`<span class="seg ${s.cls}">${s.code==='teklif_verildi'?'★ ':s.code==='ulasilamadi'?'● ':''}${s.label}</span>`:''; };
+
+const DYNAMIC_ROWS = [
+  {file:"", country:"🇩🇪", name:"ARİF", phone:"+4917661857475", seg:"teklif_verildi", rep:"Enes Ceylan", src:"WHATSAPP TR-medident", created:"11.06.2026 18:25", updated:"11.06.2026 18:42"},
+  {file:"", country:"🇩🇪", name:"Erkan Arici", phone:"+4915217687365", seg:"teklif_verildi", rep:"Enes Ceylan", src:"", created:"19.05.2026 17:32", updated:"22.05.2026 19:19"},
+  {file:"", country:"🇩🇪", name:"Salih Okatan", phone:"+491638114626", seg:"ulasilamadi", rep:"Enes Ceylan", src:"", created:"11.04.2026 15:42", updated:"22.05.2026 18:43"},
+  {file:"", country:"🇩🇪", name:"Hüseyin Gazi Halis", phone:"+491775565951", seg:"ulasilamadi", rep:"Enes Ceylan", src:"", created:"11.04.2026 15:42", updated:"22.05.2026 18:42"},
+  {file:"", country:"🇩🇪", name:"duran-ap", phone:"+491637213541", seg:"rontgen_foto", rep:"Enes Ceylan", src:"WHATSAPP TR-medident", created:"09.04.2026 16:33", updated:"22.05.2026 18:36"},
+  {file:"", country:"🇩🇪", name:"medi-dent", phone:"+491632265784", seg:"teklif_verildi", rep:"Enes Ceylan", src:"WHATSAPP TR-medident", created:"14.04.2026 16:54", updated:"22.05.2026 18:34"},
+  {file:"", country:"🇩🇪", name:"Ilyas Carcar", phone:"+491796873763", seg:"rontgen_foto", rep:"Enes Ceylan", src:"", created:"05.05.2026 17:51", updated:"22.05.2026 18:33"},
+  {file:"", country:"🇩🇪", name:"Nazik Balabanoğlu-medi", phone:"+4917623883536", seg:"ulasilamadi", rep:"Enes Ceylan", src:"WHATSAPP TR-medident", created:"16.04.2026 18:01", updated:"22.05.2026 18:29"},
+  {file:"", country:"🇩🇪", name:"Müge Deniz", phone:"+4915126959368", seg:"ulasilamadi", rep:"Enes Ceylan", src:"", created:"16.04.2026 17:36", updated:"22.05.2026 18:25"},
+  {file:"", country:"🇩🇪", name:"medi-app", phone:"+491726405712", seg:"ulasilamadi", rep:"Abdülkadir Yaşar", src:"WHATSAPP TR-medident", created:"14.04.2026 16:54", updated:"22.05.2026 19:19"}
+];
+
+const LEAD_ROWS = [
+  {created:"08.07.2026 23:17", country:"🌍", name:"Robertmeery", phone:"85627132716"},
+  {created:"08.07.2026 12:32", country:"🌍", name:"Jimmyfub", phone:"82677364186"},
+  {created:"08.07.2026 06:02", country:"🌍", name:"Traveldam", phone:"87523825156"},
+  {created:"07.07.2026 18:07", country:"🌍", name:"Robertmeery", phone:"88515535336"},
+  {created:"07.07.2026 14:11", country:"🌍", name:"Robertmeery", phone:"81623374395"},
+  {created:"06.07.2026 18:44", country:"🌍", name:"Jimmyfub", phone:"86393222774"}
+];
+
+const CLIENT_ROWS = [
+  {id:11143, name:"mediapp", country:"🇩🇪", phone:"+4917680632460", seg:"ulasilamadi", rep:"Abdülkadir Yaşar", src:"WHATSAPP TR-medident", updated:"01.07.2026", created:"01.07.2026 19:57"},
+  {id:11142, name:"enes ceylan", country:"🇹🇷", phone:"+905359288250", seg:"", rep:"Enes Ceylan", src:"", updated:"", created:"22.06.2026 16:15"},
+  {id:11141, name:"ARİF", country:"🇩🇪", phone:"+4917661857475", seg:"teklif_verildi", rep:"Enes Ceylan", src:"WHATSAPP TR-medident", updated:"11.06.2026", created:"11.06.2026 18:25"},
+  {id:11140, name:"Ali çarkıt", country:"🇩🇪", phone:"+491728668794", seg:"tekrar_gelen", rep:"Enes Ceylan", src:"WHATSAPP TR-medident", updated:"", created:"05.06.2026 17:49"},
+  {id:11139, name:"Tokac, Müjğan", country:"🇩🇪", phone:"+491785733878", seg:"ulasilamadi", rep:"Abdülkadir Yaşar", src:"WHATSAPP TR-medident", updated:"08.06.2026", created:"05.06.2026 17:49"},
+  {id:11138, name:"~HASRST", country:"🇩🇪", phone:"+4915908484101", seg:"ulasilamadi", rep:"Abdülkadir Yaşar", src:"WHATSAPP TR-medident", updated:"05.06.2026", created:"05.06.2026 17:36"},
+  {id:11135, name:"HASAN BİLDİK REFİ", country:"🇩🇪", phone:"+4915204299233", seg:"teklif_verildi", rep:"Abdülkadir Yaşar", src:"Hasta Referansı", updated:"03.06.2026", created:"03.06.2026 15:50"}
+];
+
+const CASH_ROWS = [
+  {date:"30.06.2026", who:"Bayram Acikel", type:"in", info:"Satış", ref:"D6819", method:"Nakit", note:"", amount:"4.840 EUR"},
+  {date:"30.06.2026", who:"Refiyce Celik", type:"in", info:"Satış", ref:"ZZ7JR", method:"Nakit", note:"", amount:"3.500 EUR"},
+  {date:"30.06.2026", who:"Refiyce Celik", type:"in", info:"Satış", ref:"2CDY8", method:"Nakit", note:"", amount:"600 EUR"},
+  {date:"30.06.2026", who:"", type:"out", info:"Cepten Harcamalar (Rutin Şirket Giderleri)", ref:"", method:"Nakit", note:"NEFALIXAI HOSTING API VS", amount:"-5.583 TRY"},
+  {date:"30.06.2026", who:"", type:"out", info:"SGK ÖDEMESİ (Maaş ve personel Giderleri)", ref:"", method:"Nakit", note:"SGK", amount:"-20.213 TRY"},
+  {date:"30.06.2026", who:"", type:"out", info:"Telefon Faturası (Rutin Şirket Giderleri)", ref:"", method:"Nakit", note:"VODAFON", amount:"-3.500 TRY"},
+  {date:"30.06.2026", who:"", type:"out", info:"MUHASEBE ÜCRETİ (Rutin Şirket Giderleri)", ref:"", method:"Nakit", note:"MUHASEBE", amount:"-3.000 TRY"},
+  {date:"30.06.2026", who:"", type:"out", info:"Dentalzone Ödemesi (Klinik Giderleri)", ref:"", method:"Nakit", note:"KLİNİK ÖDEMESİ", amount:"-5.750 EUR"},
+  {date:"30.06.2026", who:"", type:"out", info:"Maaş Ödemesi (Maaş ve personel Giderleri)", ref:"", method:"Nakit", note:"ÖDENDİ", amount:"-180.000 TRY"},
+  {date:"30.06.2026", who:"", type:"out", info:"SEL TUR KONAKLAMA-TRANSFER (Otel Konaklama ve Transfer Giderleri)", ref:"", method:"Nakit", note:"otel transfer", amount:"-29.940 TRY"},
+  {date:"29.06.2026", who:"Yağmur nihat ketenci", type:"in", info:"Satış", ref:"Z0S06", method:"Nakit", note:"", amount:"2.000 EUR"},
+  {date:"22.06.2026", who:"mustafa Şenlikci", type:"in", info:"Satış", ref:"EKZMR", method:"Nakit", note:"", amount:"9.000 EUR"}
+];
+
+const APPTS = [
+  {day:1,  time:"11:00", name:"Yağmur nihat ketenci", status:"done",    service:"BİTİM RANDEVUSU", staff:"Enes Ceylan", room:"DENTALZONE", type:"Bitim", phone:"+49xxxxxxxxx", fileno:"MDİ-101", note:""},
+  {day:1,  time:"14:00", name:"Faik Erol", status:"done",    service:"GÖRÜŞME KONTROL", staff:"Enes Ceylan", room:"DENTALZONE", type:"Kontrol", phone:"+49xxxxxxxxx", fileno:"MDİ-108", note:""},
+  {day:6,  time:"09:00", name:"burhan coşkun", status:"done", service:"İMPLANT NEO", staff:"Enes Ceylan", room:"DENTALZONE", type:"İmplant", phone:"+49xxxxxxxxx", fileno:"MDİ-112", note:""},
+  {day:6,  time:"10:30", name:"Serdar Çetinkaya", status:"done", service:"BİTİM RANDEVUSU", staff:"Enes Ceylan", room:"DENTALZONE", type:"Bitim", phone:"+49xxxxxxxxx", fileno:"MDİ-119", note:""},
+  {day:13, time:"10:30", name:"Funda Sultan Zühlsdorf", status:"done", service:"BİTİM RANDEVUSU", staff:"Enes Ceylan", room:"DENTALZONE", type:"Bitim", phone:"+49xxxxxxxxx", fileno:"MDİ-127", note:""},
+  {day:20, time:"17:00", name:"Sevda Emel Korkmaz", status:"waiting", service:"PORSELEN DİŞ KAPLAMA", staff:"Enes Ceylan", room:"DENTALZONE Prova/Geçici Diş Randevusu", type:"2. Aşama Hastası", phone:"+4915563072884", fileno:"MDİ-135",
+   note:"sorunlu hata imp yapmıştık şimdi kontrol yapıp karar vereceğiz. tekrar implant yapılabilir mi diye, ya da hareketli protez olacak"},
+  {day:21, time:"16:00", name:"Feyza K.", status:"waiting", service:"KONTROL", staff:"Abdülkadir Yaşar", room:"DENTALZONE", type:"Kontrol", phone:"+49xxxxxxxxx", fileno:"MDİ-140", note:""}
+];
+
+let NOTES = [
+  {body:"ANNESİ İÇİN ARAMMIŞ. ALT ÇENE. HASTA REFİ BU HÜLYA COBANOĞLUNUN. SOL ALT SAĞ ALT DİŞ YOK KALAN DİŞLER TAKMA. 9. AYIN 15 İNDE GELECEKLERMİŞ. CEMİLE ÇETİN.",
+   at:"11.06.2026 18:42", by:"Enes Ceylan", seg:"teklif_verildi"}
+];
+
+/* ================= NAV ================= */
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const map = {dynamicPool:'dynamic'};
+  const target = map[view] || view;
+  const el = document.getElementById('view-'+target);
+  if(el) el.classList.add('active');
+  document.getElementById('dynamic-title').textContent = (view==='dynamicPool') ? 'Dinamik Arama — Havuz' : 'Dinamik Arama';
+  if(view==='dynamicPool') renderDynamic(true); else if(view==='dynamic') renderDynamic(false);
+  document.querySelectorAll('#mainnav .navitem').forEach(n=>n.classList.remove('active'));
+  const navKey = {home:'home',dynamic:'crm',dynamicPool:'crm',leads:'crm',clients:'clients',client:'clients',calendar:'calendar',cash:'cash',expense:'expense',whatsapp:'whatsapp',reports:'reports',system:'system',support:'support'}[view];
+  const navEl = document.querySelector(`#mainnav .navitem[data-view="${navKey}"]`);
+  if(navEl) navEl.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ================= RENDER ================= */
+function renderDynamic(poolOnly){
+  const rows = poolOnly ? DYNAMIC_ROWS.filter(r=>r.rep==='Abdülkadir Yaşar') : DYNAMIC_ROWS;
+  document.getElementById('dynamic-tbody').innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.file||''}</td>
+      <td class="flag">${r.country}</td>
+      <td><a href="#" onclick="go('client');return false">${r.name}</a></td>
+      <td>${r.phone}</td>
+      <td>${segHtml(r.seg)}</td>
+      <td>${r.rep}</td>
+      <td>${r.src}</td>
+      <td>${r.created}</td>
+      <td>${r.updated}</td>
+      <td class="row-actions">
+        <button class="icon-btn green" title="Detay" onclick="go('client')">➜</button>
+        <button class="icon-btn" title="Not">💬</button>
+        <button class="icon-btn" title="İşaretle">🔖</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderLeads(){
+  document.getElementById('leads-tbody').innerHTML = LEAD_ROWS.map(r=>`
+    <tr>
+      <td><input type="checkbox"></td>
+      <td>${r.created}</td>
+      <td class="flag">${r.country}</td>
+      <td>${r.name}</td>
+      <td>${r.phone}</td>
+      <td class="row-actions">
+        <button class="icon-btn green" title="Yönlendir / Aç" onclick="go('client')">➜</button>
+        <button class="icon-btn" title="Diğer">▾</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderClients(){
+  document.getElementById('clients-tbody').innerHTML = CLIENT_ROWS.map(r=>`
+    <tr>
+      <td><input type="checkbox"></td>
+      <td>${r.id}</td>
+      <td><a href="#" onclick="go('client');return false">${r.name}</a></td>
+      <td class="flag">${r.country}</td>
+      <td>${r.phone}</td>
+      <td>${r.seg?segHtml(r.seg):''}</td>
+      <td>${r.rep}</td>
+      <td>${r.src}</td>
+      <td>${r.updated}</td>
+      <td>${r.created}</td>
+      <td class="row-actions">
+        <button class="icon-btn green" title="WhatsApp">💬</button>
+        <button class="icon-btn" title="Aç" onclick="go('client')">➜</button>
+        <button class="icon-btn" title="Diğer">▾</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderCash(){
+  document.getElementById('cash-tbody').innerHTML = CASH_ROWS.map(r=>`
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.who}</td>
+      <td><span class="pill ${r.type==='in'?'in':'out'}">${r.type==='in'?'Para girişi':'Para çıkışı'}</span></td>
+      <td style="white-space:normal;max-width:320px">${r.info}</td>
+      <td>${r.ref}</td>
+      <td>${r.method}</td>
+      <td>${r.note}</td>
+      <td style="font-weight:700;color:${r.type==='in'?'var(--nx-green)':'var(--nx-red)'}">${r.amount}</td>
+      <td class="row-actions"><button class="icon-btn">✏</button>${r.type==='out'?'<button class="icon-btn" style="color:var(--nx-red)">🗑</button>':''}</td>
+    </tr>`).join('');
+}
+
+function renderCalendar(){
+  const grid = document.getElementById('cal-grid');
+  const dows = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  let html = dows.map(d=>`<div class="dow">${d}</div>`).join('');
+  // Temmuz 2026: 1 Temmuz = Çarşamba (index 2). 31 gün.
+  const firstDow = 2, days = 31, today = 15;
+  for(let i=0;i<firstDow;i++) html += `<div class="cal-cell"><span class="day muted">${29+i}</span></div>`;
+  for(let d=1;d<=days;d++){
+    const appts = APPTS.filter(a=>a.day===d).map((a)=>{
+      const idx = APPTS.indexOf(a);
+      return `<span class="appt ${a.status==='done'?'done':a.status==='waiting'?'waiting':'meeting'}" onclick="openModal(${idx})">${a.time} ${a.name}</span>`;
+    }).join('');
+    html += `<div class="cal-cell ${d===today?'today':''}"><span class="day">${d}</span>${appts}</div>`;
+  }
+  const used = firstDow + days;
+  const rest = (7 - used % 7) % 7;
+  for(let i=1;i<=rest;i++) html += `<div class="cal-cell"><span class="day muted">${i}</span></div>`;
+  grid.innerHTML = html;
+}
+
+function renderNoteSegmentSelect(){
+  document.getElementById('note-segment').innerHTML =
+    `<option value="">Segment seç…</option>` +
+    SEGMENTS.map(s=>`<option value="${s.code}" ${s.code==='teklif_verildi'?'selected':''}>${s.label}</option>`).join('');
+}
+
+function renderNotes(){
+  document.getElementById('note-list').innerHTML = NOTES.map(n=>`
+    <div class="note-item">
+      ${n.body}
+      <div class="meta">
+        <span>🕘 ${n.at}</span><span>👤 ${n.by}</span>
+        ${n.seg?`<span>${segHtml(n.seg)}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+/* ================= ACTIONS ================= */
+function saveNote(){
+  const body = document.getElementById('note-body').value.trim();
+  const seg = document.getElementById('note-segment').value;
+  if(!body){alert('Not giriniz');return}
+  const now = new Date();
+  const at = now.toLocaleDateString('tr-TR')+' '+now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  NOTES.unshift({body, at, by:'Enes Ceylan', seg});
+  document.getElementById('note-body').value='';
+  renderNotes();
+  const s = segByCode(seg);
+  if(s && s.dyn) alert(`Mock: not kaydedildi. Segment "${s.label}" dinamik listede — kayıt yarın Dinamik Arama'ya düşer.`);
+}
+
+function toggleQuick(e){
+  e.stopPropagation();
+  document.getElementById('quick-menu').classList.toggle('open');
+}
+document.addEventListener('click',()=>document.getElementById('quick-menu').classList.remove('open'));
+
+function openModal(idx){
+  const a = APPTS[idx];
+  document.getElementById('m-name').textContent = a.name;
+  document.getElementById('m-fileno').textContent = a.fileno;
+  document.getElementById('m-phone').textContent = a.phone;
+  document.getElementById('m-time').textContent = a.time+' - '+(a.time==='17:00'?'18:30':'');
+  document.getElementById('m-service').textContent = a.service;
+  document.getElementById('m-staff').textContent = a.staff;
+  document.getElementById('m-room').textContent = a.room;
+  document.getElementById('m-type').textContent = a.type;
+  document.getElementById('m-note').textContent = a.note || '—';
+  document.getElementById('appt-status').value = a.status==='waiting'?'Beklemede':a.status==='done'?'Tamamlandı':'Beklemede';
+  document.getElementById('appt-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('appt-modal').classList.remove('open')}
+document.getElementById('appt-modal').addEventListener('click',e=>{if(e.target.id==='appt-modal')closeModal()});
+
+/* ================= INIT ================= */
+renderDynamic(false);
+renderLeads();
+renderClients();
+renderCash();
+renderCalendar();
+renderNoteSegmentSelect();
+renderNotes();
+go('dynamic');
+</script>
+</body>
+</html>

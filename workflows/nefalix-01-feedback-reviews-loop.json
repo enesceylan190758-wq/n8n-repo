@@ -426,7 +426,7 @@
         "url": "={{ ($env.WEBHOOK_URL || $env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/').replace(/\\/$/, '') + '/webhook/nefalix/whatsapp/send' }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({  number: String($env.CLINIC_MANAGER_WHATSAPP || '905491190819').replace(/\\D/g, ''), text: $('Detractor Şikayet').item.json.alertMessage + '\\n\\nBu hasta Google\\'da olumsuz yorum yazmadan önce görüşmeniz önerilir. Panel: nefalixai.com/dashboard', source: 'nps-manager-alert', priority: 'critical' }) }}",
+        "jsonBody": "={{ JSON.stringify({  number: String($env.CLINIC_MANAGER_WHATSAPP || '905491190819').replace(/\\D/g, ''), text: $('Detractor Şikayet').item.json.alertMessage + '\\n\\nBu hasta Google\\'da olumsuz yorum yazmadan önce görüşmeniz önerilir. Panel: nefalix.com/dashboard', source: 'nps-manager-alert', priority: 'critical' }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",

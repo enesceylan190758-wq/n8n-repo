@@ -1,11 +1,22 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-06-25  
+**Tarih:** 2026-07-15  
 **Pilot `clinic_id`:** `51738ea8-c12e-40ce-a0e2-42869496d76b` (MediDent Kartal)
+
+## Takım ayrımı (karar — 2026-07-15)
+
+İş büyürse sistemin baştan taşınması gerekebilir. Bu yüzden:
+
+| Rol | Kim | Ne yapar |
+|-----|-----|----------|
+| **PM / vibe coding / mimari** | Bu taraf (Cursor + ekip) | İşin *ne* olduğunu yazar: sistem mimarisi, ürün sınırları, SOP, içerik/iş kuralları, kararlar |
+| **Next.js altyapı geçişi** | **Arif** | Mevcut içerikleri Next.js’e taşır; mimariyi *gerçekleştirir* |
+
+**Kural:** Bu tarafta spec + mimari + canlı product mantığı; Next.js migration uygulaması Arif’te. Cursor agent sessizce “tüm siteyi Next’e çevir” veya paralel second codebase kurmaya girişmesin — Arif’in işine girmesin; Arif’e verilecek net brief / mimari doküman üretmeye odaklansın.
 
 ## Proje özeti
 
-Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/eNPS, Google yorumları, inbox ve itibar yönetimi platformudur. Bu repo (`n8n-repo`) orchestration katmanıdır: `directives/` SOP, `execution/` deterministik scriptler, `workflows/` n8n JSON, `supabase/migrations/` şema. Canlı stack: VPS `93.127.186.45` (`/opt/nefalix`), API `https://api.nefalixai.com`, site/dashboard `https://nefalixai.com`. Public site ayrı workspace: **`/Users/enesceylan/nefalix-landing`** (Vercel projesi `nefalix-landing`, deploy: `vercel --prod --yes`).
+Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/eNPS, Google yorumları, inbox ve itibar yönetimi platformudur. Bu repo (`n8n-repo`) orchestration katmanıdır: `directives/` SOP, `execution/` deterministik scriptler, `workflows/` n8n JSON, `supabase/migrations/` şema. Canlı stack: VPS `93.127.186.45` (`/opt/nefalix`), API `https://api.nefalixai.com`, site/dashboard `https://nefalixai.com`. Public site ayrı workspace: **`/Users/enesceylan/nefalix-landing`** (Vercel projesi `nefalix-landing`, deploy: `vercel --prod --yes`). Canlı site bugün HTML/JS; uzun vadede Next.js hedefi Arif tarafında.
 
 ## Bu sohbette yapılanlar
 

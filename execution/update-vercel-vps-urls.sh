@@ -17,7 +17,7 @@ if [[ -f .env ]]; then
   set +a
 fi
 
-HOST="${N8N_PUBLIC_HOST:-api.nefalixai.com}"
+HOST="${N8N_PUBLIC_HOST:-api.nefalix.com}"
 DASH_URL="https://${HOST}/webhook/nefalix/dashboard/data"
 SEND_URL="https://${HOST}/webhook/nefalix/inbox/send"
 CLEAR_URL="https://${HOST}/webhook/nefalix/inbox/clear"
@@ -54,4 +54,4 @@ if [[ -f nefalix-chat.js ]] && [[ "$CHAT_URL" != *"CHAT_WEBHOOK_ID"* ]]; then
 fi
 "$NPX" vercel --prod --yes
 
-echo "✓ Vercel güncellendi — https://nefalixai.com/dashboard"
+echo "✓ Vercel güncellendi — https://nefalix.com/dashboard"

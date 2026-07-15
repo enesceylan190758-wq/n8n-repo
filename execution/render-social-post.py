@@ -23,8 +23,15 @@ RENDER_DIR = ROOT / ".tmp" / "social-renders"
 SCREENSHOT_JS = Path(__file__).resolve().parent / "render-social-screenshot.js"
 
 
-def sb_request(method: str, path: str, body: dict | None = None) -> list | dict:
+def sb_base() -> str:
     base = os.environ.get("SUPABASE_URL", "http://127.0.0.1:54321").rstrip("/")
+    if "host.docker.internal" in base:
+        base = "http://127.0.0.1:54321"
+    return base
+
+
+def sb_request(method: str, path: str, body: dict | None = None) -> list | dict:
+    base = sb_base()
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
     if not key:
         raise SystemExit("SUPABASE_SERVICE_ROLE_KEY eksik")
@@ -64,12 +71,17 @@ def render_html(template_row: dict) -> str:
     badges = template_row.get("badges") or []
     if isinstance(badges, str):
         badges = json.loads(badges)
+    logo = ROOT / "assets" / "brand" / "nefalix-logo-512.png"
+    if not logo.is_file():
+        logo = ROOT / "assets" / "brand" / "nefalix-logo.png"
+    logo_uri = logo.resolve().as_uri() if logo.is_file() else ""
     replacements = {
         "{{POST_NUMBER}}": str(template_row.get("post_number", "")),
         "{{EYEBROW}}": template_row.get("eyebrow", ""),
         "{{HEADLINE_HTML}}": template_row.get("headline_html", ""),
         "{{SUBTITLE}}": template_row.get("subtitle", ""),
         "{{BADGES_HTML}}": badges_html(badges),
+        "{{LOGO_PATH}}": logo_uri,
     }
     for k, v in replacements.items():
         html = html.replace(k, v)
@@ -78,7 +90,11 @@ def render_html(template_row: dict) -> str:
 
 def screenshot_html(html_path: Path, output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    chrome = os.environ.get("CHROME_PATH", "/usr/local/bin/google-chrome")
+    chrome = os.environ.get("CHROME_PATH", "/usr/bin/google-chrome-stable")
+    if not Path(chrome).is_file():
+        chrome = "/usr/bin/chromium-browser"
+    if not Path(chrome).is_file():
+        chrome = "/usr/local/bin/google-chrome"
     cmd = [
         "node",
         str(SCREENSHOT_JS),
