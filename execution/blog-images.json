@@ -1,0 +1,50 @@
+{
+  "default": {
+    "cover": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=1200&h=320&fit=crop&q=85"
+  },
+  "NPS": {
+    "cover": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1666214280384-d83e3a0ae43e?w=1200&h=320&fit=crop&q=85"
+  },
+  "İtibar": {
+    "cover": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=320&fit=crop&q=85"
+  },
+  "WhatsApp": {
+    "cover": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=1200&h=320&fit=crop&q=85"
+  },
+  "Google": {
+    "cover": "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=320&fit=crop&q=85"
+  },
+  "HBYS": {
+    "cover": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&h=320&fit=crop&q=85"
+  },
+  "Recall": {
+    "cover": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&h=320&fit=crop&q=85"
+  },
+  "Sentinel": {
+    "cover": "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&h=320&fit=crop&q=85"
+  },
+  "Sağlık Turizmi": {
+    "cover": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=320&fit=crop&q=85"
+  },
+  "AEO": {
+    "cover": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&h=320&fit=crop&q=85"
+  },
+  "KVKK": {
+    "cover": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&h=320&fit=crop&q=85"
+  },
+  "Operasyon": {
+    "cover": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&h=560&fit=crop&q=85",
+    "footer": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=320&fit=crop&q=85"
+  }
+}

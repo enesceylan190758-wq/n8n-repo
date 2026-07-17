@@ -1,13 +1,63 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-06-25  
+**Tarih:** 2026-07-17  
 **Pilot `clinic_id`:** `51738ea8-c12e-40ce-a0e2-42869496d76b` (MediDent Kartal)
+
+## Takım ayrımı + n8n → Next.js (Arif brief)
+
+İş büyürse sistem taşınabilir. Karar:
+
+| Rol | Kim | Ne |
+|-----|-----|-----|
+| PM / vibe coding / mimari | Bu taraf | İşin *ne* olduğu — spec, iş kuralları |
+| Next.js geçişi | **Arif** | n8n + HTML/Vercel işlerinin Next.js’te *gerçekleştirilmesi* |
+
+**Arif tek kaynak (PDF + MD):**
+- `docs/Nefalix_Urun_ve_Mimari_Aktarim.md`
+- `docs/Nefalix_Urun_ve_Mimari_Aktarim.pdf`
+- Yeniden üret: `/usr/bin/python3 execution/generate-urun-aktarim-pdf.py`
+
+Cursor agent sessizce paralel Next codebase kurmaz; spec bu dokümanda yaşatılır.
 
 ## Proje özeti
 
 Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/eNPS, Google yorumları, inbox ve itibar yönetimi platformudur. Bu repo (`n8n-repo`) orchestration katmanıdır: `directives/` SOP, `execution/` deterministik scriptler, `workflows/` n8n JSON, `supabase/migrations/` şema. Canlı stack: VPS `93.127.186.45` (`/opt/nefalix`), API `https://api.nefalixai.com`, site/dashboard `https://nefalixai.com`. Public site ayrı workspace: **`/Users/enesceylan/nefalix-landing`** (Vercel projesi `nefalix-landing`, deploy: `vercel --prod --yes`).
 
+## Abdülkadir — Klinik CRM düzenlemesi
+
+**Sorumlu:** Abdülkadir Yaşar (Medident pilot)  
+**Directive:** `directives/clinic_crm.md`  
+**Canlı panel:** `https://nefalixai.com/klinik-crm` — giriş kodu: `abdulkadir`
+
+| CRM | Durum | Abdülkadir ne yapar |
+|-----|--------|---------------------|
+| **Klinik CRM** (`/klinik-crm`) | P0 canlı | Lead, atama, dinamik arama, not, randevu, danışan düzenleme |
+| **Saha CRM** (`/crm`) | Canlı (iç satış) | Nefalix saha pipeline — Medident operasyonu değil |
+| **Estesoft HBYS** | Pilot | Randevu tamamlandı → NPS taslak → dashboard onay |
+
+**Düzenleme dosyaları (Cursor):**
+- `nefalix-landing/klinik-crm.html` — arayüz
+- `nefalix-landing/api/_lib/clinic-crm.js` — API + Dinamik Arama kuralları
+- Supabase `crm_segments` / `crm_users` — segment offset, yeni temsilci
+
+**Deploy:** `cd nefalix-landing && vercel --prod --yes` (onaylı)
+
+**Abdülkadir Cursor ilk prompt:** `directives/clinic_crm.md` sonundaki blok.
+
 ## Bu sohbette yapılanlar
+
+### CRM devri (Abdülkadir)
+
+- `directives/clinic_crm.md` — Klinik CRM düzenleme SOP (giriş, dosya haritası, iş kuralları, Supabase segment/kullanıcı, deploy)
+- Handoff’a Abdülkadir bölümü eklendi
+
+### Ürün + mimari aktarım (Arif)
+
+- `docs/Nefalix_Urun_ve_Mimari_Aktarim.md` — tüm modüller (CX 6, Dashboard, Klinik CRM, Saha CRM, entegrasyon, büyüme, platform)
+- `docs/Nefalix_Urun_ve_Mimari_Aktarim.pdf` — Arif’e gönderilecek PDF
+- `execution/generate-urun-aktarim-pdf.py` — MD→PDF (Arial Unicode, `/usr/bin/python3`)
+- Klinik CRM: Dinamik Arama, segment `gun_offset`, atama kuralları kod gerçeğine göre yazıldı
+- Secret/şifre PDF’te yok
 
 ### Landing (`nefalix-landing` — ayrı repo)
 
@@ -44,9 +94,9 @@ Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/
 
 ## Sonraki 3 adım
 
-1. **Yeni hesapta:** `.tmp/handoff.md` + `AGENTS.md` + ilgili `directives/` oku; `git pull` sonra durumu doğrula.
-2. **`nefalix-landing`:** `git status` → remote varsa push; yoksa GitHub repo oluştur/bağla; mobil menü + kalan başlık gradientlerini bitir.
-3. **`n8n-repo`:** `directives/supabase_migrate.md` + `import_workflows.md` ile migration import ve `execution/test-all-workflows.sh`; PayTR secret gelince Vercel env + fiyatlar checkout test.
+1. **Abdülkadir:** `directives/clinic_crm.md` oku → Medident’ten gelen düzenleme listesini Cursor’a yaz → `klinik-crm.html` / `clinic-crm.js` veya Supabase segment.
+2. **`nefalix-landing`:** CRM değişikliği sonrası `vercel --prod`; git remote yoksa bağla.
+3. **`n8n-repo`:** `crm_*` tabloları için migration ekle (`supabase/migrations/`) — şu an canlı DB’de var, repoda yok.
 
 ## Önemli env değişkenleri (sadece isimler)
 

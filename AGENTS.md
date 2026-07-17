@@ -58,6 +58,7 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Supabase migration | `directives/supabase_migrate.md` |
 | Site chat tunnel | `directives/chat_tunnel.md` |
 | Estesoft CRM (Medident) | `directives/estesoft_integration.md` |
+| Klinik CRM düzenleme (Medident) | `directives/clinic_crm.md` |
 | Evolution API (WhatsApp pilot) | `directives/evolution_setup.md` |
 | Randevu tetikleme (HBYS/CRM) | `directives/appointment_trigger.md` |
 | Ürün yol haritası | `directives/product_roadmap.md` |
@@ -66,6 +67,8 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Medident dashboard otomasyonları | `directives/activate_medident_pilot.md` |
 | Güvenlik / secret rotasyon | `directives/security.md` |
 | Sosyal medya otomasyonu (IG/LinkedIn) | `directives/social_media_automation.md` |
+| Günlük blog (kaynaklar) | `directives/daily_blog.md` |
+| Günlük GEO (AI alıntı paketleri) | `directives/geo.md` |
 
 ## Self-Annealing Döngüsü
 

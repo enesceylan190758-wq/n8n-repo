@@ -1,0 +1,19 @@
+[
+  {"tag": "NPS", "angle": "Kliniklerde NPS nedir ve randevu sonrası nasıl uygulanır? Adımlar, puan eşikleri ve Google yorum daveti ilişkisi."},
+  {"tag": "WhatsApp", "angle": "Kliniklerde WhatsApp hasta iletişimi: KVKK, İYS ve operasyonel kontrol listesi."},
+  {"tag": "Google", "angle": "Randevu sonrası Google yorum daveti nasıl kurulur? Zamanlama, mesaj ve promoter kuralı."},
+  {"tag": "HBYS", "angle": "Estesoft / HBYS sonrası otomatik geri bildirim akışı nasıl kurulur?"},
+  {"tag": "İtibar", "angle": "Kötü Google yorumuna profesyonel yanıt çerçevesi: ne yazılır, ne yazılmaz."},
+  {"tag": "Sentinel", "angle": "Klinik itibar yönetiminde erken uyarı: Şikayetvar ve sosyal sinyaller."},
+  {"tag": "Diş", "angle": "Diş kliniği hasta deneyimi yazılımı seçim kriterleri: entegrasyon, KVKK, ölçüm."},
+  {"tag": "AEO", "angle": "Hastalar Google yerine yapay zekâya soruyor: klinikler için AEO/GEO görünürlüğü."},
+  {"tag": "Recall", "angle": "Kayıp hastayı geri kazanma: recall kampanyalarında dönüşüm artıran mesaj kalıpları."},
+  {"tag": "eNPS", "angle": "Klinik ekiplerinde eNPS ölçümü ve hasta deneyimine yansıması."},
+  {"tag": "KVKK", "angle": "Hasta verisi ve WhatsApp mesajlaşmada KVKK uyum kontrol listesi."},
+  {"tag": "Sağlık Turizmi", "angle": "Sağlık turizminde itibar yönetimi ve uluslararası hasta güveni."},
+  {"tag": "Estetik", "angle": "Estetik kliniklerde beklenti yönetimi ve olumsuz yorum önleme."},
+  {"tag": "Saç Ekimi", "angle": "Saç ekimi merkezlerinde hasta yolculuğu ve takip iletişimi."},
+  {"tag": "Otel", "angle": "Butik otellerde konuk deneyimi ve geri bildirim otomasyonu."},
+  {"tag": "Auto", "angle": "Auto servislerde servis sonrası NPS ve tekrar ziyaret oranı."},
+  {"tag": "Operasyon", "angle": "Klinik yöneticisi için günlük operasyon paneli: hangi metrikler önce bakılmalı?"}
+]
