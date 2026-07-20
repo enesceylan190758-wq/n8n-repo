@@ -1,0 +1,91 @@
+{
+  "name": "Nefalix - Günlük GEO",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Günlük GEO\n\n**Her gün 09:15** (Europe/Istanbul) veya `POST /webhook/nefalix/geo/publish`\n→ Vertex Gemini answer-first paket\n→ Supabase `geo_daily_runs`\n→ Site: nefalix.com/geo + /geo/:date\n\nBlog ≠ GEO. Kalite kapısı: `execution/publish-daily-geo.py`",
+        "height": 200,
+        "width": 440,
+        "color": 5
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 40]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "15 6 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Her Gün 09:15 TR",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/geo/publish",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel GEO Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 480],
+      "webhookId": "nefalix-geo-publish"
+    },
+    {
+      "parameters": {
+        "jsCode": "const root = ($env.NEFALIX_REPO_ROOT || '/opt/nefalix').replace(/\\/$/, '');\nconst body = $json.body ?? $json;\nconst parts = ['cd', JSON.stringify(root), '&&', 'python3', 'execution/publish-daily-geo.py'];\nif (body.dry_run) parts.push('--dry-run');\nif (body.force) parts.push('--force');\nif (body.skip_notify) parts.push('--skip-notify');\nreturn [{ json: { command: parts.join(' ') } }];"
+      },
+      "name": "GEO Komutu Hazırla",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 390]
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}"
+      },
+      "name": "GEO Üret",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [740, 390]
+    },
+    {
+      "parameters": {
+        "jsCode": "let parsed = {};\ntry {\n  parsed = JSON.parse($json.stdout || '{}');\n} catch (e) {\n  parsed = { raw: $json.stdout, stderr: $json.stderr };\n}\nreturn [{ json: { ok: true, ...parsed } }];"
+      },
+      "name": "Sonuç",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 390]
+    }
+  ],
+  "connections": {
+    "Her Gün 09:15 TR": {
+      "main": [[{ "node": "GEO Komutu Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Manuel GEO Webhook": {
+      "main": [[{ "node": "GEO Komutu Hazırla", "type": "main", "index": 0 }]]
+    },
+    "GEO Komutu Hazırla": {
+      "main": [[{ "node": "GEO Üret", "type": "main", "index": 0 }]]
+    },
+    "GEO Üret": {
+      "main": [[{ "node": "Sonuç", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
