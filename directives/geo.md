@@ -125,6 +125,20 @@ curl -sL https://nefalix.com/geo-sitemap.xml | head
 curl -sL https://nefalix.com/llms.txt | head
 ```
 
+## Mevcut paketleri yeniden yaz (blog dili temizliği)
+
+SSH gerekmez; Vercel/landing ile aynı DB’ye `supabase-proxy` üzerinden yazar:
+
+```bash
+export NEFALIX_INTERNAL_KEY=...   # VPS / Vercel ile aynı
+python3 execution/rewrite-geo-packs.py --dry-run
+python3 execution/rewrite-geo-packs.py
+# tek gün:
+python3 execution/rewrite-geo-packs.py --date 2026-07-20
+```
+
+Proxy: `POST https://api.nefalixai.com/webhook/nefalix/supabase-proxy` + header `X-Nefalix-Internal-Key`.
+
 Log: `/var/log/nefalix-geo.log`
 
 Mail subject satırında paket adı; body’de **Public URL** zorunlu.
@@ -163,6 +177,7 @@ Her satır: motor · mention · URL · rakip. İlk sürüm manuel; Pazar maili h
 | Dosya | Rol |
 |-------|-----|
 | `execution/publish-daily-geo.py` | Günlük GEO paketi + kalite kapısı + public_url mail |
+| `execution/rewrite-geo-packs.py` | Mevcut paketleri GEO formatına PATCH (proxy) |
 | `execution/test-geo-quality.py` | Offline kalite birimleri |
 | `execution/geo-topics.json` | Alıcı soru bankası |
 | `execution/setup-geo-cron.sh` | Cron 09:15 + Pazar 10:00 |
