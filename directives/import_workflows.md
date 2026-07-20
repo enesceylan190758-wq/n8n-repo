@@ -20,7 +20,8 @@ python3 execution/import-workflows.py
 ## Sonrası
 Workflow değişikliği yaptıysan bu script'i tekrar çalıştır — PATCH + activate yapar.
 
-Yeni workflow'lar: `nefalix-14-sikayetvar-sync.json` (Şikayetvar → Sentinel, 4h cron).
+Yeni workflow'lar: `nefalix-14-sikayetvar-sync.json` (Şikayetvar → Sentinel, 4h cron);
+`nefalix-18-blog-daily.json` (günlük blog); `nefalix-19-geo-daily.json` (günlük GEO 09:15).
 
 ## Edge Cases
 
