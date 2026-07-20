@@ -58,6 +58,12 @@ Süreç içinde plan dışı bir durum olursa — sunucu, güvenlik, sürenin uz
 
 Büyük bir karar gerekiyorsa önce yazışalım, ortak karar verelim; ikimiz için de daha rahat olur.
 
+### Yeni firmaların sisteme kaydı
+
+İlerleyen dönemde sisteme kayacak firmalar olabilir. İlk aşamada **klinik bağlantılarını senin kurmanı** bekliyoruz — WhatsApp, firma ayarları, demo firmaları falan. Bu kısım teklifteki C ve D paketleriyle örtüşüyor.
+
+Sonrasında biz de bir miktar öğrenip yeni firmaların kaydını kendimiz yapabilecek hale gelmek istiyoruz. O yüzden ilk kurulumları yaparken kısaca nasıl yaptığını da not edersen veya birlikte bir kez geçersen, sonraki firmaları biz de alırız; her seferinde sana dönmeyiz.
+
 ---
 
 ## Kapsam dışı (şimdilik)
@@ -107,6 +113,10 @@ Para tarafı:
 - Teklifteki A→B→C→D→E sırasına göre gidelim, arada kısa kısa bilgi verirsen iyi olur
 - GitHub’a attıklarını birlikte takip edebiliriz
 - Beklenmedik bir şey olursa yazışalım, birlikte karar veririz
+
+Firma kaydı:
+- İlk aşamada sisteme girecek klinik bağlantılarını senin kurmanı bekliyoruz
+- Sonrasında biz de öğrenip yeni firmaları kendimiz ekleyebilelim; ilk kurulumda kısaca nasıl yaptığını da paylaşırsan süper olur
 
 Taslak metni ekte. Sana uygunsa devam edelim.
 ```
