@@ -57,6 +57,9 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Supabase migration | `directives/supabase_migrate.md` |
 | Site chat tunnel | `directives/chat_tunnel.md` |
 | Vertex AI / Gemini (GCP kredi) | `directives/vertex_ai_setup.md` |
+| Günlük blog (playbook) | `directives/daily_blog.md` |
+| Günlük GEO (AI alıntı) | `directives/geo.md` |
+| YouTube + GEO (kanal) | `directives/youtube_geo.md` |
 
 ## Self-Annealing Döngüsü
 
