@@ -1,6 +1,6 @@
 # Nefalix × Arif — Anlaşma Taslağı
 
-> Teklif PDF’indeki iş kapsamı geçerli. Aşağıdaki maddeler ödeme ve çalışma şeklini netleştirir.
+> Teklif PDF’indeki iş kapsamı geçerli. Aşağıdakiler ödeme ve birlikte nasıl çalışacağımızı netleştirir.
 
 ---
 
@@ -11,9 +11,9 @@
 
 ---
 
-## Ne yapılacak?
+## Ne yapacağız?
 
-Teklifte yazdığımız gibi: mevcut Nefalix sistemini sıfırdan yazmadan güvenlik, stabilite, çok firmalı yapı ve panel tarafını toparlayıp kurumsal demoya hazırlamak.
+Teklifte konuştuğumuz gibi: mevcut Nefalix sistemini sıfırdan yazmadan; güvenlik, stabilite, çok firmalı yapı ve panel tarafını toparlayıp kurumsal demoya hazırlamak.
 
 İş sırası teklifteki gibi:
 **A (güvenlik) → B (stabilite) → C (çok firmalı) → D (panel) → E (test + teslim)**
@@ -29,57 +29,58 @@ Toplam anlaştığımız bedel: **1.500 USD**
 | Başlangıçta | **1.000 USD** |
 | Proje ilerledikten ve biz yatırım aldıktan sonra | **700 USD** (kalan) |
 
-- Ödemeleri **her ayın son günü** yapıyoruz.
-- Özel bir durum olursa konuşup esnetiriz, sorun değil.
-- Ödeme için **IBAN’ını ve fatura bilgilerini** bize göndermeni istiyoruz.
+- Ödemeleri genelde **her ayın son günü** yapıyoruz.
+- Özel bir durum olursa konuşup esnetiriz, ikimiz için de sorun değil.
+- Ödeme tarafında IBAN ve fatura bilgilerini paylaşırsan seviniriz — ona göre ay sonlarında hallederiz.
 
 ---
 
-## Nasıl çalışacağız?
+## Nasıl çalışalım?
 
-### Bilgi verme
+### Bilgilendirme
 
-İşi teklifteki plana göre **aşama aşama** ilerletmeni bekliyoruz.
+Teklifteki plana göre aşama aşama gitmemiz iyi olur diye düşünüyoruz.
 
-Düzenli olarak şunları yazman yeterli:
-- Bu hafta ne yaptın
+Haftalık kısa bir özet yeterli olur bizim için — mesela:
+- Bu hafta neler oldu
 - Sırada ne var
-- Takılırsan veya bir şey bekliyorsa ne olduğunu söyle
+- Bir yerde takıldıysan veya bizden bir şey bekliyorsa haberimiz olsun
 
-Haftada bir kısa mesaj / mail yeterli. Bir paketi bitirince (A, B, C…) biraz daha detaylı yaz.
+Bir paketi bitirince (A, B, C…) biraz daha detaylı yazarsan süper olur.
 
 ### Takip
 
-Yaptığın işleri takip edebilmek istiyoruz — kod tarafını GitHub’a atman, ne değiştirdiğini kısaca yazman yeterli. Böylece biz de bakıp “tamam, bu bitti” diyebiliriz.
+Yaptıklarını birlikte takip edebilmek isteriz. Kod tarafını GitHub’a koyduğunda ve kısaca ne değiştirdiğini yazdığında biz de bakıp “tamam, bu kısım halloldu” diyebiliriz.
 
-### Beklenmeyen bir şey olursa
+### Beklenmeyen bir şey çıkarsa
 
-Süreç içinde plan dışı bir durum çıkarsa (sunucu, güvenlik, süre uzaması, ekstra iş vs.) **mutlaka haber ver, konuşalım.**
+Süreç içinde plan dışı bir durum olursa — sunucu, güvenlik, sürenin uzaması, ekstra iş falan — birlikte konuşalım, haberimiz olsun yeter.
 
-Tek başına büyük bir karar alma; önce bize yaz, birlikte halledelim.
+Büyük bir karar gerekiyorsa önce yazışalım, ortak karar verelim; ikimiz için de daha rahat olur.
 
 ---
 
 ## Kapsam dışı (şimdilik)
 
-Bunlar bu anlaşmaya dahil değil — ileride ayrı konuşuruz:
+Bunları şimdilik bu anlaşmaya dahil etmiyoruz — ileride ayrı konuşuruz:
 - PayTR / ödeme sistemi canlıya alma
 - Resmi Meta WhatsApp geçişi
 - Sıfırdan yeni sistem yazmak
-- 7 Ağustos sonrası sürekli bakım (ayrı anlaşma gerekir)
+- 7 Ağustos sonrası sürekli bakım
 
 ---
 
 ## Teslim
 
-Teklifteki teslim tarihi referans: **7 Ağustos 2026**  
-Gecikme olursa ve sebep bizden kaynaklanıyorsa (erişim vermemek, onay bekletmek vs.) süre uzar — ceza falan yok.
+Teklifteki teslim tarihi referans: **7 Ağustos 2026**
+
+Gecikme olursa ve sebep bizden kaynaklanıyorsa — erişim geç vermek, onay bekletmek gibi — süreyi birlikte uzatırız, ceza tarafı yok.
 
 ---
 
 ## Onay
 
-Her iki taraf da bu metni okuyup uygun görürse imza / mail ile onaylar.
+İkimiz de uygun görürsek mail veya imza ile tamam deriz.
 
 | | |
 |---|---|
@@ -93,18 +94,19 @@ Her iki taraf da bu metni okuyup uygun görürse imza / mail ile onaylar.
 ```
 Arif selam,
 
-Anlaştığımız maddeleri toparladım:
+Anlaştığımız şeyleri toparladım, bir bak istersen:
 
-- Toplam: 1.500 USD
-- Başta: 1.000 USD
+Para tarafı:
+- Toplam 1.500 USD
+- Başta 1.000 USD
 - Kalan 700 USD: proje ilerleyince ve biz yatırım alınca (ay sonu öderiz)
-- Ödemeler genelde ay sonu; özel durum olursa konuşuruz
-- IBAN + fatura bilgilerini gönder lütfen
+- Ödemeler genelde ay sonu; özel durum olursa konuşur hallederiz
+- IBAN + fatura bilgilerini paylaşırsan seviniriz
 
-Beklentimiz:
-- İşi A→B→C→D→E diye aşama aşama yap, düzenli bilgi ver
-- Yaptıklarını takip edebilelim (GitHub vs.)
-- Beklenmedik bir şey olursa mutlaka yaz, konuşalım
+Çalışma tarafı:
+- Teklifteki A→B→C→D→E sırasına göre gidelim, arada kısa kısa bilgi verirsen iyi olur
+- GitHub’a attıklarını birlikte takip edebiliriz
+- Beklenmedik bir şey olursa yazışalım, birlikte karar veririz
 
-Taslak metni ekte / linkte. Uygunsa onayla, devam edelim.
+Taslak metni ekte. Sana uygunsa devam edelim.
 ```
