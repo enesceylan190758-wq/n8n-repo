@@ -1,22 +1,13 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-07-20  
-**Pilot `clinic_id`:** `51738ea8-c12e-40ce-a0e2-42869496d76b`
+**Tarih:** 2026-07-23
 
-## Bu oturum — GEO tamamlandı (canlı)
+## Bu oturum
+- 10 Geo SEO kapak görseli kaydedildi: `assets/geo-seo-covers/`
+- 10 GEO paketi canlı: `/geo/2026-07-28` … `/geo/2026-08-06`
+- 10 blog yazısı canlı (aynı konular + kapaklar)
+- Branch: `cursor/geo-seo-10-packs-c5e3`
 
-1. PR #6 merge: GEO/blog otomasyonu `main`’e alındı.
-2. 14 mevcut GEO paketi satış/blog dilinden answer-first GEO’ya yeniden yazıldı (canlı).
-   - Araç: `execution/rewrite-geo-packs.py` + `supabase-proxy` + `NEFALIX_INTERNAL_KEY`
-   - Doğrulama: `/api/geo/list` bloggy=0; örnek `/geo/2026-07-20` ve `/geo/2026-07-27` OK
-
-## Kalan
-
-- VPS SSH yok bu ortamda → `setup-geo-cron.sh` henüz kurulamadı (Mac’ten `ssh root@93.127.186.45` ile).
-- Pazar citation baseline (`docs/geo-prompt-baseline.md`) ilk skor manuel.
-
-## Smoke
-
-- https://nefalix.com/blog — OK
-- https://nefalix.com/geo — OK
-- https://nefalix.com/geo/2026-07-20 — answer-first GEO
+## Sonraki
+- PR merge; kapak URL’lerini merge sonrası `main` raw’a çevirmek isteğe bağlı (`GEO_SEO_ASSET_BRANCH=main`)
+- VPS: `setup-geo-cron.sh` hâlâ Mac SSH ile
