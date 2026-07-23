@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Günlük blog yazısı üret → Supabase blog_posts → yöneticilere mail.
 
-GEO formatı: answer-first intro + H2 bölümler + SSS.
-VPS cron (her gün 09:05 TR) veya manuel:
+Blog ≠ GEO. Blog uzun operasyon playbook'udur (/blog/:slug).
+VPS cron (her gün 09:05 TR):
   python3 execution/publish-daily-blog.py
-  python3 execution/publish-daily-blog.py --dry-run
-  python3 execution/publish-daily-blog.py --skip-notify
 """
 from __future__ import annotations
 
@@ -19,6 +17,7 @@ import sys
 import traceback
 import unicodedata
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,12 +25,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "execution"))
 
+from lib.content_quality import blog_quality_gate, word_count  # noqa: E402
+from lib.topic_picker import pick_blog_topic, recent_blog_tags  # noqa: E402
 from vertex_gemini import vertex_json  # noqa: E402
 
 TOPICS = json.loads((ROOT / "execution" / "blog-topics.json").read_text(encoding="utf-8"))
 IMAGES = json.loads((ROOT / "execution" / "blog-images.json").read_text(encoding="utf-8"))
 
 DEFAULT_NOTIFY_TO = "enes.ceylan190758@gmail.com,akadirysr@gmail.com"
+SITE = "https://nefalix.com"
+COVER_DIR = (
+    "https://raw.githubusercontent.com/enesceylan190758-wq/n8n-repo/main/"
+    "assets/geo-seo-covers"
+)
+TAG_COVERS = {
+    "GEO": f"{COVER_DIR}/geo-seo-04-yerel-icerik-kule.png",
+    "AEO": f"{COVER_DIR}/geo-seo-04-yerel-icerik-kule.png",
+    "Google": f"{COVER_DIR}/geo-seo-05-gmb-checklist.png",
+    "İtibar": f"{COVER_DIR}/geo-seo-03-yorum-itibar.png",
+    "Sağlık Turizmi": f"{COVER_DIR}/geo-seo-01-saglik-turizmi-kuresel.png",
+    "Operasyon": f"{COVER_DIR}/geo-seo-07-veri-isi-haritasi.png",
+}
 
 
 def sb_base() -> str:
@@ -67,6 +81,10 @@ def sb(method: str, path: str, body: dict | None = None) -> list | dict:
         raise SystemExit(f"Supabase {e.code}: {e.read().decode()[:400]}") from e
 
 
+def sb_get(path: str) -> list | dict:
+    return sb("GET", path)
+
+
 def slugify(text: str) -> str:
     text = unicodedata.normalize("NFKD", text)
     text = text.encode("ascii", "ignore").decode("ascii")
@@ -89,24 +107,28 @@ def recent_slugs(limit: int = 30) -> set[str]:
     return {r.get("slug", "") for r in rows}
 
 
-def pick_topic(day_index: int) -> dict:
-    return TOPICS[day_index % len(TOPICS)]
+def cover_api(kind: str, tag: str, title: str) -> str:
+    q = urllib.parse.urlencode(
+        {"action": "cover", "kind": kind, "tag": tag, "t": title, "v": "11"}
+    )
+    return f"{SITE}/api/blog?{q}"
 
 
-def images_for_tag(tag: str) -> tuple[str, str]:
+def images_for_tag(tag: str, title: str) -> tuple[str, str]:
+    if tag in TAG_COVERS:
+        return TAG_COVERS[tag], cover_api("footer", tag, "Nefalix")
     cfg = IMAGES.get(tag) or IMAGES.get("default", {})
     default = IMAGES["default"]
-    return (
-        cfg.get("cover") or default["cover"],
-        cfg.get("footer") or default["footer"],
-    )
+    cover = cfg.get("cover") or default["cover"] or cover_api("blog", tag, title)
+    footer = cfg.get("footer") or default["footer"] or cover_api("footer", tag, "Nefalix")
+    return cover, footer
 
 
 def geo_body_to_html(intro: str, sections: list[dict], faq: list[dict], cta: str) -> str:
     parts: list[str] = []
     intro = str(intro or "").strip()
     if intro:
-        parts.append(f"<p><strong>{html.escape(intro)}</strong></p>")
+        parts.append(f'<p class="blog-lede"><strong>{html.escape(intro)}</strong></p>')
     for sec in sections or []:
         heading = str(sec.get("heading") or sec.get("h2") or "").strip()
         body = str(sec.get("body") or sec.get("text") or "").strip()
@@ -136,23 +158,29 @@ def generate_post(topic: dict, used_slugs: set[str], attempt: int = 1) -> dict:
 Konu etiketi: {topic['tag']}
 Açı: {topic['angle']}
 
-Nefalix için Türkçe GEO uyumlu blog yazısı yaz.
+Nefalix için Türkçe OPERASYON PLAYBOOK blog yazısı yaz (GEO paketi değil).
+
+Blog ≠ GEO:
+- Blog = uzun, okunabilir rehber (insan dili)
+- GEO iskelet jargonu YASAK: "NAP bloğu", "FAQPage", "answer-first giriş", "entity güçlendir"
+
 Nefalix: klinik/otel/auto için WhatsApp, NPS, Google yorumları, HBYS entegrasyonu platformu.
 
-JSON döndür (tek geçerli JSON nesnesi):
+JSON (tek nesne):
 {{
-  "title": "Soru veya net vaat içeren başlık (max 90 karakter)",
+  "title": "Net, klinik yöneticisine hitap eden başlık (max 90 karakter)",
   "tag": "{topic['tag']}",
-  "excerpt": "2 cümle özet (max 200 karakter)",
-  "meta_description": "SEO/GEO açıklaması max 155 karakter",
-  "intro": "İlk 40-60 kelime: doğrudan cevap, filler yok",
+  "excerpt": "2 cümle özet (max 200 karakter) — insan dili",
+  "meta_description": "SEO açıklaması max 155 karakter",
+  "intro": "60-100 kelime: sorunu ve vaadi düz Türkçe anlat; jargon yok",
   "sections": [
-    {{"heading": "Soru formatında H2?", "body": "150-250 kelime net paragraf"}},
-    {{"heading": "Soru formatında H2?", "body": "..."}},
-    {{"heading": "Soru formatında H2?", "body": "..."}}
+    {{"heading": "Soru veya adım başlığı", "body": "120-220 kelime uygulanabilir paragraf"}},
+    {{"heading": "...", "body": "..."}},
+    {{"heading": "...", "body": "..."}},
+    {{"heading": "...", "body": "..."}}
   ],
   "faq": [
-    {{"q": "Soru 1?", "a": "Kısa net cevap"}},
+    {{"q": "Soru 1?", "a": "En az 2 cümle net cevap"}},
     {{"q": "Soru 2?", "a": "..."}},
     {{"q": "Soru 3?", "a": "..."}},
     {{"q": "Soru 4?", "a": "..."}}
@@ -161,7 +189,7 @@ JSON döndür (tek geçerli JSON nesnesi):
 }}
 
 Kurallar:
-- sections: 3 veya 4 madde; heading soru olsun
+- sections: 3 veya 4 madde; her body min ~100 kelime
 - faq: 4-6 madde
 - Tıbbi iddia veya garanti verme
 - Markdown kullanma; düz metin
@@ -169,8 +197,11 @@ Kurallar:
     try:
         out = vertex_json(
             prompt,
-            system="Sen Nefalix GEO içerik editörüsün. Yalnızca geçerli JSON döndür.",
-            temperature=0.45 if attempt > 1 else 0.55,
+            system=(
+                "Sen Nefalix blog editörüsün. Uzun playbook yazarsın; "
+                "kısa GEO iskeleti yazmazsın. Yalnızca geçerli JSON."
+            ),
+            temperature=0.4 if attempt > 1 else 0.55,
         )
     except json.JSONDecodeError:
         if attempt < 3:
@@ -199,8 +230,20 @@ Kurallar:
                 for p in paras[1:]
             ]
 
+    gate = blog_quality_gate(
+        intro=intro,
+        sections=sections if isinstance(sections, list) else [],
+        faq=faq if isinstance(faq, list) else [],
+        title=title,
+        excerpt=str(out.get("excerpt") or ""),
+    )
+    if gate and attempt < 4:
+        return generate_post(topic, used_slugs, attempt + 1)
+    if gate:
+        raise RuntimeError(f"Blog kalite kapısı başarısız: {gate}")
+
     tag = str(out.get("tag") or topic["tag"]).strip() or topic["tag"]
-    cover, footer = images_for_tag(tag)
+    cover, footer = images_for_tag(tag, title)
     body_html = geo_body_to_html(intro, sections, faq, str(out.get("cta") or ""))
 
     return {
@@ -214,6 +257,7 @@ Kurallar:
         "footer_image_url": footer,
         "status": "published",
         "published_at": datetime.now(timezone.utc).isoformat(),
+        "_intro_wc": word_count(intro),
     }
 
 
@@ -258,22 +302,35 @@ def main() -> None:
     try:
         used = recent_slugs()
         day_index = datetime.now().toordinal()
-        topic = pick_topic(day_index)
+        try:
+            tags = recent_blog_tags(sb_get, days=21)
+        except Exception:
+            tags = set()
+        topic = pick_blog_topic(TOPICS, day_index, recent_tags=tags)
         post = generate_post(topic, used)
+        intro_wc = post.pop("_intro_wc", None)
 
         if args.dry_run:
-            print(json.dumps({"ok": True, "dry_run": True, "post": post}, ensure_ascii=False, indent=2))
+            print(
+                json.dumps(
+                    {"ok": True, "dry_run": True, "post": post, "intro_wc": intro_wc},
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
             return
 
         rows = sb("POST", "blog_posts", post)
         row = rows[0] if isinstance(rows, list) and rows else post
-        url = f"https://nefalix.com/blog/{row.get('slug', post['slug'])}"
+        slug = row.get("slug", post["slug"])
+        url = f"{SITE}/blog/{slug}"
         title = row.get("title", post["title"])
         result = {
             "ok": True,
-            "slug": row.get("slug", post["slug"]),
+            "slug": slug,
             "title": title,
             "url": url,
+            "cache_bust_url": f"{url}?v={today_key()}",
             "published_at": row.get("published_at", post["published_at"]),
         }
 
@@ -293,7 +350,7 @@ def main() -> None:
             try:
                 notify_managers(
                     f"[HATA] Günlük blog üretilemedi: {exc}",
-                    "https://nefalix.com/blog",
+                    f"{SITE}/blog",
                     args.to,
                 )
             except Exception:

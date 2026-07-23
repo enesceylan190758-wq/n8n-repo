@@ -3,16 +3,20 @@
 ## Hedef
 
 Her gün **09:05 (İstanbul)** otomatik:
-1. Vertex Gemini ile 1 Türkçe operasyon playbook’u (answer-first intro + H2 + SSS)
-2. Kapak + alt görsel
-3. Supabase `blog_posts` kaydı → sitede yayın
-4. `info@nefalix.com` ile yöneticilere mail
+1. Vertex Gemini ile 1 Türkçe operasyon playbook’u (insan dili intro + H2 + SSS)
+2. `blog_quality_gate` (min bölüm/kelime; GEO iskelet jargonu yasak)
+3. Kapak: mümkünse `assets/geo-seo-covers` tag eşlemesi; yoksa cover API (Unsplash varsayılan değil)
+4. Supabase `blog_posts` kaydı → sitede yayın
+5. `info@nefalix.com` ile yöneticilere mail
 
 > **Blog ≠ GEO.** Blog uzun rehberdir (`/blog/:slug`). AI alıntı paketi ayrı kanaldır:
 > sabah **09:15** `directives/geo.md` → `/geo/YYYY-MM-DD`.
 > “GEO” etiketli blog yazısı GEO sayılmaz.
+> Yasak sızıntı: “NAP bloğu”, “FAQPage”, “answer-first giriş”, allowlist jargonu.
 
 **Cursor / AI açık olması gerekmez.** VPS cron çalıştırır.
+
+**Tek otomasyon:** crontab **veya** n8n (`nefalix-18`) — ikisi birden değil (`directives/geo.md`).
 
 - Liste: https://nefalix.com/blog
 - Yazı: https://nefalix.com/blog/{slug}
@@ -76,9 +80,22 @@ python3 execution/publish-daily-blog.py --dry-run
 python3 execution/publish-daily-blog.py
 # sadece yazı, mail yok:
 python3 execution/publish-daily-blog.py --skip-notify
+
+# Kalite birimleri (blog + GEO)
+python3 execution/test-geo-quality.py
+
+# Zayıf Geo SEO blog’larını playbook standardına yeniden yaz
+python3 execution/rewrite-geo-seo-blogs.py --dry-run
+export NEFALIX_INTERNAL_KEY=...
+python3 execution/rewrite-geo-seo-blogs.py
+
+# Public smoke
+python3 execution/smoke-geo-public.py
 ```
 
 Log: `/var/log/nefalix-blog.log`
+
+CDN/HTML stale ise detay URL’ye `?v=` ekle.
 
 ## Zamanlanmış yayın (2 saat arayla)
 
@@ -104,10 +121,13 @@ python3 execution/schedule-blog-batch.py --count 3 --interval-hours 2
 
 | Dosya | Rol |
 |-------|-----|
-| `execution/publish-daily-blog.py` | Üret + kaydet + mail |
+| `execution/lib/content_quality.py` | `blog_quality_gate` |
+| `execution/lib/topic_picker.py` | Tag çeşitliliği |
+| `execution/publish-daily-blog.py` | Üret + kapı + kaydet + mail |
+| `execution/rewrite-geo-seo-blogs.py` | 10 Geo SEO → playbook |
 | `execution/send-blog-notification.py` | Hostinger SMTP |
 | `execution/setup-blog-cron.sh` | Cron kurulumu |
 | `execution/schedule-blog-batch.py` | Toplu / aralıklı yayın |
-| `execution/blog-images.json` | Kapak görselleri |
+| `execution/blog-images.json` / `assets/geo-seo-covers/` | Kapaklar |
 | `nefalix-landing/api/blog.js` | Site API |
 | `nefalix-landing/blog.html` | Blog listesi |

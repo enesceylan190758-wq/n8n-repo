@@ -2,7 +2,8 @@
 
 **Amaç:** ChatGPT / Perplexity / Gemini’de citation/mention oranını haftalık ölçmek.  
 **Entity:** Nefalix  
-**Rutin:** Pazar 10:00 hatırlatma maili (`send-geo-weekly-reminder.py`)
+**Rutin:** Pazar 10:00 hatırlatma maili (`send-geo-weekly-reminder.py`)  
+**Kaynak skorlar:** tablo `geo_citation_scores` (`record-geo-citation.py` / `report-geo-citation.py`). Bu dosya 25 prompt **şablonu**; haftalık gerçek skorlar DB’den özetlenir.
 
 ## Skorlama
 
