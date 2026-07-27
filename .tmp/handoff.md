@@ -67,6 +67,20 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 - Plan: `docs/CRM_NextJS_Gecis_Plani.md`
 - Karar: **CRM kalıcı = Next; Stella kesimi şimdi P0 HTML ile** (`/hasta-crm` paralel koşu; Next Stella’yı bloke etmez)
 
+### Stella discovery paket (2026-07-27) — adım 1 tamam
+
+Ekran/Excel/ses PC’den yüklendi; gap analizi henüz yok (önce belge).
+
+| Yer | Path | Doğrulama |
+|-----|------|-----------|
+| Local | `n8n-repo/.tmp/stella-discovery/` | 390 PNG + 4 XLSX + `Onat-Sk.m4a` |
+| Zip | `.tmp/stella-discovery-2026-07-27.zip` | ~171MB |
+| VPS | `root@93.127.186.45:/opt/nefalix/.tmp/stella-discovery/` | 397 dosya, 205MB |
+| VPS zip | `/opt/nefalix/.tmp/stella-discovery-2026-07-27.zip` | 171MB |
+| Git pointer | `docs/stella_discovery_assets.md` | binary yok (LFS yok) |
+
+Asıl klasör: `nefalix-crm/` (12 sekme klasörü + 4 Excel). Ses: `Onat-Sk.m4a`.
+
 ### Stella → Hasta CRM P0 (2026-07-27)
 
 - **Spec:** `docs/Stella_Phase1_Spec.md`, `docs/stella_segments.csv`, `docs/stella_reference_sources.csv`
@@ -145,9 +159,9 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 
 ## Sonraki 3 adım
 
-1. **Stella P0 prod:** Migration SQL → import tanımlar + hasta/randevu → `vercel --prod` → Enes/Abdülkadir paralel koşu.
+1. **Adım 2:** `.tmp/stella-discovery/` paketinden Stella→Nefalix gap/action haritası çıkar → `docs/` + `directives/stella_migration.md`.
 2. **Abdülkadir:** `directives/stella_migration.md` checklist — segment isimleri ince ayar.
-3. **`nefalix-landing`:** Vercel env `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD` doğrula.
+3. **Paralel koşu:** Hasta CRM canlı akış doğrula → Stella kesimi.
 
 ## Önemli env değişkenleri (sadece isimler)
 
