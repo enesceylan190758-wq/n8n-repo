@@ -5,22 +5,46 @@ from __future__ import annotations
 import base64
 import gzip
 import json
+import os
 import re
 from pathlib import Path
 
-LANDING = Path("/Users/enesceylan/nefalix-landing")
-HTML = LANDING / "nefalix-hasta-crm.html"
-APP = LANDING / "nefalix-hasta-crm-app"
 STORE_UUID = "a90a0ed2-5e97-4f96-9a33-f09210399e03"
 
 
+def resolve_landing() -> Path:
+    """Mac default; cloud/CI: NEFALIX_LANDING veya kardeş klasör."""
+    env = os.environ.get("NEFALIX_LANDING", "").strip()
+    candidates = []
+    if env:
+        candidates.append(Path(env))
+    candidates.extend(
+        [
+            Path("/Users/enesceylan/nefalix-landing"),
+            Path(__file__).resolve().parents[1].parent / "nefalix-landing",
+            Path(__file__).resolve().parents[1] / ".tmp" / "nefalix-landing-extract",
+        ]
+    )
+    for p in candidates:
+        if (p / "nefalix-hasta-crm.html").is_file() and (p / "nefalix-hasta-crm-app" / "store.js").is_file():
+            return p
+    raise SystemExit(
+        "nefalix-landing bulunamadı. NEFALIX_LANDING=/path/to/nefalix-landing ayarla "
+        "veya Mac'te /Users/enesceylan/nefalix-landing kullan."
+    )
+
+
 def main() -> None:
-    html = HTML.read_text(encoding="utf-8")
+    landing = resolve_landing()
+    html_path = landing / "nefalix-hasta-crm.html"
+    app = landing / "nefalix-hasta-crm-app"
+    print("Landing:", landing)
+    html = html_path.read_text(encoding="utf-8")
     man = json.loads(re.search(r'<script type="__bundler/manifest">(.*?)</script>', html, re.S).group(1))
     files = ["store.js", "Login.dc.html", "index.html"]
     updated = []
     for name in files:
-        path = APP / name
+        path = app / name
         if not path.exists():
             print("skip missing", name)
             continue
@@ -41,10 +65,12 @@ def main() -> None:
             html = html2
             updated.append(f"index.html → __bundler/template ({len(raw)} bytes)")
             continue
-        uid = STORE_UUID if name == "store.js" else None
         if name == "store.js":
+            uid = STORE_UUID
             raw = path.read_bytes()
-            (APP / "_assets" / f"{uid}.js").write_bytes(raw)
+            assets = app / "_assets"
+            assets.mkdir(parents=True, exist_ok=True)
+            (assets / f"{uid}.js").write_bytes(raw)
             compressed = gzip.compress(raw, compresslevel=9)
             man[uid]["data"] = base64.b64encode(compressed).decode("ascii")
             man[uid]["compressed"] = True
@@ -73,8 +99,8 @@ def main() -> None:
     )
     if n != 1:
         raise SystemExit("manifest replace failed")
-    HTML.write_text(html2, encoding="utf-8")
-    print("Packed", HTML)
+    html_path.write_text(html2, encoding="utf-8")
+    print("Packed", html_path)
     for line in updated:
         print(" ", line)
 
