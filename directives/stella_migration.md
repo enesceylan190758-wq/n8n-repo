@@ -65,7 +65,9 @@ Vercel env: `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD`, `DASHBOARD_SE
 - Cookie: `nefalix_clinic`, 90 gün HttpOnly
 - Yenilemede oturum: `clinic-me` + `restoreServerSession()`
 
-**Lead listesi:** yalnızca segment `YENİ DATA` / `Yeni Lead` / `Yeni Gelen` veya segmentsiz. Diğer potansiyel/takip → Danışan + Dinamik.
+**Lead listesi:** yalnızca segment `YENİ DATA` / `Yeni Lead` / `Yeni Gelen` veya segmentsiz (`store.js` `NEW_LEAD_LABELS` + boş). Diğer potansiyel/takip → Danışan + Dinamik.  
+**Stage reclassify:** `python3 execution/reclassify-crm-stages.py` (atanmış + non-yeni → `danisan`).  
+**Hasta kartı:** `patientHistory` senkron obje döner; notlar arka planda (`clinic-contact`).
 
 ## Paralel koşu checklist (2 hafta)
 

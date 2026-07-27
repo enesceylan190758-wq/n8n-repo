@@ -79,6 +79,15 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 
 **Sonraki:** Onat ses transkript; landing’de P0 gap checklist (`directives/stella_migration.md`).
 
+### Hasta CRM hotfix (2026-07-27) — kart + Lead filtresi
+
+Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
+
+- `patientHistory` senkron return + notlar fire-and-forget (HastaKarti `.slice` kırığı yok)
+- `getLeads` → `NEW_LEAD_LABELS` (YENİ DATA / Yeni Lead / Yeni Gelen) + boş segment
+- Stage: atanmış non-yeni → danisan (reclassify 0 bekleyen; `execution/reclassify-crm-stages.py`)
+- Pack: `execution/pack-nefalix-hasta-crm.py` (`NEFALIX_LANDING` veya `.tmp/nefalix-landing-extract`)
+
 ### Stella → Hasta CRM P0 (2026-07-27)
 
 - **Spec:** `docs/Stella_Phase1_Spec.md`, `docs/stella_segments.csv`, `docs/stella_reference_sources.csv`
