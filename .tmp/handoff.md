@@ -67,19 +67,17 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 - Plan: `docs/CRM_NextJS_Gecis_Plani.md`
 - Karar: **CRM kalıcı = Next; Stella kesimi şimdi P0 HTML ile** (`/hasta-crm` paralel koşu; Next Stella’yı bloke etmez)
 
-### Stella discovery paket (2026-07-27) — adım 1 tamam
-
-Ekran/Excel/ses PC’den yüklendi; gap analizi henüz yok (önce belge).
+### Stella discovery paket (2026-07-27) — adım 1+2 tamam
 
 | Yer | Path | Doğrulama |
 |-----|------|-----------|
-| Local | `n8n-repo/.tmp/stella-discovery/` | 390 PNG + 4 XLSX + `Onat-Sk.m4a` |
-| Zip | `.tmp/stella-discovery-2026-07-27.zip` | ~171MB |
-| VPS | `root@93.127.186.45:/opt/nefalix/.tmp/stella-discovery/` | 397 dosya, 205MB |
-| VPS zip | `/opt/nefalix/.tmp/stella-discovery-2026-07-27.zip` | 171MB |
-| Git pointer | `docs/stella_discovery_assets.md` | binary yok (LFS yok) |
+| Git LFS | `discovery/stella-discovery-2026-07-27.zip` | `0aae4bc` (~171MB) |
+| Cloud `.tmp` | `.tmp/stella-discovery/` | unzip sonrası 390 PNG + 4 XLSX + Onat |
+| VPS | `root@93.127.186.45:/opt/nefalix/.tmp/stella-discovery/` | 397 dosya (yedek) |
+| Gap map | `docs/Stella_Gap_Action_Map.md` | ~35 ekran örnek + 4 Excel |
+| Path doc | `docs/stella_discovery_assets.md` | |
 
-Asıl klasör: `nefalix-crm/` (12 sekme klasörü + 4 Excel). Ses: `Onat-Sk.m4a`.
+**Sonraki:** Onat ses transkript; landing’de P0 gap checklist (`directives/stella_migration.md`).
 
 ### Stella → Hasta CRM P0 (2026-07-27)
 
