@@ -1,13 +1,15 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-07-23
+**Tarih:** 2026-07-27
 
 ## Bu oturum
-- 10 Geo SEO kapak görseli kaydedildi: `assets/geo-seo-covers/`
-- 10 GEO paketi canlı: `/geo/2026-07-28` … `/geo/2026-08-06`
-- 10 blog yazısı canlı (aynı konular + kapaklar)
-- Branch: `cursor/geo-seo-10-packs-c5e3`
+- Saha CRM (`crm.html` / `/saha`): takvim randevu görünümü + tıklanabilir klinik kartı iyileştirmesi
+- Patch: `patches/nefalix-landing/crm.html` (+ `.patch`)
+- **nefalix-landing GitHub repo bu ortamda erişilemedi** — dosyayı oraya kopyalayıp deploy onayı sonrası yayınlamak gerekiyor
+- Dinamik Arama `hatirlatma` mantığına dokunulmadı
+- Deploy yapılmadı (onay kuralı)
 
 ## Sonraki
-- PR merge; kapak URL’lerini merge sonrası `main` raw’a çevirmek isteğe bağlı (`GEO_SEO_ASSET_BRANCH=main`)
-- VPS: `setup-geo-cron.sh` hâlâ Mac SSH ile
+1. `nefalix-landing` içinde `crm.html` güncelle (patch veya dosya kopyası)
+2. Kullanıcı onayıyla Vercel prod deploy
+3. Abdülkadir ile takvimde örnek randevu doğrula
