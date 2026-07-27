@@ -71,15 +71,17 @@ ssh root@93.127.186.45 'find /opt/nefalix/.tmp/stella-discovery -type f | wc -l;
 - sistem sekmesi
 - whatsapp sekmesi
 
-## Git politikası
+## Git politikası (Mac → cloud)
 
-- Binary paket **commit edilmez** (LFS yok, ~200MB).
-- Bu path dokümanı + sonraki gap/action MD **git’te** tutulur.
-- Yeniden sync: `rsync -a ~/Downloads/nefalix\ crm/ .tmp/stella-discovery/nefalix-crm/` → zip → `scp` VPS.
+- Binary paket **Git LFS** ile: `discovery/stella-discovery-2026-07-27.zip` (bkz. `discovery/README.md`).
+- Path dokümanı + gap/action MD normal git’te.
+- VPS kopyası yedek: `scp` → `/opt/nefalix/.tmp/stella-discovery/`
+- Yeniden sync: `rsync` Downloads → `.tmp/stella-discovery/nefalix-crm/` → zip → `discovery/` + LFS push + (opsiyonel) VPS scp.
 
 ## Durum (2026-07-27 doğrulandı)
 
 - [x] Local sync: `.tmp/stella-discovery/` (390 PNG + 4 XLSX + Onat-Sk.m4a; `.DS_Store` hariç içerik = VPS)
 - [x] VPS: `/opt/nefalix/.tmp/stella-discovery/` — **397 dosya**, 205MB; zip **171MB**
-- [x] Path dokümanı git’te (`docs/stella_discovery_assets.md`); binary paket LFS yok → VPS
-- [ ] Gap/action çıkarımı (adım 2 — paket eklendikten sonra)
+- [x] Path dokümanı git’te (`docs/stella_discovery_assets.md`)
+- [ ] LFS zip: `discovery/stella-discovery-2026-07-27.zip` (Mac push bekleniyor)
+- [ ] Gap/action çıkarımı (adım 2 — cloud’da LFS pull sonrası)

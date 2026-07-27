@@ -1,0 +1,2 @@
+# Stella discovery package (Mac → cloud via Git LFS)
+discovery/*.zip filter=lfs diff=lfs merge=lfs -text
