@@ -1,0 +1,40 @@
+code,label,gun_offset,show_in_dynamic,hide_in_report,durum,max_dynamic_attempts,sira
+yeni_data,YENİ DATA,0,true,false,notr,,1
+yeni_lead,Yeni Lead,0,true,false,notr,,2
+yeni_gelen,Yeni Gelen,0,true,false,notr,,3
+potansiyel,Potansiyel,1,true,false,notr,,4
+ulasilamadi_tekrar_aranacak,Ulaşılamadı Tekrar Aranacak,1,true,false,notr,5,5
+5_kez_ulasilamadi,5 Kez Ulaşılamadı,0,false,true,negatif,,6
+10_kez_ulasilamadi,10 Kez Ulaşılamadı,0,false,true,negatif,,7
+2_gun_sonra_aranacak,2 Gün Sonra Aranacak,2,true,false,notr,,8
+3_gun_sonra_aranacak,3 Gün Sonra Aranacak,3,true,false,notr,,9
+1_hafta_sonra_aranacak,1 Hafta Sonra Aranacak,7,true,false,notr,,10
+kisa_vadede_dusunecek_1_hafta,Kısa Vadede Düşünecek 1 Hafta,7,true,false,notr,,11
+orta_vadede_dusunecek,Orta Vadede Düşünecek,14,true,false,notr,,12
+uzun_vadede_dusunecek,Uzun Vadede Düşünecek,30,true,false,notr,,13
+sicak_alacak,Sıcak Alacak,1,true,false,notr,,14
+analiz_verilecek,Analiz Verilecek,1,true,false,notr,,15
+fotograf_gonderecek,Fotoğraf Gönderecek,2,true,false,notr,,16
+rontgen_ve_fotograf_gonderecek,Röntgen ve Fotoğraf Gönderecek,2,true,false,notr,,17
+teklif_verildi,Teklif Verildi,1,true,false,notr,,18
+bilet_bekleniyor,Bilet Bekleniyor,2,true,false,notr,,19
+otel_rezervasyonu_bekleniyor,Otel Rezervasyonu Bekleniyor,3,true,false,notr,,20
+transfer_bekleniyor,Transfer Bekleniyor,2,true,false,notr,,21
+randevu_verildi,Randevu Verildi,0,false,false,notr,,22
+gelecek,Gelecek,0,false,false,notr,,23
+gelmedi,Gelmedi,1,true,false,notr,,24
+ertelendi,Ertelendi,3,true,false,notr,,25
+iptal,İptal,0,false,true,negatif,,26
+anlasildi_onaylandi,Anlaşıldı / Onaylandı,0,false,false,notr,,27
+satildi,Satıldı,0,false,true,notr,,28
+sureci_biten,Süreci Biten,0,false,true,notr,,29
+2_asama_hastasi,2.AŞAMA HASTASI,0,false,false,notr,,30
+mevcut_hasta,Mevcut Hasta,0,false,true,notr,,31
+referans,Referans,1,true,false,notr,,32
+whatsapp_tan_yazdi,WhatsApp'tan Yazdı,0,true,false,notr,,33
+olumsuz_ilgilenmiyor,Olumsuz / İlgilenmiyor,0,false,true,negatif,,34
+baska_yerde_yaptirmis,Başka Yerde Yaptırmış,0,false,true,negatif,,35
+engelledi,Engelledi,0,false,true,negatif,,36
+gecersiz_numara_yanlis,Geçersiz Numara (Yanlış),0,false,true,negatif,,37
+yanlis_kayit,Yanlış Kayıt,0,false,true,negatif,,38
+tedaviye_uygun_degil,Tedaviye Uygun Değil,0,false,true,negatif,,39

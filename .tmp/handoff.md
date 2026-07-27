@@ -1,6 +1,6 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-07-17  
+**Tarih:** 2026-07-23  
 **Pilot `clinic_id`:** `51738ea8-c12e-40ce-a0e2-42869496d76b` (MediDent Kartal)
 
 ## Takım ayrımı + n8n → Next.js (Arif brief)
@@ -13,8 +13,8 @@
 | Next.js geçişi | **Arif** | n8n + HTML/Vercel işlerinin Next.js’te *gerçekleştirilmesi* |
 
 **Arif tek kaynak (PDF + MD):**
-- `docs/Nefalix_Urun_ve_Mimari_Aktarim.md`
-- `docs/Nefalix_Urun_ve_Mimari_Aktarim.pdf`
+- `docs/Nefalix_Urun_Mimarisi.md`
+- `docs/Nefalix_Urun_Mimarisi.pdf`
 - Yeniden üret: `/usr/bin/python3 execution/generate-urun-aktarim-pdf.py`
 
 Cursor agent sessizce paralel Next codebase kurmaz; spec bu dokümanda yaşatılır.
@@ -23,16 +23,27 @@ Cursor agent sessizce paralel Next codebase kurmaz; spec bu dokümanda yaşatıl
 
 Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/eNPS, Google yorumları, inbox ve itibar yönetimi platformudur. Bu repo (`n8n-repo`) orchestration katmanıdır: `directives/` SOP, `execution/` deterministik scriptler, `workflows/` n8n JSON, `supabase/migrations/` şema. Canlı stack: VPS `93.127.186.45` (`/opt/nefalix`), API `https://api.nefalixai.com`, site/dashboard `https://nefalixai.com`. Public site ayrı workspace: **`/Users/enesceylan/nefalix-landing`** (Vercel projesi `nefalix-landing`, deploy: `vercel --prod --yes`).
 
+## Blog / GEO kalite (2026-07-17)
+
+Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
+
+- **Kapaklar:** v5 — Unsplash insan figürü + markalı SVG overlay (`/api/blog?action=cover&v=5`).
+- **Batch SEO/AI:** 10 blog + 10 GEO (18–27 Temmuz) canlı; **tek digest mail** gitti (enes + akadir).
+- Komut: `python3 execution/publish-batch-seo-geo.py`
+- Log: `/var/log/nefalix-batch-seo-geo.log`
+
 ## Abdülkadir — Klinik CRM düzenlemesi
 
 **Sorumlu:** Abdülkadir Yaşar (Medident pilot)  
 **Directive:** `directives/clinic_crm.md`  
-**Canlı panel:** `https://nefalixai.com/klinik-crm` — giriş kodu: `abdulkadir`
+**Canlı panel:** `https://nefalix.com/klinik-crm` — giriş kodu: `abdulkadir`
 
 | CRM | Durum | Abdülkadir ne yapar |
 |-----|--------|---------------------|
-| **Klinik CRM** (`/klinik-crm`) | P0 canlı | Lead, atama, dinamik arama, not, randevu, danışan düzenleme |
-| **Saha CRM** (`/crm`) | Canlı (iç satış) | Nefalix saha pipeline — Medident operasyonu değil |
+| **Klinik CRM** (`/klinik-crm`) | Açık (arşivden geri) | Lead, atama, dinamik arama, not, randevu |
+| **Saha CRM** (`/crm`, `/saha`) | Açık (arşivden geri) | Nefalix saha pipeline |
+| **Kurum CRM** (`/nefalix-crm`) | Ana canlı | Yeni kurum CRM |
+| **Hasta CRM** (`/hasta-crm`) | Canlı (2026-07-27) | DC klinik UI — HastaKarti / Danışan |
 | **Estesoft HBYS** | Pilot | Randevu tamamlandı → NPS taslak → dashboard onay |
 
 **Düzenleme dosyaları (Cursor):**
@@ -44,19 +55,59 @@ Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/
 
 **Abdülkadir Cursor ilk prompt:** `directives/clinic_crm.md` sonundaki blok.
 
+### CRM — Dinamik sıfırlama (2026-07-27)
+
+- Saha CRM tüm ekip Dinamik → Havuz: **62 klinik** (`execution/saha-crm-dinamik-to-havuz.py --all` VPS `nefalix_state` id=1)
+- Sonra: en/ak/kd/mi dinamik = 0
+
 ## Bu sohbette yapılanlar
+
+### CRM Next.js geçiş kararı (2026-07-27)
+
+- Plan: `docs/CRM_NextJS_Gecis_Plani.md`
+- Karar: **CRM kalıcı = Next; Stella kesimi şimdi P0 HTML ile** (`/hasta-crm` paralel koşu; Next Stella’yı bloke etmez)
+
+### Stella → Hasta CRM P0 (2026-07-27)
+
+- **Spec:** `docs/Stella_Phase1_Spec.md`, `docs/stella_segments.csv`, `docs/stella_reference_sources.csv`
+- **Migration:** `supabase/migrations/20260727120000_crm_stella_phase1.sql`
+- **API:** `clinic-crm.js` → `sbCrmRequest` (cloud prod); yeni endpoint: `clinic-me`, `clinic-offers`, `clinic-payments`, `clinic-reports`
+- **Hasta store:** `nefalix-hasta-crm-app/store.js` — cookie oturum 90 gün, `resumeRoute`, clinic-* API
+- **Pack:** `execution/pack-nefalix-hasta-crm.py`
+- **Import:** `import-stella-definitions.py --prod`, `import-stella-crm.py --prod`
+- **SOP:** `directives/stella_migration.md`
+
+**Prod uygulandı (2026-07-27):**
+1. VPS alter migration + 39 segment + 11 referans seed
+2. Stella import: ~411 aktif contact (devam arka planda `/var/log/nefalix-stella-import.log`), 13 randevu
+3. `clinic-crm.js` → `sbRequest` (VPS proxy; cloud PROD değil)
+4. `vercel --prod` → https://nefalix.com/hasta-crm
+5. Stella List pagination: `offset` (skip çalışmıyor)
+
+### Hasta CRM canlı (2026-07-27)
+
+- Canlı: **https://nefalix.com/hasta-crm**
+- Kaynak: Drive `CRM ÇALIŞMASI/Nefalix CRM - Hasta.html` → `nefalix-landing/nefalix-hasta-crm.html`
+- Rewrite: `/hasta-crm` → `nefalix-hasta-crm.html` (HastaKarti / DanisanListesi)
+
+### İletişim / Mail sistemi (2026-07-23)
+
+- Canlı: https://nefalix.com/iletisim (+ `/imza`, `/kilavuz`, `/onizleme`; alias `/mail`)
+- Kaynak: `nefalix-landing/iletisim.html` — telefonlar + sosyal dolduruldu; CRM deep-link `?firm=&name=&kart=`
+- CRM: Kurum kartı "Mail kalıbı" + menü CRM → İletişim Kalıpları
+- SOP: `directives/nefalix_mail.md`
+
 
 ### CRM devri (Abdülkadir)
 
 - `directives/clinic_crm.md` — Klinik CRM düzenleme SOP (giriş, dosya haritası, iş kuralları, Supabase segment/kullanıcı, deploy)
 - Handoff’a Abdülkadir bölümü eklendi
 
-### Ürün + mimari aktarım (Arif)
+### Ürün mimarisi (Arif)
 
-- `docs/Nefalix_Urun_ve_Mimari_Aktarim.md` — tüm modüller (CX 6, Dashboard, Klinik CRM, Saha CRM, entegrasyon, büyüme, platform)
-- `docs/Nefalix_Urun_ve_Mimari_Aktarim.pdf` — Arif’e gönderilecek PDF
+- `docs/Nefalix_Urun_Mimarisi.md` — sürüm 3.0; her CX/CRM modülü tam iş kuralı + durum + veri + kenar
+- `docs/Nefalix_Urun_Mimarisi.pdf` — Arif’e gönderilecek PDF
 - `execution/generate-urun-aktarim-pdf.py` — MD→PDF (Arial Unicode, `/usr/bin/python3`)
-- Klinik CRM: Dinamik Arama, segment `gun_offset`, atama kuralları kod gerçeğine göre yazıldı
 - Secret/şifre PDF’te yok
 
 ### Landing (`nefalix-landing` — ayrı repo)
@@ -79,7 +130,7 @@ Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/
 2. **`nefalix-landing` git remote** — Yerel branch `cursor/landing-i18n-and-chat`; uzak repo bağlı değilse push yapılamaz; Vercel CLI ile prod deploy yapıldı ama Git senkronu eksik olabilir.
 3. **Mobil menü** — Açılıyor; `Platformlar` alt linkleri uzun menüde scroll ile erişiliyor (ilk fold altında).
 4. **Benefit kartları** — Sadece bazı `h3`’lere `liquid-sapphire-gold` class verildi; diğer 4 kart hâlâ genel selector’a bağlı.
-5. **n8n-repo** — Tüm yeni workflow/migration’ların prod VPS’e import + `supabase db push` / migrate doğrulanmadı (bu handoff commit’inden sonra yapılmalı).
+5. **Stella P0 prod** — Migration + import + Vercel deploy (yukarıdaki 4 adım); ardından 2 hafta paralel koşu (`directives/stella_migration.md`).
 6. **Stripe** — Kod var, env yok; öncelik PayTR.
 
 ## Bilinen hatalar / dikkat
@@ -94,9 +145,9 @@ Nefalix, klinik ve hizmet işletmeleri için WhatsApp-first hasta deneyimi, NPS/
 
 ## Sonraki 3 adım
 
-1. **Abdülkadir:** `directives/clinic_crm.md` oku → Medident’ten gelen düzenleme listesini Cursor’a yaz → `klinik-crm.html` / `clinic-crm.js` veya Supabase segment.
-2. **`nefalix-landing`:** CRM değişikliği sonrası `vercel --prod`; git remote yoksa bağla.
-3. **`n8n-repo`:** `crm_*` tabloları için migration ekle (`supabase/migrations/`) — şu an canlı DB’de var, repoda yok.
+1. **Stella P0 prod:** Migration SQL → import tanımlar + hasta/randevu → `vercel --prod` → Enes/Abdülkadir paralel koşu.
+2. **Abdülkadir:** `directives/stella_migration.md` checklist — segment isimleri ince ayar.
+3. **`nefalix-landing`:** Vercel env `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD` doğrula.
 
 ## Önemli env değişkenleri (sadece isimler)
 

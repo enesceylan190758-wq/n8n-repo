@@ -59,7 +59,11 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Site chat tunnel | `directives/chat_tunnel.md` |
 | Estesoft CRM (Medident) | `directives/estesoft_integration.md` |
 | Klinik CRM düzenleme (Medident) | `directives/clinic_crm.md` |
+| Stella → Hasta CRM geçişi (P0) | `directives/stella_migration.md` |
+| Kurum CRM (yeni, saha) | `directives/nefalix_crm.md` |
+| İletişim / mail kalıpları | `directives/nefalix_mail.md` |
 | Evolution API (WhatsApp pilot) | `directives/evolution_setup.md` |
+| Chatwoot (hazır WhatsApp inbox) | `directives/chatwoot_setup.md` |
 | Randevu tetikleme (HBYS/CRM) | `directives/appointment_trigger.md` |
 | Ürün yol haritası | `directives/product_roadmap.md` |
 | Google yorum senkronu (Places API) | `directives/google_reviews_sync.md` |

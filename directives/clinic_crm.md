@@ -10,14 +10,15 @@ Abdülkadir bu modülde **panel kullanımı** ve **Cursor ile düzenleme** (UI, 
 
 | Ürün | URL | Kim | Veri |
 |------|-----|-----|------|
-| **Klinik CRM** | `https://nefalixai.com/klinik-crm` | Medident ekibi | Supabase `crm_*` tabloları |
-| **Saha CRM** | `https://nefalixai.com/crm` | Nefalix iç satış | `nefalix_state` JSON blob |
+| **Klinik CRM** | `https://nefalix.com/klinik-crm` | Medident ekibi | Supabase `crm_*` tabloları |
+| **Saha CRM** | `https://nefalix.com/crm` · `/saha` | Nefalix iç satış | `nefalix_state` JSON blob |
+| **Kurum CRM (ana)** | `https://nefalix.com/nefalix-crm` | Nefalix ekip | `nefalix_state` id=2 |
 
 Bu directive **Klinik CRM** içindir. Saha CRM ayrı üründür (`nefalix-landing/crm.html`).
 
 ## Canlı giriş (Abdülkadir)
 
-1. `https://nefalixai.com/klinik-crm`
+1. `https://nefalix.com/klinik-crm` veya `https://nefalix.com/hasta-crm` (Stella UI)
 2. Kullanıcı kodu: `abdulkadir` (şifre yok — kod Supabase `crm_users` ile eşleşir)
 3. Diğer kodlar: `enes`, `kader` (temsilci/yönetici rolleri `crm_users.rol` alanından)
 
@@ -27,12 +28,17 @@ Rol `yonetici` ise tüm dinamik arama listesini `?all=1` ile görür; `temsilci`
 
 | Ne düzenlenir | Dosya / yer |
 |---------------|-------------|
-| Arayüz (ekran, buton, liste) | `nefalix-landing/klinik-crm.html` |
+| Arayüz (ekran, buton, liste) | `nefalix-landing/klinik-crm.html` veya `nefalix-hasta-crm-app/*.dc.html` |
+| Hasta CRM store (API) | `nefalix-landing/nefalix-hasta-crm-app/store.js` |
+| Pack hasta CRM | `execution/pack-nefalix-hasta-crm.py` |
 | API + iş kuralları | `nefalix-landing/api/_lib/clinic-crm.js` |
-| URL rewrite | `nefalix-landing/vercel.json` (`/api/clinic/*`) |
-| Segment etiketleri, gün offset | Supabase `crm_segments` |
+| URL rewrite | `nefalix-landing/vercel.json` (`/api/clinic/*`, `/hasta-crm`) |
+| Segment etiketleri, gün offset | Supabase `crm_segments` — `docs/stella_segments.csv` |
+| Referans kaynakları | Supabase `crm_reference_sources` — `docs/stella_reference_sources.csv` |
+| Stella geçiş SOP | `directives/stella_migration.md` |
+| Migration | `supabase/migrations/20260727120000_crm_stella_phase1.sql` |
 | Kullanıcı ekleme / rol | Supabase `crm_users` |
-| Ürün spec (iş kuralı referans) | `docs/Nefalix_Urun_ve_Mimari_Aktarim.md` §4.1 |
+| Ürün spec (iş kuralı referans) | `docs/Nefalix_Urun_Mimarisi.md` §4.1 |
 | Estesoft → NPS (HBYS) | `directives/estesoft_integration.md` |
 
 **Repo:** UI/API değişikliği **`nefalix-landing`** workspace'inde yapılır. Bu repo (`n8n-repo`) spec + n8n + migration içindir.
@@ -45,7 +51,8 @@ Rol `yonetici` ise tüm dinamik arama listesini `?all=1` ile görür; `temsilci`
 - Not kaydında segment seçilince:  
   `next_call_date = (not_tarihi || bugün) + segment.gun_offset` (`gun_offset` min 1)
 - **Dinamik segment** (`show_in_dynamic=true`): Ulaşılamadı (+1), Teklif Verildi (+1), Takip (+2), Orta Vadede (+7)…
-- **Kapanış segmenti** (`show_in_dynamic=false`): Satıldı, Süreci Biten, Tedaviye Uygun Değil → `next_call_date=null`; bu üçünde `status=arsiv`
+- **Kapanış segmenti** (`show_in_dynamic=false`): Satıldı, Süreci Biten, Tedaviye Uygun Değil → `next_call_date=null`; `status=arsiv`
+- **5× ulaşılamadı:** `ulasilamadi_tekrar_aranacak` notlarında `dynamic_attempt_count` artar; 5’te otomatik `5_kez_ulasilamadi` + arşiv
 - Sorgu: `status=aktif AND next_call_date <= bugün`
 
 ### Atama
@@ -87,25 +94,35 @@ vercel --prod --yes
 
 Deploy öncesi mobil (390px) ve giriş akışını kontrol et. `.env` / secret commit etme.
 
-## Henüz yapılmayan (P1/P2)
+## P0 canlı (2026-07-27)
 
-P0 canlı: lead, atama, dinamik arama, not, randevu, danışan düzenleme.
+Lead, atama, dinamik arama, not, randevu, danışan düzenleme, teklif, basit ödeme, ay sonu rapor.
 
-Planlanan ama kod yok:
-- Kasa / ödeme takibi
+| Ürün | URL |
+|------|-----|
+| Hasta CRM (Stella UI) | `https://nefalix.com/hasta-crm` |
+| Klinik CRM (basit) | `https://nefalix.com/klinik-crm` |
+
+- **Store + API:** `nefalix-hasta-crm-app/store.js` → `clinic-*` (`sbCrmRequest` / `SUPABASE_URL_PROD`)
+- **Import:** `execution/import-stella-definitions.py --prod`, `import-stella-crm.py --prod`
+- **Paralel koşu SOP:** `directives/stella_migration.md`
+- **Spec:** `docs/Stella_Phase1_Spec.md`
+
+## P1
+
+- Meta FB lead otomatik → `clinic-lead-intake`
 - Teklif PDF
-- Raporlar
-- WhatsApp panel entegrasyonu (wf-06 lead upsert kısmen var)
-
-Abdülkadir öncelikle **P0 akışını Medident operasyonuna göre ince ayar** (segment isimleri, offset, UI metinleri) yapabilir.
+- WhatsApp panel (Evolution) hasta kartı
+- Stella tam not/teklif geçmiş import
 
 ## Cursor — Abdülkadir ilk prompt
 
 ```text
 Proje: nefalix-landing (Klinik CRM) + n8n-repo (spec)
-Önce oku: n8n-repo/.tmp/handoff.md, directives/clinic_crm.md, docs/Nefalix_Urun_ve_Mimari_Aktarim.md §4.1
-Canlı: https://nefalixai.com/klinik-crm — giriş kodu abdulkadir
-Düzenlenecek dosyalar: klinik-crm.html, api/_lib/clinic-crm.js
+Önce oku: n8n-repo/.tmp/handoff.md, directives/clinic_crm.md, docs/Nefalix_Urun_Mimarisi.md §4.1
+Canlı: https://nefalix.com/klinik-crm veya /hasta-crm — giriş kodu abdulkadir
+Düzenlenecek dosyalar: nefalix-hasta-crm-app/store.js, api/_lib/clinic-crm.js
+Önce oku: directives/stella_migration.md
 Kurallar: Dinamik Arama next_call_date mantığını bozma; .env commit etme; deploy için onay iste.
 Görev: [buraya Medident'ten gelen düzenleme isteğini yaz]
 ```
