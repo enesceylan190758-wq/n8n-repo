@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>Nefalix WhatsApp · giriş</title>
+  <style>
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      font-family: system-ui, sans-serif; background:#0b141a; color:#e9edef; }
+    .box { text-align:center; padding:24px; }
+    .spin { width:28px; height:28px; border:3px solid #233138; border-top-color:#25d366;
+      border-radius:50%; animation:s .7s linear infinite; margin:0 auto 14px; }
+    @keyframes s { to { transform:rotate(360deg) } }
+    a { color:#25d366 }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="spin"></div>
+    <div id="msg">WhatsApp açılıyor…</div>
+  </div>
+  <script>
+(function () {
+  var p = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+  var apiUrl = (p.get('apiUrl') || '').replace(/\/$/, '');
+  var token = p.get('token') || '';
+  var version = p.get('version') || '2.3.7';
+  var instance = p.get('instance') || 'nefalix-crm';
+  var next = p.get('next') || '';
+  var msg = document.getElementById('msg');
+
+  if (!apiUrl || !token) {
+    msg.innerHTML = 'Eksik giriş. <a href="/wa-inbox/">Inbox</a>';
+    return;
+  }
+
+  try {
+    localStorage.setItem('apiUrl', apiUrl);
+    localStorage.setItem('token', token);
+    localStorage.setItem('accessToken', token);
+    localStorage.setItem('version', version);
+    localStorage.setItem('instanceName', instance);
+    localStorage.setItem('clientName', 'nefalix_evolution');
+  } catch (e) {
+    msg.textContent = 'Depolama engelli: ' + e.message;
+    return;
+  }
+
+  function go(url) { location.replace(url); }
+
+  function openInstanceChat(id) {
+    var base = '/manager/instance/' + encodeURIComponent(id) + '/chat';
+    // İlk grubu otomatik aç — sağ panel boş kalmasın
+    fetch(apiUrl + '/chat/findChats/' + encodeURIComponent(instance), {
+      method: 'POST',
+      headers: { apikey: token, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: '{}'
+    }).then(function (r) { return r.json(); }).then(function (chats) {
+      var list = Array.isArray(chats) ? chats : [];
+      var g = null;
+      for (var i = 0; i < list.length; i++) {
+        var jid = list[i] && (list[i].remoteJid || list[i].id);
+        if (jid && String(jid).indexOf('@g.us') >= 0) { g = jid; break; }
+      }
+      if (!g && list[0]) g = list[0].remoteJid || list[0].id;
+      if (g) go(base + '/' + encodeURIComponent(g));
+      else go(base);
+    }).catch(function () { go(base); });
+  }
+
+  if (next && next.indexOf('/manager/instance/') === 0 && next.indexOf('/chat/') > 0) {
+    go(next);
+    return;
+  }
+
+  var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 2500);
+
+  fetch(apiUrl + '/instance/fetchInstances?instanceName=' + encodeURIComponent(instance), {
+    headers: { apikey: token, Accept: 'application/json' },
+    signal: ctrl ? ctrl.signal : undefined
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    clearTimeout(t);
+    var list = Array.isArray(data) ? data : (data ? [data] : []);
+    var row = null;
+    for (var i = 0; i < list.length; i++) {
+      var x = list[i] || {};
+      var name = x.name || (x.instance && (x.instance.instanceName || x.instance.name)) || '';
+      if (String(name).toLowerCase() === String(instance).toLowerCase()) { row = x; break; }
+    }
+    if (!row && list.length === 1) row = list[0];
+    var id = row && (row.id || (row.instance && row.instance.id));
+    if (id) {
+      try { localStorage.setItem('nefalixInstanceId', String(id)); } catch (_) {}
+      openInstanceChat(id);
+      return;
+    }
+    go(next || '/wa-inbox/');
+  }).catch(function () {
+    clearTimeout(t);
+    go('/wa-inbox/');
+  });
+})();
+  </script>
+</body>
+</html>

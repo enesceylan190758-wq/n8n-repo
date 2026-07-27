@@ -23,14 +23,16 @@ VPS cron 09:05 Europe/Istanbul
     ↓
 python3 -u execution/publish-daily-blog.py
     ↓
-Vertex Gemini → JSON (başlık, özet, paragraflar)
+Vertex Gemini → JSON (başlık, özet, takeaways, sections, checklist, FAQ)
     ↓
-blog-images.json → cover + footer
+branded_cover.py → markalı SVG kapak (`/api/blog?action=cover`) — Unsplash yok
     ↓
 Supabase blog_posts INSERT
     ↓
 SMTP (Hostinger info@nefalix.com) → yöneticiler
 ```
+
+**İçerik kalitesi:** Swell CX Resources seviyesinde playbook (öne çıkanlar + 5 bölüm + kontrol listesi + SSS). Kapaklar stok foto değil markalı SVG.
 
 ## Kurulum (tek sefer)
 
@@ -74,6 +76,12 @@ python3 execution/publish-daily-blog.py --dry-run
 python3 execution/publish-daily-blog.py
 # sadece yazı, mail yok:
 python3 execution/publish-daily-blog.py --skip-notify
+# mevcut son N yazıyı kallavi yeniden üret (slug aynı):
+python3 execution/regenerate-blog-quality.py --limit 5
+# Unsplash kapakları → markalı SVG:
+python3 execution/backfill-branded-covers.py
+# SEO/AI batch (10 blog + 10 GEO) + tek digest mail:
+python3 execution/publish-batch-seo-geo.py
 ```
 
 Log: `/var/log/nefalix-blog.log`

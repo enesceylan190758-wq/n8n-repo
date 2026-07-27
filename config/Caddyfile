@@ -2,8 +2,14 @@
 	email {$ACME_EMAIL}
 }
 
-{$N8N_PUBLIC_HOST} {
+api.nefalix.com, api.nefalixai.com {
 	encode gzip
+	handle_path /internal/social/* {
+		reverse_proxy social-webhook:8791
+	}
+	handle_path /internal/crm/* {
+		reverse_proxy social-webhook:8791
+	}
 	handle_path /v2* {
 		root * /srv/nefalix-site-v2
 		file_server
@@ -13,12 +19,49 @@
 	}
 }
 
-{$EVOLUTION_PUBLIC_HOST} {
+evo.nefalix.com, evo.nefalixai.com {
 	encode gzip
-	reverse_proxy evolution-api:8080
+	handle /wa-sso* {
+		root * /srv/nefalix-site-v2
+		rewrite * /wa-sso.html
+		header Cache-Control "no-store"
+		file_server
+	}
+	handle /wa-inbox* {
+		root * /srv/nefalix-site-v2
+		header Cache-Control "no-store"
+		file_server
+	}
+	handle {
+		reverse_proxy evolution-api:8080
+	}
 }
 
-{$V2_SITE_HOST:v2.nefalixai.com} {
+# Chatwoot — aynı host, 8443 (yeni DNS gerekmez; evo cert kullanılır)
+https://evo.nefalix.com:8443, https://evo.nefalixai.com:8443 {
+	encode gzip
+	header {
+		-X-Frame-Options
+		Content-Security-Policy "frame-ancestors https://nefalix.com https://*.nefalix.com https://nefalixai.com https://*.nefalixai.com"
+	}
+	reverse_proxy chatwoot-rails:3000 {
+		# HTTP/2 underscore header düşer — API token’ı taşı
+		header_up API-Access-Token {http.request.header.api_access_token}
+		header_up api_access_token {http.request.header.API-Access-Token}
+	}
+}
+
+# DNS A → VPS eklenince (opsiyonel)
+chat.nefalix.com, chat.nefalixai.com {
+	encode gzip
+	header {
+		-X-Frame-Options
+		Content-Security-Policy "frame-ancestors https://nefalix.com https://*.nefalix.com https://nefalixai.com https://*.nefalixai.com"
+	}
+	reverse_proxy chatwoot-rails:3000
+}
+
+{$V2_SITE_HOST:v2.nefalix.com} {
 	encode gzip
 	root * /srv/nefalix-site-v2
 	file_server

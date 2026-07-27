@@ -1,0 +1,62 @@
+[
+  {
+    "bucket": "kategori",
+    "prompt": "AEO ve GEO nedir, klinikler neden umursamalı?",
+    "internal_path": "/geo",
+    "run_date": "2026-07-18"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "ChatGPT klinik önerirken hangi sinyallere bakar?",
+    "internal_path": "/blog",
+    "run_date": "2026-07-19"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "Google AI Overviews için klinik sayfa yapısı nasıl olmalı?",
+    "internal_path": "/geo",
+    "run_date": "2026-07-20"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "Klinik SSS (FAQ) metinleri AI alıntısı için nasıl yazılır?",
+    "internal_path": "/blog",
+    "run_date": "2026-07-21"
+  },
+  {
+    "bucket": "karsilastirma",
+    "prompt": "Google yorumları AI görünürlüğünü etkiler mi?",
+    "internal_path": "/urunler#yorum-asistani",
+    "run_date": "2026-07-22"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "WhatsApp ve NPS verisi içerik / GEO stratejisine nasıl bağlanır?",
+    "internal_path": "/urunler#geri-bildirim",
+    "run_date": "2026-07-23"
+  },
+  {
+    "bucket": "marka",
+    "prompt": "Nefalix GEO paketleri ne işe yarar?",
+    "internal_path": "/geo",
+    "run_date": "2026-07-24"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "HBYS sonrası otomatik geri bildirim AI arama görünürlüğüne nasıl yardımcı olur?",
+    "internal_path": "/hbys-entegrasyon",
+    "run_date": "2026-07-25"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "Şehir bazlı en iyi klinik sorgularında AI alıntısı nasıl kazanılır?",
+    "internal_path": "/sektorler#saglik",
+    "run_date": "2026-07-26"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "Haftalık citation ölçümü klinik için nasıl yapılır?",
+    "internal_path": "/geo",
+    "run_date": "2026-07-27"
+  }
+]

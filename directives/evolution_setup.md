@@ -4,6 +4,20 @@
 Evolution API **resmi WhatsApp Business API değildir**. WhatsApp Web protokolü kullanır.
 Pilot/test içindir; ban riski ve İYS/KVKK sorumluluğu sizde kalır.
 
+## Ürün yüzeyi (sağlam kurulum)
+
+CRM WhatsApp = **Chatwoot** (hazır inbox) — Evolution’a bağlı.
+
+| Ne | URL |
+|----|-----|
+| Chatwoot | https://evo.nefalix.com:8443/app |
+| CRM panel | https://nefalix.com/nefalix-crm#WhatsappPanel |
+| SOP | `directives/chatwoot_setup.md` |
+| Manager (admin) | https://evo.nefalix.com/manager/ |
+
+- Instance: `nefalix-crm` → Chatwoot inbox **Nefalix CRM WhatsApp**
+- Evolution `CHATWOOT_ENABLED=true`, internal URL `http://chatwoot-rails:3000`
+
 ## Kurulum
 
 ```bash
@@ -13,20 +27,44 @@ bash execution/setup-evolution.sh
 
 ## İlk bağlantı (QR)
 
-### Dashboard (önerilen — SSH gerekmez)
+### Nefalix CRM (önerilen)
+
+1. https://nefalix.com/nefalix-crm → `enes` / `kader` / `abdulkadir`
+2. **WhatsApp** menüsü → Evolution Manager sohbet (SSO ile)
+3. Bağlı değilse QR; bağlıysa sohbet listesi + mesaj
+
+### Dashboard (klinik)
 
 1. [Dashboard](https://nefalixai.com/dashboard) → **Firmalar** → firma düzenle
 2. **Evolution instance adı** girin (ör. `medident-pilot`)
 3. **Kaydet** → **QR oluştur**
 4. Telefonda **WhatsApp → Bağlı cihazlar → Cihaz bağla** ile okutun
 
-Vercel ortam değişkenleri: `EVOLUTION_API_KEY`, `EVOLUTION_API_URL` (varsayılan `https://evo.nefalixai.com`).
+Vercel ortam değişkenleri: `EVOLUTION_API_KEY`, `EVOLUTION_API_URL` (varsayılan `https://evo.nefalix.com`).
 
 **Supabase Vercel'de yok** — DB VPS'te kapalı portta. Dashboard API'leri VPS n8n proxy üzerinden gider:
 - `N8N_WHATSAPP_CONNECT_URL` → wf-15
 - `N8N_SUPABASE_PROXY_URL` + `NEFALIX_INTERNAL_KEY` → wf-16 (firma kaydı vb.)
 
 API: `POST /api/whatsapp/connect` — `action: start | refresh | status`, `clinicId`, opsiyonel `instanceName`.
+CRM: `POST /api/blog?action=crm-whatsapp` — `manager-sso | start | status | chats | messages | send`.
+
+## İsim / numara görünmüyorsa
+
+Evolution bazen `Chat`/`Contact` tablolarını boş bırakır; Manager JID gösterir.
+Düzeltme (VPS):
+
+```bash
+cd /opt/nefalix
+set -a && . ./.env && set +a
+EVOLUTION_API_URL=https://evo.nefalix.com \
+EVOLUTION_INSTANCE=nefalix-crm \
+EVOLUTION_INSTANCE_ID=<uuid> \
+python3 execution/backfill-evolution-names.py
+```
+
+Script: grup `subject` → `Chat.name`, mesaj `pushName` + `participantAlt` → `Contact`.
+Sonra CRM’de WhatsApp → Yenile giriş.
 
 ### Yerel script (alternatif)
 

@@ -28,9 +28,9 @@ sys.path.insert(0, str(ROOT / "execution"))
 
 from vertex_gemini import vertex_json  # noqa: E402
 from pick_youtube_video import pick_youtube_video  # noqa: E402
+from branded_cover import branded_cover_url, branded_footer_url  # noqa: E402
 
 TOPICS = json.loads((ROOT / "execution" / "blog-topics.json").read_text(encoding="utf-8"))
-IMAGES = json.loads((ROOT / "execution" / "blog-images.json").read_text(encoding="utf-8"))
 
 BLOG_RESPONSE_SCHEMA = {
     "type": "object",
@@ -40,6 +40,7 @@ BLOG_RESPONSE_SCHEMA = {
         "excerpt": {"type": "string"},
         "meta_description": {"type": "string"},
         "intro": {"type": "string"},
+        "takeaways": {"type": "array", "items": {"type": "string"}},
         "sections": {
             "type": "array",
             "items": {
@@ -51,6 +52,7 @@ BLOG_RESPONSE_SCHEMA = {
                 "required": ["heading", "body"],
             },
         },
+        "checklist": {"type": "array", "items": {"type": "string"}},
         "faq": {
             "type": "array",
             "items": {
@@ -64,7 +66,7 @@ BLOG_RESPONSE_SCHEMA = {
         },
         "cta": {"type": "string"},
     },
-    "required": ["title", "excerpt", "meta_description", "intro", "sections", "faq"],
+    "required": ["title", "excerpt", "meta_description", "intro", "sections", "faq", "takeaways"],
 }
 
 DEFAULT_NOTIFY_TO = "enes.ceylan190758@gmail.com,akadirysr@gmail.com"
@@ -129,27 +131,48 @@ def pick_topic(day_index: int) -> dict:
     return TOPICS[day_index % len(TOPICS)]
 
 
-def images_for_tag(tag: str) -> tuple[str, str]:
-    cfg = IMAGES.get(tag) or IMAGES.get("default", {})
-    default = IMAGES["default"]
-    return (
-        cfg.get("cover") or default["cover"],
-        cfg.get("footer") or default["footer"],
-    )
-
-
-def geo_body_to_html(intro: str, sections: list[dict], faq: list[dict], cta: str) -> str:
+def geo_body_to_html(
+    intro: str,
+    sections: list[dict],
+    faq: list[dict],
+    cta: str,
+    takeaways: list | None = None,
+    checklist: list | None = None,
+) -> str:
     parts: list[str] = []
     intro = str(intro or "").strip()
     if intro:
-        parts.append(f"<p><strong>{html.escape(intro)}</strong></p>")
+        parts.append(f'<p class="blog-lede"><strong>{html.escape(intro)}</strong></p>')
+    if takeaways:
+        parts.append('<div class="blog-takeaways"><h2>Öne çıkanlar</h2><ul>')
+        for item in takeaways[:6]:
+            t = str(item or "").strip()
+            if t:
+                parts.append(f"<li>{html.escape(t)}</li>")
+        parts.append("</ul></div>")
     for sec in sections or []:
         heading = str(sec.get("heading") or sec.get("h2") or "").strip()
         body = str(sec.get("body") or sec.get("text") or "").strip()
         if heading:
             parts.append(f"<h2>{html.escape(heading)}</h2>")
         if body:
-            parts.append(f"<p>{html.escape(body)}</p>")
+            # Split long bodies into paragraphs on double newline or ~2 sentences
+            chunks = [c.strip() for c in re.split(r"\n+", body) if c.strip()]
+            if len(chunks) == 1 and len(body) > 420:
+                # soft-split on sentence ends
+                sents = re.split(r"(?<=[.!?])\s+", body)
+                mid = max(2, len(sents) // 2)
+                chunks = [" ".join(sents[:mid]).strip(), " ".join(sents[mid:]).strip()]
+                chunks = [c for c in chunks if c]
+            for chunk in chunks:
+                parts.append(f"<p>{html.escape(chunk)}</p>")
+    if checklist:
+        parts.append('<div class="blog-checklist"><h2>Uygulama kontrol listesi</h2><ul>')
+        for item in checklist[:8]:
+            t = str(item or "").strip()
+            if t:
+                parts.append(f"<li>{html.escape(t)}</li>")
+        parts.append("</ul></div>")
     if faq:
         parts.append("<h2>Sık sorulan sorular</h2>")
         for item in faq:
@@ -163,36 +186,44 @@ def geo_body_to_html(intro: str, sections: list[dict], faq: list[dict], cta: str
             )
     cta = str(cta or "").strip()
     if cta:
-        parts.append(f"<p>{html.escape(cta)}</p>")
+        parts.append(f'<p class="blog-cta">{html.escape(cta)}</p>')
     return "\n".join(parts)
 
 
 def build_prompt(topic: dict, attempt: int) -> str:
-    compact = attempt >= 3
-    section_count = 2 if compact else 3
-    faq_count = 3 if compact else 4
-    section_words = 90 if compact else 120
+    compact = attempt >= 4
+    section_count = 3 if compact else 5
+    faq_count = 4 if compact else 6
+    section_words = 160 if compact else 220
     return f"""Bugünün tarihi: {today_key()}
 Konu etiketi: {topic['tag']}
 Açı: {topic['angle']}
 
-Nefalix için Türkçe GEO uyumlu blog yazısı yaz.
+Nefalix için Türkçe, Swell CX Resources seviyesinde KALLAVİ bir playbook yazısı yaz.
+Hedef okuyucu: klinik sahibi, operasyon müdürü, hasta deneyimi sorumlusu.
 Nefalix: klinik/otel/auto için WhatsApp, NPS, Google yorumları, HBYS entegrasyonu platformu.
 
+Ton: uzman, net, operasyonel. Boş slogan yok. Somut adım, metrik, örnek mesaj kalıbı ver.
+Okuyucu yazıyı bitirince yarın klinikte uygulayabilmeli.
+
 JSON alanları:
-- title: max 80 karakter
-- excerpt: max 180 karakter
-- meta_description: max 150 karakter
-- intro: max 55 kelime, doğrudan cevap
-- sections: tam {section_count} madde; heading soru cümlesi; body max {section_words} kelime
-- faq: tam {faq_count} madde; kısa cevaplar
-- cta: 1 cümle, hafif Nefalix çağrısı
+- title: max 85 karakter, vaat + net sonuç (clickbait yok)
+- excerpt: max 200 karakter, neden okumalı
+- meta_description: max 155 karakter
+- intro: 80-110 kelime, doğrudan cevap + bağlam
+- takeaways: 5 maddelik öne çıkanlar (kısa, aksiyon)
+- sections: tam {section_count} madde; heading soru veya net başlık; body ~{section_words} kelime (2 paragraf; \\n ile ayır)
+- checklist: 6 uygulama maddesi (sırayla yapılabilir)
+- faq: tam {faq_count} madde; pratik cevap (40-70 kelime)
+- cta: 1-2 cümle, hafif Nefalix çağrısı (garanti yok)
 - tag: "{topic['tag']}"
 
 Kurallar:
-- Metin içinde çift tırnak (") kullanma
+- Metin içinde çift tırnak (") kullanma; gerekirse tek tırnak veya tire kullan
 - Markdown kullanma
-- Tıbbi iddia veya garanti verme
+- Tıbbi tedavi iddiası veya garanti verme
+- Genel gevezelik yok; her bölümde klinik operasyon örneği olsun
+- En az bir bölümde örnek WhatsApp/SMS mesaj kalıbı veya skor eşiği (ör. NPS <7) olsun
 """
 
 
@@ -203,13 +234,14 @@ def generate_post(topic: dict, used_slugs: set[str], attempt: int = 1) -> dict:
         out = vertex_json(
             prompt,
             system=(
-                "Sen Nefalix GEO içerik editörüsün. "
+                "Sen Nefalix kıdemli içerik editörüsün. "
+                "Swell CX tarzı derin playbook yazarsın. "
                 "Yalnızca şemaya uygun geçerli JSON döndür. "
                 "String değerlerinde çift tırnak kullanma."
             ),
             temperature=temperature,
             response_schema=BLOG_RESPONSE_SCHEMA,
-            max_output_tokens=8192 if attempt >= 3 else 6144,
+            max_output_tokens=8192,
         )
     except (json.JSONDecodeError, RuntimeError):
         if attempt < 5:
@@ -239,8 +271,16 @@ def generate_post(topic: dict, used_slugs: set[str], attempt: int = 1) -> dict:
             ]
 
     tag = str(out.get("tag") or topic["tag"]).strip() or topic["tag"]
-    cover, footer = images_for_tag(tag)
-    body_html = geo_body_to_html(intro, sections, faq, str(out.get("cta") or ""))
+    cover = branded_cover_url(title=title, tag=tag, kind="blog")
+    footer = branded_footer_url(tag=tag)
+    body_html = geo_body_to_html(
+        intro,
+        sections,
+        faq,
+        str(out.get("cta") or ""),
+        takeaways=out.get("takeaways") or [],
+        checklist=out.get("checklist") or [],
+    )
 
     yt = pick_youtube_video(
         tag=tag,
@@ -299,6 +339,12 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--skip-notify", action="store_true")
     parser.add_argument(
+        "--topic-index",
+        type=int,
+        default=None,
+        help="Konu indeksi (mod len(TOPICS)); yoksa bugünün ordinali",
+    )
+    parser.add_argument(
         "--to",
         default=os.environ.get("BLOG_NOTIFY_TO", DEFAULT_NOTIFY_TO),
         help="Virgülle ayrılmış yönetici e-postaları",
@@ -307,7 +353,11 @@ def main() -> None:
 
     try:
         used = recent_slugs()
-        day_index = datetime.now().toordinal()
+        day_index = (
+            args.topic_index
+            if args.topic_index is not None
+            else datetime.now().toordinal()
+        )
         topic = pick_topic(day_index)
         post = generate_post(topic, used)
 

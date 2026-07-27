@@ -1,0 +1,42 @@
+[
+  {
+    "tag": "AEO",
+    "angle": "Hastalar ChatGPT ve Gemini'ye klinik soruyor: AEO/GEO nedir, klinik operasyonu için net adım planı nedir?"
+  },
+  {
+    "tag": "GEO",
+    "angle": "Google AI Overviews'ta diş kliniği nasıl görünür olur? Sayfa yapısı, entity ve yorum sinyalleri."
+  },
+  {
+    "tag": "AEO",
+    "angle": "Perplexity ve Gemini alıntısı için answer-first içerik nasıl yazılır? Klinik örnekleriyle playbook."
+  },
+  {
+    "tag": "GEO",
+    "angle": "Schema.org + FAQPage ile AI motorlarına alıntılanabilir klinik sayfası nasıl kurulur?"
+  },
+  {
+    "tag": "AEO",
+    "angle": "Marka entity (Nefalix) ve klinik entity tutarlılığı: AI aramada güven ve alıntı için ne tutarlı olmalı?"
+  },
+  {
+    "tag": "GEO",
+    "angle": "Google yorumları ve NPS verisini AI arama sinyeline çevirmek: hangi metrikler içerikte görünmeli?"
+  },
+  {
+    "tag": "Sağlık Turizmi",
+    "angle": "Sağlık turizmi ve saç ekimi için çok dilli GEO: hangi dillerde hangi sorular, nasıl cevaplanır?"
+  },
+  {
+    "tag": "GEO",
+    "angle": "En iyi diş kliniği [şehir] tarzı AI cevaplarına girmek: yerel sinyaller, içerik ve itibar."
+  },
+  {
+    "tag": "AEO",
+    "angle": "Blog playbook vs günlük GEO paketi: hangi format ne zaman, klinik içerik takvimi nasıl kurulur?"
+  },
+  {
+    "tag": "GEO",
+    "angle": "Haftalık GEO ölçüm: ChatGPT/Perplexity/Gemini citation kontrol listesi ve iyileştirme döngüsü."
+  }
+]

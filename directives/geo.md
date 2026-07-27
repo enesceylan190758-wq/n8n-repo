@@ -24,15 +24,16 @@ python3 -u execution/publish-daily-geo.py
     ↓
 geo-topics.json → sıradaki alıcı sorusu
     ↓
-Vertex Gemini → answer / FAQ / LinkedIn one-liner
+Vertex Gemini → derin answer / bullets / FAQ / LinkedIn one-liner
     ↓
 Supabase geo_daily_runs INSERT (status=published)
     ↓
-Landing (Vercel) /geo + /geo/:date  ← public crawl surface
+Landing (Vercel) /geo + /geo/:date  ← public crawl surface + markalı SVG kapak
     ↓
 SMTP → yöneticiler (mailde public_url)
 ```
 
+**Kalite:** direct_answer 100–140 kelime; 5–6 operasyonel madde; 4–5 SSS. İndeks Swell tarzı featured + kapaklı kartlar.
 Public yüzeyler (nefalix-landing):
 
 | URL | Rol |
@@ -85,6 +86,8 @@ python3 execution/publish-daily-geo.py --dry-run
 python3 execution/publish-daily-geo.py
 python3 execution/publish-daily-geo.py --skip-notify
 python3 execution/send-geo-weekly-reminder.py --dry-run
+# SEO/AI batch (10 GEO tarihleri 18–27 Temmuz + 10 blog) tek mail:
+python3 execution/publish-batch-seo-geo.py
 
 # Public smoke
 curl -sI https://nefalix.com/geo

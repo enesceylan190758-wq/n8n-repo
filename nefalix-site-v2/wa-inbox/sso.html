@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nefalix WhatsApp · giriş</title>
+  <style>
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      font-family: system-ui, sans-serif; background:#0b141a; color:#e9edef; }
+    .box { text-align:center; padding:24px; }
+    .spin { width:28px; height:28px; border:3px solid #233138; border-top-color:#25d366;
+      border-radius:50%; animation:s .7s linear infinite; margin:0 auto 14px; }
+    @keyframes s { to { transform:rotate(360deg) } }
+    a { color:#25d366 }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="spin"></div>
+    <div id="msg">WhatsApp sohbetine bağlanıyor…</div>
+  </div>
+  <script>
+(function () {
+  var KEY = 'nefalix_wa_inbox_cfg';
+  var p = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+  var apiUrl = (p.get('apiUrl') || '').replace(/\/$/, '');
+  var token = p.get('token') || '';
+  var instance = p.get('instance') || 'nefalix-crm';
+  var label = p.get('label') || 'Nefalix CRM';
+  var next = p.get('next') || './index.html';
+  var msg = document.getElementById('msg');
+
+  if (!apiUrl || !token) {
+    msg.innerHTML = 'Eksik giriş. <a href="/manager/">Manager</a> veya CRM panelinden açın.';
+    return;
+  }
+
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      apiUrl: apiUrl,
+      token: token,
+      instance: instance,
+      label: label,
+      ts: Date.now()
+    }));
+  } catch (e) {
+    msg.textContent = 'Tarayıcı depolama engelli: ' + e.message;
+    return;
+  }
+
+  location.replace(next);
+})();
+  </script>
+</body>
+</html>

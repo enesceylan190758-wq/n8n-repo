@@ -144,26 +144,28 @@ def to_answer_html(
 def build_geo_prompt(topic: dict, attempt: int) -> str:
     path = topic.get("internal_path") or "/"
     compact = attempt >= 3
-    faq_n = 2 if compact else 3
-    bullet_n = 3 if compact else 4
+    faq_n = 4 if compact else 5
+    bullet_n = 5 if compact else 6
     return f"""Bugünün tarihi: {today_key()}
 Alıcı sorusu: {topic['prompt']}
 Kova: {topic.get('bucket', 'kategori')}
 İlgili sayfa: {SITE}{path}
 
-Nefalix için Türkçe GEO (AI alıntı) paketi üret.
-Nefalix: klinikler/otel/auto için WhatsApp, NPS, Google yorumları, HBYS entegrasyonu platformu. Marka adı: Nefalix.
+Nefalix için Türkçe, Swell Resources derinliğinde GEO (AI alıntı) paketi üret.
+Kısa format ama zayıf değil: her cümle operasyonel değer taşısın.
+Nefalix: klinikler/otel/auto için WhatsApp, NPS, Google yorumları, HBYS entegrasyonu. Marka: Nefalix.
 
 JSON alanları:
-- direct_answer: max 55 kelime, doğrudan cevap
-- bullets: tam {bullet_n} kısa madde
-- faq: tam {faq_n} madde (q/a)
+- direct_answer: 100-140 kelime, otoriter doğrudan cevap (filler yok; 1 metrik veya süreç adı geçsin)
+- bullets: tam {bullet_n} madde; her madde 18-35 kelime, somut adım veya eşik
+- faq: tam {faq_n} madde (q/a); cevap 40-70 kelime
 - internal_links: 2-4 site URL (https://nefalix.com/...)
-- linkedin_one_liner: max 200 karakter
+- linkedin_one_liner: max 200 karakter, sharable insight
 
 Kurallar:
 - Metin içinde çift tırnak (") kullanma
 - Tıbbi iddia/garanti yok
+- Genel slogan yok; metrik, süreç veya örnek mesaj kalıbı ver
 """
 
 
@@ -199,7 +201,8 @@ def generate_geo(topic: dict, attempt: int = 1) -> dict:
     if isinstance(links, str):
         links = [links]
     links = [str(u).strip() for u in links if str(u).strip()]
-    geo_url = public_url(today_key())
+    run_date = str(topic.get("run_date") or today_key())
+    geo_url = public_url(run_date)
     if geo_url not in links:
         links.insert(0, geo_url)
     if f"{SITE}/geo" not in links:
@@ -214,15 +217,15 @@ def generate_geo(topic: dict, attempt: int = 1) -> dict:
     )
 
     row = {
-        "run_date": today_key(),
+        "run_date": run_date,
         "bucket": topic.get("bucket"),
         "prompt": topic["prompt"],
-        "direct_answer": direct[:800],
-        "bullets": bullets[:6],
-        "faq": faq[:5],
+        "direct_answer": direct[:1200],
+        "bullets": bullets[:7],
+        "faq": faq[:6],
         "internal_links": links,
         "linkedin_one_liner": str(out.get("linkedin_one_liner", "")).strip()[:280],
-        "answer_html": to_answer_html(topic["prompt"], direct, bullets[:6], faq[:5], links),
+        "answer_html": to_answer_html(topic["prompt"], direct, bullets[:7], faq[:6], links),
         "status": "published",
     }
     if yt:
@@ -290,6 +293,9 @@ def main() -> None:
     run_date = today_key()
 
     try:
+        if not args.dry_run and args.force and already_ran(run_date):
+            sb("DELETE", f"geo_daily_runs?run_date=eq.{run_date}")
+
         if not args.dry_run and not args.force and already_ran(run_date):
             print(
                 json.dumps(

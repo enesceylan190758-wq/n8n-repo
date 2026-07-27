@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nefalix WhatsApp</title>
+  <link rel="stylesheet" href="./whatsapp-inbox.css" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b141a; }
+    #inbox { height: 100vh; width: 100%; }
+    #boot {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      color: #e9edef; font-family: system-ui, sans-serif; flex-direction: column; gap: 12px;
+    }
+    .spin {
+      width: 28px; height: 28px; border: 3px solid #233138; border-top-color: #25d366;
+      border-radius: 50%; animation: s .7s linear infinite;
+    }
+    @keyframes s { to { transform: rotate(360deg); } }
+    #err { color: #f87171; max-width: 420px; text-align: center; padding: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <div id="boot"><div class="spin"></div><div>WhatsApp yükleniyor…</div></div>
+  <div id="err"></div>
+  <div id="inbox" style="display:none;"></div>
+  <script src="./whatsapp-inbox.umd.js"></script>
+  <script>
+(function () {
+  var KEY = 'nefalix_wa_inbox_cfg';
+  function showErr(msg) {
+    document.getElementById('boot').style.display = 'none';
+    var e = document.getElementById('err');
+    e.style.display = 'block';
+    e.textContent = msg;
+  }
+  function readCfg() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return null;
+  }
+  var cfg = readCfg();
+  if (!cfg || !cfg.apiUrl || !cfg.token || !cfg.instance) {
+    showErr('Oturum yok. CRM → WhatsApp → Yenile giriş.');
+    return;
+  }
+  var apiUrl = String(cfg.apiUrl).replace(/\/$/, '');
+  try {
+    if (!window.WhatsAppInbox || typeof WhatsAppInbox.mount !== 'function') {
+      showErr('Inbox kütüphanesi yüklenemedi.');
+      return;
+    }
+    document.getElementById('boot').style.display = 'none';
+    document.getElementById('inbox').style.display = 'block';
+    WhatsAppInbox.mount(document.getElementById('inbox'), {
+      devices: [{
+        id: 'nefalix-crm',
+        label: cfg.label || 'Nefalix CRM',
+        apiUrl: apiUrl,
+        instanceToken: cfg.token,
+        instanceName: cfg.instance,
+        providerType: 'evolution'
+      }],
+      defaultDeviceId: 'nefalix-crm'
+    });
+  } catch (err) {
+    showErr(String(err && err.message || err));
+  }
+})();
+  </script>
+</body>
+</html>
