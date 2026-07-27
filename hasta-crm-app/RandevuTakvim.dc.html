@@ -136,7 +136,7 @@ class Component extends DCLogic {
       modal,
       closeModal: () => this.setState({ modalId: null }),
       stop: (e) => e.stopPropagation(),
-      changeStatus: (e) => { window.Nefalix.setRandevuStatus(this.state.modalId, e.target.value); this.setState(s => ({ ver: s.ver + 1 })); }
+      changeStatus: (e) => { Promise.resolve(window.Nefalix.setRandevuStatus(this.state.modalId, e.target.value)).then(() => this.setState(s => ({ ver: s.ver + 1 }))); }
     };
   }
 }
