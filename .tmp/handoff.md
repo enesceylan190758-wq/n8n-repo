@@ -89,6 +89,13 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 - Pack: `execution/pack-nefalix-hasta-crm.py` (`NEFALIX_LANDING` veya `.tmp/nefalix-landing-extract`)
 
 
+### Hasta kartı not+segment + randevu durum (2026-07-27 gece)
+
+- `HastaKarti`: not kaydında segment select (boot `getSegments`) → `clinic-note-save` + gun_offset
+- `RandevuListe` + kart sekmesi: durum select (Geldi/Gelmedi/…) renkli; `setRandevuStatus`
+- Pack: `RandevuListe`/`RandevuTakvim` eklendi; `hasta-crm-app/` sync
+- **Mac:** `bash execution/apply-crm-offers-payments-vps.sh` sonra `bash execution/deploy-hasta-crm-from-extract.sh`
+
 ### Teklif/Kasa 502 + Lead kolon (2026-07-27 akşam)
 
 - Kök neden: VPS’te `crm_offers` / `crm_payments` eksik → Proxy workflow error
@@ -181,9 +188,9 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 
 ## Sonraki 3 adım
 
-1. **Adım 2:** `.tmp/stella-discovery/` paketinden Stella→Nefalix gap/action haritası çıkar → `docs/` + `directives/stella_migration.md`.
-2. **Abdülkadir:** `directives/stella_migration.md` checklist — segment isimleri ince ayar.
-3. **Paralel koşu:** Hasta CRM canlı akış doğrula → Stella kesimi.
+1. **Mac:** VPS `crm_offers`/`crm_payments` apply + `deploy-hasta-crm-from-extract.sh` (Vercel).
+2. Smoke: teklif/kasa, not+segment dinamik, randevu geldi/gelmedi.
+3. Paralel koşu go/no-go (`directives/stella_migration.md`); P1 Meta FB lead sonra.
 
 ## Önemli env değişkenleri (sadece isimler)
 

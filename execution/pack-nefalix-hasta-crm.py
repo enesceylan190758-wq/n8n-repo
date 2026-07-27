@@ -51,6 +51,8 @@ def main() -> None:
         "YeniSatis.dc.html",
         "Kasa.dc.html",
         "LeadListesi.dc.html",
+        "RandevuListe.dc.html",
+        "RandevuTakvim.dc.html",
     ]
     updated = []
     ext = json.loads(re.search(r'<script type="__bundler/ext_resources">(.*?)</script>', html, re.S).group(1))

@@ -9,7 +9,8 @@ cd ~/n8n-repo && python3 execution/pack-nefalix-hasta-crm.py
 cd ~/nefalix-landing && vercel --prod --yes
 ```
 
-Değişiklikler: teklif otel/transfer, kasa EUR/yöntem/işlem tipi, store addKasa contact_id.
+Değişiklikler: teklif otel/transfer, kasa EUR/yöntem/işlem tipi, store addKasa contact_id,
+HastaKarti not+segment (dinamik), RandevuListe/kart geldi-gelmedi durum select + renk.
 
 ## VPS: offers/payments 502
 

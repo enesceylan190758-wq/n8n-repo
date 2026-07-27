@@ -104,7 +104,15 @@
   function mapAppt(a) {
     const start = a.start_at ? new Date(a.start_at) : new Date();
     const contact = a.contact || {};
-    const durumMap = { beklemede: 'bekliyor', tamamlandi: 'geldi', iptal: 'iptal', ertelendi: 'bekliyor', gelmedi: 'gelmedi' };
+    const durumMap = {
+      beklemede: 'bekliyor',
+      tamamlandi: 'geldi',
+      geldi: 'geldi',
+      iptal: 'iptal',
+      ertelendi: 'ertelendi',
+      gelmedi: 'gelmedi',
+      onayli: 'onayli'
+    };
     return {
       _id: a.id,
       danisanId: a.contact_id,
@@ -375,6 +383,15 @@
 
   function getNotes(danisanId) { return _notes[danisanId] || []; }
 
+  function getSegments() {
+    return ((_boot && _boot.segments) || []).map(s => ({
+      code: s.code,
+      label: s.label,
+      gun_offset: s.gun_offset,
+      show_in_dynamic: s.show_in_dynamic
+    }));
+  }
+
   function addNote(danisanId, text, segmentLabel) {
     const body = { contact_id: danisanId, body: text || '(not)' };
     if (segmentLabel) {
@@ -431,12 +448,14 @@
   function getGelir() { return getKasa().filter(k => (parseFloat(k['Tutar']) || 0) >= 0); }
   function getGider() { return getKasa().filter(k => (parseFloat(k['Tutar']) || 0) < 0); }
 
+  // Renkler Stella/Onat: geldi yeşil, gelmedi kırmızı, bekliyor sarı
   const RND_STATUS = [
     { key: 'bekliyor', label: 'Bekliyor', color: '#f59e0b' },
     { key: 'onayli', label: 'Onaylandı', color: '#2563eb' },
     { key: 'geldi', label: 'Geldi', color: '#16a34a' },
     { key: 'gelmedi', label: 'Gelmedi', color: '#ef4444' },
-    { key: 'iptal', label: 'İptal', color: '#9ca3af' }
+    { key: 'iptal', label: 'İptal', color: '#9ca3af' },
+    { key: 'ertelendi', label: 'Ertelendi', color: '#8b5cf6' }
   ];
   const RND_TYPES = ['Kontrol', 'İşlem', 'Konsültasyon', 'Transfer'];
 
@@ -457,7 +476,14 @@
     }).then(() => refreshData());
   }
   function setRandevuStatus(id, durum) {
-    const rev = { bekliyor: 'beklemede', geldi: 'tamamlandi', iptal: 'iptal', gelmedi: 'gelmedi', onayli: 'beklemede' };
+    const rev = {
+      bekliyor: 'beklemede',
+      onayli: 'beklemede',
+      geldi: 'tamamlandi',
+      gelmedi: 'gelmedi',
+      iptal: 'iptal',
+      ertelendi: 'ertelendi'
+    };
     return apiCall('clinic-appointments', 'POST', { id, durum: rev[durum] || durum }).then(() => refreshData());
   }
 
@@ -602,7 +628,7 @@
     getDanisan, getDanisanById, updateDanisan, addDanisan,
     findIdByName, hrefForName,
     getLeads, convertLead, salesSegments,
-    getNotes, addNote,
+    getNotes, addNote, getSegments,
     getDinamik, getDinamikDue, setDinamikResult,
     getKasa, addKasa, kasaTotals, getBakiye, getGelir, getGider,
     getRandevu, addRandevu, setRandevuStatus, RND_STATUS, RND_TYPES,

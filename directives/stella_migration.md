@@ -108,7 +108,7 @@ Vercel env: `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD`, `DASHBOARD_SE
 Kaynak: `docs/Stella_Gap_Action_Map.md` (~35/390 ekran örnek + 4 Excel).
 
 - [ ] Lead + Dinamik kolon parity (`store.js`, `clinic-crm.js`)
-- [ ] Hasta kartı çekirdek: not / segment / temsilci / teklif / randevu / tahsilat
+- [x] Hasta kartı çekirdek: not / segment / temsilci / teklif / randevu / tahsilat (UI patch; Mac deploy bekliyor)
 - [ ] Randevu takvim oluştur+liste; import doğrula
 - [x] Kasa EUR (yöntem, kur) — YeniSatış + `clinic-payments` (otel/transfer teklifte)
 - [ ] Segment + referans seed VPS teyit

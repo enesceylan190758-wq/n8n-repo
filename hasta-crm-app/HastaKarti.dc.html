@@ -81,9 +81,10 @@
             <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
               <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:14px;">💬 Notlar</div>
               <textarea key="{{ noteKey }}" class="nf-f" placeholder="Notunuzu giriniz" onInput="{{ onNote }}" style="width:100%; box-sizing:border-box; min-height:70px; border:1px solid #d9d5ee; border-radius:9px; padding:11px; font-size:13px; color:#241854; resize:vertical; font-family:inherit;"></textarea>
+              <div style="margin-top:10px;"><label style="display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;">Segment (dinamik gün için)</label><select class="nf-f" value="{{ noteSegSel }}" onChange="{{ onNoteSeg }}" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13px; color:#241854; background:#fff;"><sc-for list="{{ segOpts }}" as="s" hint-placeholder-count="8"><option>{{ s.label }}</option></sc-for></select></div>
               <div class="nf-btn" onClick="{{ saveNote }}" style="margin-top:10px; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:10px; text-align:center; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Notu Kaydet</div>
               <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px; max-height:360px; overflow-y:auto;">
-                <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4"><div style="display:flex; gap:10px;"><span style="width:16px; height:16px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13px; color:#241854;">{{ n.text }}</div><div style="font-size:11px; color:#9c98b8; margin-top:3px;">🕒 {{ n.ts }} • 👤 {{ n.user }}</div></div></div></sc-for>
+                <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4"><div style="display:flex; gap:10px;"><span style="width:16px; height:16px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13px; color:#241854;">{{ n.text }}</div><div style="font-size:11px; color:#9c98b8; margin-top:3px;">🕒 {{ n.ts }} • 👤 {{ n.user }}<sc-if value="{{ n.hasSeg }}" hint-placeholder-val="{{ false }}"> • 🏷 {{ n.seg }}</sc-if></div></div></div></sc-for>
                 <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:#c5c1dc; text-align:center; padding:12px;">Henüz not girilmemiş.</div></sc-if>
               </div>
             </div>
@@ -130,10 +131,10 @@
           <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:22px;">
             <div style="font-size:15px; font-weight:700; color:#241854; margin-bottom:16px;">💬 Notlar</div>
             <textarea key="{{ noteKey }}" class="nf-f" placeholder="Notunuzu giriniz" onInput="{{ onNote }}" style="width:100%; box-sizing:border-box; min-height:80px; border:1px solid #d9d5ee; border-radius:9px; padding:11px; font-size:13.5px; color:#241854; resize:vertical; font-family:inherit;"></textarea>
-            <div style="display:flex; gap:12px; align-items:flex-end; margin-top:12px; flex-wrap:wrap;"><div><label style="display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;">Segment (kaydederken güncelle)</label><select class="nf-f" value="{{ noteSegSel }}" onChange="{{ onNoteSeg }}" style="padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; background:#fff; min-width:230px; font-family:inherit;"><option>Yeni Lead</option><option>Ulaşılamadı Tekrar Aranacak</option><option>Sıcak Alacak</option><option>Bilet Bekleniyor</option><option>Analiz Verilecek</option><option>2 Gün Sonra Aranacak</option><option>Uzun Vade Takip</option><option>Olumsuz / İlgilenmiyor</option></select></div></div>
+            <div style="display:flex; gap:12px; align-items:flex-end; margin-top:12px; flex-wrap:wrap;"><div><label style="display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;">Segment (kaydederken güncelle)</label><select class="nf-f" value="{{ noteSegSel }}" onChange="{{ onNoteSeg }}" style="padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; background:#fff; min-width:230px; font-family:inherit;"><sc-for list="{{ segOpts }}" as="s" hint-placeholder-count="12"><option>{{ s.label }}</option></sc-for></select></div></div>
             <div class="nf-btn" onClick="{{ saveNote }}" style="margin-top:10px; display:inline-block; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:10px 24px; text-align:center; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Notu Kaydet</div>
             <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
-              <sc-for list="{{ notes }}" as="n" hint-placeholder-count="5"><div style="display:flex; gap:12px; padding-bottom:14px; border-bottom:1px solid #f6f5fb;"><span style="width:18px; height:18px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13.5px; color:#241854;">{{ n.text }}</div><div style="font-size:11.5px; color:#9c98b8; margin-top:4px;">🕒 {{ n.ts }} • 👤 {{ n.user }}</div></div></div></sc-for>
+              <sc-for list="{{ notes }}" as="n" hint-placeholder-count="5"><div style="display:flex; gap:12px; padding-bottom:14px; border-bottom:1px solid #f6f5fb;"><span style="width:18px; height:18px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13.5px; color:#241854;">{{ n.text }}</div><div style="font-size:11.5px; color:#9c98b8; margin-top:4px;">🕒 {{ n.ts }} • 👤 {{ n.user }}<sc-if value="{{ n.hasSeg }}" hint-placeholder-val="{{ false }}"> • 🏷 {{ n.seg }}</sc-if></div></div></div></sc-for>
               <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px; color:#c5c1dc; text-align:center; padding:20px;">Henüz not girilmemiş.</div></sc-if>
             </div>
           </div>
@@ -156,8 +157,8 @@
           <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
             <div style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0eef8;"><span style="font-size:15px; font-weight:700; color:#241854;">Randevular</span><a href="YeniRandevu.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:9px 15px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Randevu</a></div>
             <sc-if value="{{ hasRnd }}" hint-placeholder-val="{{ false }}">
-              <div style="display:grid; grid-template-columns:1fr 0.7fr 1fr 1.1fr 1fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Tarih</span><span>Saat</span><span>Tip</span><span>Doktor</span><span style="text-align:center;">Durum</span></div>
-              <sc-for list="{{ randevular }}" as="r" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1fr 0.7fr 1fr 1.1fr 1fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#4b4770;">{{ r.tarih }}</span><span style="color:#4b4770;">{{ r.saat }}</span><span style="color:#241854; font-weight:600;">{{ r.tip }}</span><span style="color:#4b4770;">{{ r.doktor }}</span><span style="display:flex; justify-content:center;"><span style="{{ r.badge }}">{{ r.durum }}</span></span></div></sc-for>
+              <div style="display:grid; grid-template-columns:1fr 0.7fr 1fr 1.1fr 1.3fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Tarih</span><span>Saat</span><span>Tip</span><span>Doktor</span><span style="text-align:center;">Durum</span></div>
+              <sc-for list="{{ randevular }}" as="r" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1fr 0.7fr 1fr 1.1fr 1.3fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#4b4770;">{{ r.tarih }}</span><span style="color:#4b4770;">{{ r.saat }}</span><span style="color:#241854; font-weight:600;">{{ r.tip }}</span><span style="color:#4b4770;">{{ r.doktor }}</span><span style="display:flex; justify-content:center;"><select value="{{ r.durumKey }}" onChange="{{ r.change }}" style="{{ r.badgeSelect }}"><sc-for list="{{ rndStatusOpts }}" as="s" hint-placeholder-count="5"><option value="{{ s.key }}">{{ s.label }}</option></sc-for></select></span></div></sc-for>
             </sc-if>
             <sc-if value="{{ noRnd }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">🔍 Kayıt bulunamadı. Eğer olduğunu düşünüyorsanız, arama kriterlerini gözden geçirip yeniden deneyin.</div></sc-if>
           </div>
@@ -245,11 +246,23 @@ class Component extends DCLogic {
     const badge = (c) => ({ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', color: c, background: c + '22', whiteSpace: 'nowrap' });
     const sideItems = SIDE.map(s => ({ label: s.label, icon: s.icon, pick: () => this.setState({ tab: s.key, editSaved: false }),
       style: { display: 'flex', alignItems: 'center', gap: '9px', padding: '10px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontWeight: tab === s.key ? 700 : 500, color: tab === s.key ? '#4338ca' : '#4b4770', background: tab === s.key ? '#f1eefc' : 'transparent' } }));
-    const userNotes = window.Nefalix.getNotes(this._id).map(n => ({ text: n.text, user: n.user, ts: n.ts, color: '#22c55e' }));
-    const seedNote = d['Son müşteri notu'] ? [{ text: d['Son müşteri notu'], user: d['Oluşturan'] || 'Sistem', ts: d['Değişiklik tarihi'] || d['Kayıt tarihi'] || '', color: '#f59e0b' }] : [];
+    const userNotes = window.Nefalix.getNotes(this._id).map(n => ({ text: n.text, user: n.user, ts: n.ts, color: '#22c55e', seg: n.segment || '', hasSeg: !!(n.segment || '').trim() }));
+    const seedNote = d['Son müşteri notu'] ? [{ text: d['Son müşteri notu'], user: d['Oluşturan'] || 'Sistem', ts: d['Değişiklik tarihi'] || d['Kayıt tarihi'] || '', color: '#f59e0b', seg: '', hasSeg: false }] : [];
     const notes = userNotes.concat(seedNote);
+    const segOpts = (window.Nefalix.getSegments ? window.Nefalix.getSegments() : []).map(s => ({ label: s.label }));
+    if (!segOpts.length) {
+      ['Yeni Lead', 'YENİ DATA', 'Ulaşılamadı Tekrar Aranacak', '2 Gün Sonra Aranacak', 'Teklif Verildi', 'Randevu Verildi', 'Uzun Vadede Düşünecek'].forEach(l => segOpts.push({ label: l }));
+    }
+    const rndStatusOpts = RS.map(s => ({ key: s.key, label: s.label }));
     const teklifler = H.teklifler.slice(0, 20).map(t => ({ hizmet: t.hizmet, otel: t.hotel || '—', tarih: t.tarih, tutar: money(t.tutar, t.kur), durum: tlabel[t.durum] || t.durum, badge: badge(tcolor[t.durum] || '#888') }));
-    const randevular = H.randevular.slice(0, 20).map(r => ({ tarih: r.tarih, saat: r.saat, tip: r.tip, doktor: r.doktor, durum: rlabel[r.durum] || r.durum, badge: badge(rcolor[r.durum] || '#888') }));
+    const randevular = H.randevular.slice(0, 20).map(r => {
+      const c = rcolor[r.durum] || '#888';
+      return {
+        tarih: r.tarih, saat: r.saat, tip: r.tip, doktor: r.doktor, durumKey: r.durum,
+        change: (e) => { Promise.resolve(window.Nefalix.setRandevuStatus(r._id, e.target.value)).then(() => this.setState(s => ({ ver: s.ver + 1 }))); },
+        badgeSelect: { border: 'none', borderRadius: '20px', padding: '5px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#fff', background: c, appearance: 'none', textAlign: 'center' }
+      };
+    });
     const satislar = H.satislar.slice(0, 20).map(s => ({ tarih: s['Ödeme tarihi'] || '-', bilgi: s['Bilgi'] || 'Satış', yontem: s['Ödeme Yöntemi'] || '-', tutar: money(s['Tutar'], s['Kur']) }));
     const faturalar = H.satislar.slice(0, 20).map((s, i) => ({ no: 'FTR-' + (2026000 + i), tarih: s['Ödeme tarihi'] || '-', hizmet: s['Bilgi'] || 'Tedavi', tutar: money(s['Tutar'], s['Kur']) }));
     const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
@@ -267,7 +280,7 @@ class Component extends DCLogic {
       kisisel: pick(d, [['E-Posta', 'E-Posta'], ['Telefon', 'Telefon'], ['Cinsiyet', 'Cinsiyet'], ['Yaş', 'Yaş'], ['Doğum tarihi', 'Doğum tarihi'], ['Kayıt tarihi', 'Kayıt tarihi']]),
       adres: pick(d, [['Ülke', 'Ülke'], ['Şehir', 'Şehir'], ['İlçe', 'İlçe'], ['Dil', 'Dil']]),
       diger: pick(d, [['Kayıt açan', 'Oluşturan'], ['Segment', 'Segment'], ['Referans kaynağı', 'Referans kaynağı'], ['Satış temsilcisi', 'Satış temsilcisi'], ['Kampanyası', 'Facebook Kampanyası'], ['Reklam seti', 'Facebook Reklam seti'], ['Reklamı', 'Facebook Reklamı'], ['Değişiklik tarihi', 'Değişiklik tarihi']]),
-      notes, noNotes: notes.length === 0, noteKey: this.state.noteKey,
+      notes, noNotes: notes.length === 0, noteKey: this.state.noteKey, segOpts, rndStatusOpts,
       rndCount: H.randevular.length, satisCount: H.satislar.length, teklifCount: H.teklifler.length,
       teklifler, hasTeklif: teklifler.length > 0, noTeklif: teklifler.length === 0,
       randevular, hasRnd: randevular.length > 0, noRnd: randevular.length === 0,
@@ -276,16 +289,17 @@ class Component extends DCLogic {
       lbl, inp,
       f_ad: d['Ad'] || '', f_tel: d['Telefon'] || '', f_email: d['E-Posta'] || '', f_cinsiyet: d['Cinsiyet'] || '', f_yas: d['Yaş'] || '', f_segment: d['Segment'] || '', f_ulke: d['Ülke'] || '', f_sehir: d['Şehir'] || '', f_dil: d['Dil'] || '', f_temsilci: d['Satış temsilcisi'] || '', f_referans: d['Referans kaynağı'] || '',
       editSaved: this.state.editSaved,
-      noteSegSel: this.state.noteSeg || d['Segment'] || 'Yeni Lead',
+      noteSegSel: this.state.noteSeg || d['Segment'] || (segOpts[0] && segOpts[0].label) || 'Yeni Lead',
       onNoteSeg: (e) => this.setState({ noteSeg: e.target.value }),
       onNote: (e) => { this._note = e.target.value; },
       saveNote: () => {
         const t = (this._note || '').trim();
-        const seg = this.state.noteSeg;
+        const seg = this.state.noteSeg || d['Segment'] || '';
         const segChanged = seg && seg !== d['Segment'];
         if (!t && !segChanged) return;
-        if (t) window.Nefalix.addNote(this._id, t);
-        if (segChanged) { window.Nefalix.updateDanisan(this._id, { 'Segment': seg, 'Değişiklik tarihi': window.Nefalix.todayStr(true) }); this._d = window.Nefalix.getDanisanById(this._id); }
+        // Tek çağrı: not + segment → clinic-note-save gun_offset (dinamik)
+        window.Nefalix.addNote(this._id, t || ('Segment: ' + seg), seg || undefined);
+        this._d = window.Nefalix.getDanisanById(this._id) || this._d;
         this._note = '';
         this.setState(s => ({ ver: s.ver + 1, noteKey: s.noteKey + 1 }));
       },
