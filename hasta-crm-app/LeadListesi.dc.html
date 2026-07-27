@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-page:hover { background:#ece9f9 !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-conv:hover { filter:brightness(1.08); }
+  .nf-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="crm" hint-size="100%,132px"></dc-import>
+
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8;">
+        <div style="font-size:17px; font-weight:700; color:#241854;">Leadler</div>
+        <div style="display:flex; gap:8px;">
+        <div class="nf-btn" onClick="{{ doExcel }}" style="background:#16a34a; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+        <div class="nf-btn" onClick="{{ doPdf }}" style="background:#dc2626; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+        <a href="YeniLead.dc.html" class="nf-btn" style="display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:10px 16px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Lead</a>
+        </div>
+      </div>
+
+      <div style="padding:16px 24px; display:flex; gap:12px; align-items:center; border-bottom:1px solid #f0eef8;">
+        <div style="display:flex; align-items:center; gap:8px; border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; flex:1;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b87a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input class="nf-input" placeholder="Lead ara (ad, telefon)..." onInput="{{ onQ }}" onKeyDown="{{ onKey }}" style="border:none; outline:none; font-size:13.5px; color:#241854; width:100%; background:transparent;" />
+        </div>
+        <div class="nf-btn" onClick="{{ doSearch }}" style="background:linear-gradient(135deg,#2563eb,#22d3ee); border-radius:9px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">Ara</div>
+      </div>
+
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:40px 1.1fr 1.3fr 1.1fr 1.2fr 1.1fr 1.1fr 200px; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+          <span></span><span>Kayıt tarihi</span><span>Lead</span><span>Telefon</span><span>Segment</span><span>Temsilci</span><span>Referans</span><span style="text-align:right;">İşlemler</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+          <div class="nf-row" style="{{ r.rowStyle }}">
+            <span style="font-size:16px;">{{ r.flag }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.kayit }}</span>
+            <a href="{{ r.href }}" style="font-weight:600; color:#241854; font-size:13px;">{{ r.ad }}</a>
+            <span style="color:#4b4770; font-size:13px;">{{ r.tel }}</span>
+            <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#4b4770;"><span style="{{ r.segDot }}"></span>{{ r.segment }}</span>
+            <span style="color:#4b4770; font-size:12px;">{{ r.temsilci }}</span>
+            <span style="color:#4b4770; font-size:12px;">{{ r.referans }}</span>
+            <div style="display:flex; gap:7px; justify-content:flex-end; align-items:center;">
+              <sc-if value="{{ r.converted }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px; font-weight:700; color:#16a34a; background:#dcfce7; padding:5px 11px; border-radius:20px;">✓ Danışan oldu</span></sc-if>
+              <sc-if value="{{ r.notConverted }}" hint-placeholder-val="{{ true }}">
+                <div class="nf-conv" onClick="{{ r.convert }}" style="display:flex; align-items:center; gap:6px; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; font-size:12px; font-weight:600; padding:7px 13px; border-radius:8px; cursor:pointer;" title="Danışana dönüştür">→ Danışana Aktar</div>
+              </sc-if>
+              <a href="{{ r.href }}" style="width:30px; height:30px; border-radius:8px; background:#f4f2fb; display:flex; align-items:center; justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg></a>
+            </div>
+          </div>
+        </sc-for>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px;">
+          <span style="font-size:13px; color:#8b87a8;">{{ countLabel }}</span>
+          <div style="display:flex; gap:6px;">
+            <span class="nf-page" onClick="{{ prev }}" style="padding:0 10px; height:32px; border-radius:7px; background:#f4f2fb; color:#4338ca; display:flex; align-items:center; font-size:13px; cursor:pointer;">‹</span>
+            <span style="padding:0 12px; height:32px; border-radius:7px; background:#4338ca; color:#fff; display:flex; align-items:center; font-size:13px; font-weight:600;">{{ pageLabel }}</span>
+            <span class="nf-page" onClick="{{ next }}" style="padding:0 10px; height:32px; border-radius:7px; background:#f4f2fb; color:#4338ca; display:flex; align-items:center; font-size:13px; cursor:pointer;">›</span>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+const FLAGS = { 'Almanya': '🇩🇪', 'Türkiye': '🇹🇷', 'Avusturya': '🇦🇹', 'Hollanda': '🇳🇱', 'İsviçre': '🇨🇭', 'Fransa': '🇫🇷', 'Belçika': '🇧🇪', 'İngiltere': '🇬🇧' };
+function segColor(s) { s = (s || '').toLowerCase(); if (s.includes('ulaşılamadı')) return '#f59e0b'; if (s.includes('sıcak') || s.includes('sonra aranacak')) return '#2563eb'; if (s.includes('uzun vade')) return '#7c3aed'; if (s.includes('olumsuz')) return '#ef4444'; if (s.includes('yeni lead')) return '#16a34a'; return '#9ca3af'; }
+class Component extends DCLogic {
+  state = { ready: false, page: 1, q: '', ver: 0 };
+  _q = '';
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    if (!this.state.ready) return { loading: true, ready: false };
+    const res = window.Nefalix.getLeads({ q: this.state.q, page: this.state.page, size: 30 });
+    const rows = res.rows.map((d, i) => {
+      const conv = (d['Danışan tipi'] || '') === 'Aktif Hasta';
+      return {
+        flag: FLAGS[d['Ülke']] || '🌍',
+        kayit: d['Kayıt tarihi'] || '-', ad: d['Ad'] || '(İsimsiz)', tel: d['Telefon'] || '-',
+        segment: d['Segment'] || 'Yeni Lead',
+        temsilci: d['Satış temsilcisi'] || '—',
+        referans: d['Referans kaynağı'] || '—',
+        segDot: { width: '9px', height: '9px', borderRadius: '50%', background: segColor(d['Segment'] || 'Yeni Lead'), display: 'inline-block', flexShrink: 0 },
+        href: 'HastaKarti.dc.html?id=' + encodeURIComponent(d._id),
+        converted: conv, notConverted: !conv,
+        convert: () => { window.Nefalix.convertLead(d._id); this.setState(s => ({ ver: s.ver + 1 })); },
+        rowStyle: { display: 'grid', gridTemplateColumns: '40px 1.1fr 1.3fr 1.1fr 1.2fr 1.1fr 1.1fr 200px', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      };
+    });
+    return {
+      ready: true, loading: false, rows,
+      countLabel: res.total.toLocaleString('tr-TR') + ' lead • ' + ((res.page - 1) * res.size + 1) + '-' + Math.min(res.page * res.size, res.total) + ' arası',
+      pageLabel: res.page + ' / ' + res.pages,
+      onQ: (e) => { this._q = e.target.value; }, onKey: (e) => { if (e.key === 'Enter') this.setState({ q: this._q, page: 1 }); },
+      doSearch: () => this.setState({ q: this._q, page: 1 }),
+      prev: () => this.setState(s => ({ page: Math.max(1, s.page - 1) })), next: () => this.setState(s => ({ page: Math.min(res.pages, s.page + 1) })),
+      doExcel: () => this.exp('excel'), doPdf: () => this.exp('pdf')
+    };
+  }
+  exp(kind) {
+    const full = window.Nefalix.getLeads({ q: this.state.q, size: 100000 }).rows;
+    const headers = ['Kayıt tarihi', 'Lead', 'Telefon', 'Segment', 'Ülke', 'Temsilci', 'Referans', 'Durum'];
+    const rows = full.map(d => [d['Kayıt tarihi'] || '', d['Ad'] || '', d['Telefon'] || '', d['Segment'] || 'Yeni Lead', d['Ülke'] || '', d['Satış temsilcisi'] || '', d['Referans kaynağı'] || '', (d['Danışan tipi'] === 'Aktif Hasta' ? 'Danışan oldu' : 'Lead')]);
+    if (kind === 'excel') window.Nefalix.exportExcel('lead-listesi', headers, rows);
+    else window.Nefalix.exportPDF('Lead Listesi', headers, rows);
+  }
+}
+</script>
+</body>
+</html>

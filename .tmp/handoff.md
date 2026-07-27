@@ -88,6 +88,14 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 - Stage: atanmış non-yeni → danisan (reclassify 0 bekleyen; `execution/reclassify-crm-stages.py`)
 - Pack: `execution/pack-nefalix-hasta-crm.py` (`NEFALIX_LANDING` veya `.tmp/nefalix-landing-extract`)
 
+
+### Teklif/Kasa 502 + Lead kolon (2026-07-27 akşam)
+
+- Kök neden: VPS’te `crm_offers` / `crm_payments` eksik → Proxy workflow error
+- Düzelt: `bash execution/apply-crm-offers-payments-vps.sh` (Mac SSH)
+- Lead listesi: Temsilci + Referans kolonları (`hasta-crm-app/LeadListesi.dc.html`)
+- Deploy: `bash execution/deploy-hasta-crm-from-extract.sh`
+
 ### Onat + P0 teklif/kasa (2026-07-27)
 
 - Transkript: `docs/Onat_Sk_Transcript.md`

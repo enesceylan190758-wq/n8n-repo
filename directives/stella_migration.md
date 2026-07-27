@@ -66,6 +66,7 @@ Vercel env: `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD`, `DASHBOARD_SE
 - Yenilemede oturum: `clinic-me` + `restoreServerSession()`
 
 **Lead listesi:** yalnızca segment `YENİ DATA` / `Yeni Lead` / `Yeni Gelen` veya segmentsiz (`store.js` `NEW_LEAD_LABELS` + boş). Diğer potansiyel/takip → Danışan + Dinamik.  
+**Teklif/Kasa 502:** VPS’te tablolar yoksa `bash execution/apply-crm-offers-payments-vps.sh`
 **Stage reclassify:** `python3 execution/reclassify-crm-stages.py` (atanmış + non-yeni → `danisan`).  
 **Hasta kartı:** `patientHistory` senkron obje döner; notlar arka planda (`clinic-contact`).
 

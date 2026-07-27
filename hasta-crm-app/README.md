@@ -10,3 +10,10 @@ cd ~/nefalix-landing && vercel --prod --yes
 ```
 
 Değişiklikler: teklif otel/transfer, kasa EUR/yöntem/işlem tipi, store addKasa contact_id.
+
+## VPS: offers/payments 502
+
+```bash
+bash execution/apply-crm-offers-payments-vps.sh
+# sonra Mac: bash execution/deploy-hasta-crm-from-extract.sh
+```
