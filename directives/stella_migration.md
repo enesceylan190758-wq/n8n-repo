@@ -6,7 +6,8 @@ Medident günlük Stella akışını `/hasta-crm` üzerinden sürdürmek; 2–4 
 
 **Canlı:** https://nefalix.com/hasta-crm  
 **Motor:** `nefalix-landing/api/_lib/clinic-crm.js` → Supabase `crm_*` (cloud: `SUPABASE_URL_PROD`)  
-**Spec:** `docs/Stella_Phase1_Spec.md`
+**Spec:** `docs/Stella_Phase1_Spec.md`  
+**Discovery paket (ekran/Excel/ses):** `docs/stella_discovery_assets.md` → VPS `/opt/nefalix/.tmp/stella-discovery/`
 
 ## Mimari
 
