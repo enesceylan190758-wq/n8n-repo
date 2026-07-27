@@ -7,7 +7,8 @@ Medident günlük Stella akışını `/hasta-crm` üzerinden sürdürmek; 2–4 
 **Canlı:** https://nefalix.com/hasta-crm  
 **Motor:** `nefalix-landing/api/_lib/clinic-crm.js` → Supabase `crm_*` (cloud: `SUPABASE_URL_PROD`)  
 **Spec:** `docs/Stella_Phase1_Spec.md`  
-**Discovery paket (ekran/Excel/ses):** `docs/stella_discovery_assets.md` → VPS `/opt/nefalix/.tmp/stella-discovery/`
+**Gap / nerede ne:** `docs/Stella_Gap_Action_Map.md`  
+**Discovery paket (ekran/Excel/ses):** `docs/stella_discovery_assets.md` · Git LFS `discovery/stella-discovery-2026-07-27.zip` · VPS `/opt/nefalix/.tmp/stella-discovery/`
 
 ## Mimari
 
@@ -99,9 +100,24 @@ Vercel env: `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD`, `DASHBOARD_SE
 | Dinamik boş | `import-stella-definitions.py --prod`; `next_call_date` bugün veya geçmiş |
 | 5× ulaşılamadı | `dynamic_attempt_count` + segment `5_kez_ulasilamadi` otomatik |
 
+## P0 gap checklist (ekran paketinden)
+
+Kaynak: `docs/Stella_Gap_Action_Map.md` (~35/390 ekran örnek + 4 Excel).
+
+- [ ] Lead + Dinamik kolon parity (`store.js`, `clinic-crm.js`)
+- [ ] Hasta kartı çekirdek: not / segment / temsilci / teklif / randevu / tahsilat
+- [ ] Randevu takvim oluştur+liste; import doğrula
+- [ ] Kasa EUR (yöntem, kur, referans) — `clinic-payments` / reports
+- [ ] Segment + referans seed VPS teyit
+- [ ] Onat ses transkript → gap doc güncelle
+- [ ] Paralel koşu go/no-go
+
+**Atlanan (P0 değil):** tedavi kartı, dosya/foto, şikayet/form, yetki grupları, Stella WhatsApp paneli, gider/fatura derinliği.
+
 ## P1 (kesim sonrası)
 
 - Meta FB lead otomatik → `clinic-lead-intake`
 - WhatsApp panel (Evolution) hasta kartı
-- Tam finans / fatura
+- Tam finans / fatura / gider
 - Stella not/teklif geçmiş import
+- Ana özet paneller + rapor ağacı

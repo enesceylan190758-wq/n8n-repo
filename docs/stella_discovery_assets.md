@@ -83,5 +83,6 @@ ssh root@93.127.186.45 'find /opt/nefalix/.tmp/stella-discovery -type f | wc -l;
 - [x] Local sync: `.tmp/stella-discovery/` (390 PNG + 4 XLSX + Onat-Sk.m4a; `.DS_Store` hariç içerik = VPS)
 - [x] VPS: `/opt/nefalix/.tmp/stella-discovery/` — **397 dosya**, 205MB; zip **171MB**
 - [x] Path dokümanı git’te (`docs/stella_discovery_assets.md`)
-- [ ] LFS zip: `discovery/stella-discovery-2026-07-27.zip` (Mac push bekleniyor)
-- [ ] Gap/action çıkarımı (adım 2 — cloud’da LFS pull sonrası)
+- [x] LFS zip: `discovery/stella-discovery-2026-07-27.zip` (`0aae4bc`)
+- [x] Cloud: `git lfs pull` + unzip → `.tmp/stella-discovery/`
+- [x] Gap/action: `docs/Stella_Gap_Action_Map.md`
