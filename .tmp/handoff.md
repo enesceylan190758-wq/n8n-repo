@@ -88,6 +88,13 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 - Stage: atanmış non-yeni → danisan (reclassify 0 bekleyen; `execution/reclassify-crm-stages.py`)
 - Pack: `execution/pack-nefalix-hasta-crm.py` (`NEFALIX_LANDING` veya `.tmp/nefalix-landing-extract`)
 
+### Onat + P0 teklif/kasa (2026-07-27)
+
+- Transkript: `docs/Onat_Sk_Transcript.md`
+- UI patch (git): `hasta-crm-app/` — otel/transfer, YeniSatış EUR/yöntem/işlem tipi
+- Pack extract: `.tmp/nefalix-landing-extract/nefalix-hasta-crm.html`
+- **Mac deploy:** `bash execution/deploy-hasta-crm-from-extract.sh` (Vercel token cloud’da yok)
+
 ### Stella → Hasta CRM P0 (2026-07-27)
 
 - **Spec:** `docs/Stella_Phase1_Spec.md`, `docs/stella_segments.csv`, `docs/stella_reference_sources.csv`
