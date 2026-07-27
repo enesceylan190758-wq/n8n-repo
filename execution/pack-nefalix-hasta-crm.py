@@ -41,8 +41,19 @@ def main() -> None:
     print("Landing:", landing)
     html = html_path.read_text(encoding="utf-8")
     man = json.loads(re.search(r'<script type="__bundler/manifest">(.*?)</script>', html, re.S).group(1))
-    files = ["store.js", "Login.dc.html", "index.html"]
+    files = [
+        "store.js",
+        "Login.dc.html",
+        "index.html",
+        "YeniTeklif.dc.html",
+        "Teklifler.dc.html",
+        "HastaKarti.dc.html",
+        "YeniSatis.dc.html",
+        "Kasa.dc.html",
+    ]
     updated = []
+    ext = json.loads(re.search(r'<script type="__bundler/ext_resources">(.*?)</script>', html, re.S).group(1))
+    uuid_map = {e["id"].lstrip("./"): e["uuid"] for e in ext}
     for name in files:
         path = app / name
         if not path.exists():
@@ -76,9 +87,6 @@ def main() -> None:
             man[uid]["compressed"] = True
             updated.append(f"{name} → {uid[:8]} ({len(raw)} bytes)")
             continue
-        # Login.dc.html — ext resources uuid lookup
-        ext = json.loads(re.search(r'<script type="__bundler/ext_resources">(.*?)</script>', html, re.S).group(1))
-        uuid_map = {e["id"].lstrip("./"): e["uuid"] for e in ext}
         uid = uuid_map.get(name)
         if not uid or uid not in man:
             print("skip no uuid", name)

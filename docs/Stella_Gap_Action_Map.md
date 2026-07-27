@@ -12,7 +12,7 @@
 | Pakette PNG | 390 |
 | Bu turda okunan örnek ekran | **~35** (her üst klasörden 1–3 + sistem/rapor alt) |
 | Excel | 4/4 başlık+örnek satır |
-| Onat ses (`Onat-Sk.m4a`) | **bekliyor** (transkript yok) |
+| Onat ses (`Onat-Sk.m4a`) | **tamam** → `docs/Onat_Sk_Transcript.md` |
 
 Tam 390 ekran okunmadı; klasör envanteri + örnek görseller + Excel + mevcut P0 spec birleştirildi.
 
@@ -85,7 +85,7 @@ Durum: **VAR** (P0 canlıda / importta), **KISMİ**, **YOK**.
 | 20 | Sistem: tanımlamalar (segment, hizmet, ürün) | KISMİ | Segment/referans CSV seed VAR; hizmet/ürün/paket YOK | P0 segment / P1 hizmet |
 | 21 | Destek | YOK | İhtiyaç yok (Estesoft destek) | — |
 | 22 | FB/TikTok lead attribution | YOK | Excel kolonları hazır; `clinic-lead-intake` + Meta webhook | P1 |
-| 23 | Onat ses notları | BEKLIYOR | Transkript → bu dosyaya P0 maddeleri ekle | P0 (bilgi) |
+| 23 | Onat ses notları | VAR | `docs/Onat_Sk_Transcript.md` — lead atama, dinamik gun_offset, teklif, randevu renk, gelir/gider, CRM rapor, ay sonu kesim | P0 bilgi ✓ |
 
 \*WhatsApp: Stella hesabı boş görünüyor; Nefalix zaten ayrı kanal planlıyor.
 
@@ -100,7 +100,7 @@ Günlük akış: **Lead → atama → dinamik arama → not/segment → randevu 
 3. **Randevu takvim** — oluştur/liste; import doğrula.
 4. **Kasa / EUR ödeme** — Stella `Kasa Raporu` alanları (yöntem, kur, referans kodu).
 5. **Segment/referans tanımları** — `docs/stella_segments.csv` + `stella_reference_sources.csv` VPS seed teyit.
-6. **Onat ses transkript** — saha kurallarını P0’a işle.
+6. **Onat ses** — `docs/Onat_Sk_Transcript.md` (2026-07-27); kurallar gap’e işlendi.
 7. Paralel koşu checklist → `directives/stella_migration.md`.
 
 ### Dokunulacak dosyalar (özet)

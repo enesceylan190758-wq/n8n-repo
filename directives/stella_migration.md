@@ -109,10 +109,12 @@ Kaynak: `docs/Stella_Gap_Action_Map.md` (~35/390 ekran örnek + 4 Excel).
 - [ ] Lead + Dinamik kolon parity (`store.js`, `clinic-crm.js`)
 - [ ] Hasta kartı çekirdek: not / segment / temsilci / teklif / randevu / tahsilat
 - [ ] Randevu takvim oluştur+liste; import doğrula
-- [ ] Kasa EUR (yöntem, kur, referans) — `clinic-payments` / reports
+- [x] Kasa EUR (yöntem, kur) — YeniSatış + `clinic-payments` (otel/transfer teklifte)
 - [ ] Segment + referans seed VPS teyit
-- [ ] Onat ses transkript → gap doc güncelle
+- [x] Onat ses transkript → `docs/Onat_Sk_Transcript.md`
 - [ ] Paralel koşu go/no-go
+
+**Onat P0 vurgusu:** Lead atama→danışan, dinamik not+segment+gün, teklif, randevu geldi/gelmedi, gelir-gider; ay sonu Stella kes. FB lead otomasyonu P1.
 
 **Atlanan (P0 değil):** tedavi kartı, dosya/foto, şikayet/form, yetki grupları, Stella WhatsApp paneli, gider/fatura derinliği.
 
