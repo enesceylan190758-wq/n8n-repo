@@ -1,29 +1,30 @@
-# Saha CRM — Takvim randevu + Klinik kartı
+# Saha CRM — Takvim + Klinik kartı (tam sekmeler)
 
-Kaynak: canlı `https://nefalix.com/saha` → `crm.html`  
-Hedef repo: **nefalix-landing** (bu cloud ortamında private repo erişimi yoktu; patch burada).
+Hedef: `nefalix-landing/crm.html` → `https://nefalix.com/saha`
 
-## Değişiklikler
+## Takvim
+- Randevu olan günlerde yeşil rozet: `saat + klinik adı` (Stellamedi tarzı; kişi yerine klinik)
+- Rozaete / saate tık → randevu detayı (kim görüşecek, durum, klinik linki)
+- Klinik adına tık → klinik kartı
 
-| Alan | İyileştirme |
-|------|-------------|
-| Takvim saatleri | Randevu varsa yeşil blokta klinik + kim görüşecek; tık → detay |
-| Takvim gün mini | Randevu satırına tık → detay |
-| Randevu detayı | Klinik linki, katılımcılar, oluşturan, durum, not |
-| Klinik adı | Kokpit / Dinamik / Arama / Havuz / Randevular / Notlar → kart |
-| Klinik kartı | Sol panel: Detaylar, Düzenle, Görüşmeler, Randevular, Notlar |
-| Düzenleme | Yalnızca `abdulkadir` (`ak`) ve `enes` (`en`) |
-| Dinamik Arama | `hatirlatma` / `segmentAta` **dokunulmadı** |
+## Klinik kartı — sol sekmeler (hepsi çalışır)
+| Sekme | İçerik |
+|-------|--------|
+| Detaylar | Tüm kurum / adres / CRM alanları |
+| Düzenle | Form (yalnızca abdulkadir + enes); `hatirlatma` dokunulmaz |
+| İlgili kişiler | Liste + ekle/sil |
+| Görüşmeler | Form + geçmiş (`segmentAta` ile Dinamik Arama uyumlu) |
+| Teklifler | Liste + Yeni teklif formu |
+| Sözleşme | Boş durum / kayıt formu |
+| Notlar | Not kaydet + geçmiş |
+| Dosyalar | Meta kayıt (ad/boyut) |
+| Aktivite | Görüşme + randevu + teklif + ödeme birleşik |
+| Tahsilat | Toplam / açık bakiye + ödeme ekle |
+| Randevular | Klinik randevu listesi |
 
 ## Uygulama
-
 ```bash
 cd /Users/enesceylan/nefalix-landing
-# A) doğrudan kopya
 cp /path/to/patches/nefalix-landing/crm.html ./crm.html
-
-# B) veya patch
-patch -p1 < /path/to/patches/nefalix-landing/crm-takvim-klinik-kart.patch
+# Deploy: onay sonrası vercel --prod
 ```
-
-**Deploy:** onay sonrası `vercel --prod` (otomatik deploy etme).
