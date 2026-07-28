@@ -77,7 +77,7 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 | Gap map | `docs/Stella_Gap_Action_Map.md` | ~35 ekran örnek + 4 Excel |
 | Path doc | `docs/stella_discovery_assets.md` | |
 
-**Sonraki:** Onat ses transkript; landing’de P0 gap checklist (`directives/stella_migration.md`).
+**Sonraki:** Mac `apply-crm-offers-payments-vps.sh` + `deploy-hasta-crm-from-extract.sh`; smoke teklif/kasa.
 
 ### Hasta CRM hotfix (2026-07-27) — kart + Lead filtresi
 
