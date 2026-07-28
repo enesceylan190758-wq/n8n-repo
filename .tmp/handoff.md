@@ -1,21 +1,25 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-07-23
+**Tarih:** 2026-07-28
 
-## Bu oturum (GEO sistem yükseltme)
+## Bu oturum (Google SERP / 3 ajan)
 
-Branch: `cursor/geo-sistem-upgrade-c5e3`
+Branch: `cursor/nefalix-serp-gorunurluk-5b76`  
+Lead: https://cursor.com/agents/bc-cd41d924-157e-418b-a188-d8bb12955b76  
+Brief: `.tmp/nefalix-serp-brief.md` · SOP: `directives/google_serp_visibility.md`
 
-- `execution/lib/content_quality.py` — GEO + blog kalite kapıları
-- `execution/lib/topic_picker.py` — son N gün / bucket dengesi
-- `geo_citation_scores` + `geo_daily_runs.cover_image_url` migration
-- `record-geo-citation.py` / `report-geo-citation.py` / reminder DB eksik satır
-- `rewrite-geo-seo-blogs.py` — 10 blog playbook standardı
-- `smoke-geo-public.py` + `directives/geo.md` / `daily_blog.md` tek otomasyon yolu
+**Verdict:** Site crawlable; kategori sorgusunda yokluk = intent mismatch + entity/host parçalanma + zayıf marka index. GEO ≠ Google SEO.
+
+| Ajan | Bulgu |
+|------|--------|
+| A Teknik | Host duplikasyonu (nefalix.com / www / nefalixai); title NefalixAI vs schema Nefalix; geo-sitemap HEAD 405; future-dated GEO |
+| B SERP | “uygulama” → KYS/App Store; asıl fırsat Q2–Q5 (yazılım/NPS/yorum); rakipler ePrestij, eKlinisyen, Esinix |
+| C Patch | Bu repoda geo-topics + v2 title/meta; canlı patch `nefalix-landing` (Vercel) |
 
 ## Sonraki (canlı)
 
-1. Prod SQL: iki migration (`cover_image_url`, `geo_citation_scores`)
-2. `NEFALIX_INTERNAL_KEY` ile `rewrite-geo-seo-blogs.py` (isteğe bağlı yeniden yazım)
-3. VPS: cron **veya** n8n — ikisi birden değil
-4. `python3 execution/smoke-geo-public.py`
+1. **nefalix-landing:** host 301 + homepage/`/urunler` title/meta (Nefalix + kategori kelimeleri)
+2. GSC: `nefalix.com` sitemap + Coverage; `site:nefalix.com` manuel
+3. Opsiyonel: `/klinik-itibar-yonetimi` landing (Ajan B #1)
+4. Future GEO tarihlerini düzelt / sitemap filtre
+5. Önceki GEO checklist (handoff 2026-07-23) hâlâ açık: prod migration, tek cron yolu, smoke

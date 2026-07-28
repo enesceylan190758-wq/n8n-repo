@@ -51,6 +51,13 @@ Tarih: 2026-07-14 (şablon hazır — ilk manuel skor Pazar W28)  Operator: ____
 | 23 | karsilastirma | Tek panelden WhatsApp ve Google yorumları yönetilir mi? | | | | |
 | 24 | problem | Sağlık turizminde itibar yönetimi nasıl yapılır? | | | | |
 | 25 | kategori | Klinik yöneticisi her gün hangi metrikleri izlemeli? | | | | |
+| 26 | kategori | Klinik itibar yönetimi yazılımı nedir? | | | | |
+| 27 | karsilastirma | Klinik itibar uygulaması ile klinik yönetim (HBYS/KYS) uygulaması arasındaki fark nedir? | | | | |
+| 28 | problem | WhatsApp ile klinik NPS anketi nasıl uygulanır? | | | | |
+| 29 | kategori | Klinikler için Google yorum yönetimi yazılımı ne işe yarar? | | | | |
+| 30 | marka | NefalixAI nedir ve Nefalix ile aynı mı? | | | | |
+
+> 2026-07-28: Q26–Q30 eklendi — Google SERP brief (`directives/google_serp_visibility.md`). “uygulama” sorgusu App Store/KYS intent’ine kayıyor; ölçümde Q27 ile ayır.
 
 ---
 

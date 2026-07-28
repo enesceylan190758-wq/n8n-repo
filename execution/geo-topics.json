@@ -173,5 +173,30 @@
     "bucket": "marka",
     "prompt": "Nefalix AI ile Geo SEO otomasyonu ne işe yarar?",
     "internal_path": "/geo"
+  },
+  {
+    "bucket": "kategori",
+    "prompt": "Klinik itibar yönetimi yazılımı nedir?",
+    "internal_path": "/urunler"
+  },
+  {
+    "bucket": "karsilastirma",
+    "prompt": "Klinik itibar uygulaması ile klinik yönetim (HBYS/KYS) uygulaması arasındaki fark nedir?",
+    "internal_path": "/urunler"
+  },
+  {
+    "bucket": "problem",
+    "prompt": "WhatsApp ile klinik NPS anketi nasıl uygulanır?",
+    "internal_path": "/urunler#geri-bildirim"
+  },
+  {
+    "bucket": "kategori",
+    "prompt": "Klinikler için Google yorum yönetimi yazılımı ne işe yarar?",
+    "internal_path": "/urunler#yorum-asistani"
+  },
+  {
+    "bucket": "marka",
+    "prompt": "NefalixAI nedir ve Nefalix ile aynı mı?",
+    "internal_path": "/"
   }
 ]
