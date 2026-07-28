@@ -20,4 +20,10 @@ echo "OK: crm_offers / crm_payments"
 docker exec "$DB_CTN" psql -U postgres -d postgres -c "\\dt public.crm_offers" -c "\\dt public.crm_payments"
 EOF
 
-echo "Smoke: curl clinic-offers after login should be 200"
+echo
+echo "OK: crm_offers / crm_payments tabloları VPS'te."
+echo "Smoke (Mac, login cookie ile):"
+echo "  curl -sS -o /dev/null -w '%{http_code}\\n' -b cookies.txt \\"
+echo "    'https://nefalix.com/api/blog?action=clinic-offers'"
+echo "  → 200 olmalı (401=oturum yok, 502=tablo/proxy hâlâ kırık)"
+echo "Sonra UI: bash execution/deploy-hasta-crm-from-extract.sh"
