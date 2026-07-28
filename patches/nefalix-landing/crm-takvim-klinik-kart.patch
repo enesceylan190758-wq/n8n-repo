@@ -270,8 +270,8 @@
 +      <td class="sml" style="max-width:380px">${esc(n.metin||'—')}${n.duzenlendi?' <span class="mut">(düzenlendi)</span>':''}</td>
        <td class="sml">${esc(usr(n.userId).ad.split(' ')[0])}</td>
 -      <td><button class="btn sm" onclick="klinikAc('${n.clinicId}')">Kart</button></td></tr>`}).join('')}
-+      <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${n.clinicId}')">Kart</button>
-+        <button class="btn sm p" onclick="notDuzenleAc('${n.id}')">Notu düzenle</button></td></tr>`}).join('')}
++      <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${n.clinicId}','gorusme')">Kart</button>
++        <button class="btn sm p" onclick="klinikAc('${n.clinicId}','gorusme')">Notu düzenle</button></td></tr>`}).join('')}
    </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz görüşme notu yok.<br><span class="sml">Arama Ekranı'ndan bir sonuç işaretlediğinde buraya düşer.</span></div>`}
    </div>`;
  }
@@ -298,7 +298,7 @@
          <button class="segbtn ${_segSec===s.k?'on':''}" data-k="${s.k}" onclick="segSec('${s.k}')">
            <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
 -          <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
-+          <div class="gn">${s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')))}</div>
++          <div class="gn">${s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner'))}</div>
          </button>`).join('')}</div>
      </div>
      <div><label class="f">Görüşme notu</label>
@@ -310,16 +310,14 @@
      : `↳ Dönüş tarihi: <b class="mono">${tarihTR(ekleGun(bugun(), s.gun))}</b> — o gün <b>Dinamik Arama</b> panelinde listelenir.`;
  }
  function aramaKaydet(cid){
-@@ -1309,58 +1404,574 @@
+@@ -1309,58 +1404,584 @@
      calGun = bugun(); git('takvim');
      return;
    }
 -  mKapat(); toast('Kaydedildi: '+SEG[_segSec].ad); ciz();
-+  const sonNot = S.notes.find(n=>n.clinicId===cid);
 +  toast('Kaydedildi: '+SEG[_segSec].ad);
 +  ciz();
-+  if(sonNot){ notDuzenleAc(sonNot.id, true); }
-+  else mKapat();
++  klinikAc(cid, 'gorusme');
 +}
 +
 +/* --- Not düzenle --- */
@@ -340,12 +338,27 @@
 +    <button class="btn p" onclick="notDuzenleKaydet('${nid}')">Notu kaydet</button>
 +  </div>`);
 +}
-+function notDuzenleKaydet(nid){
++function notDuzenleKaydet(nid, stay){
 +  const n = S.notes.find(x=>x.id===nid); if(!n) return;
-+  n.metin = (document.getElementById('nd_metin')?.value||'').trim();
++  const el = document.getElementById('note_edit_'+nid) || document.getElementById('nd_metin');
++  n.metin = (el?.value||'').trim();
 +  n.duzenlendi = new Date().toISOString();
 +  n.duzenleyen = ME.id;
-+  kaydet(); toast('Not güncellendi.'); mKapat(); ciz();
++  kaydet(); toast('Not güncellendi.');
++  if(stay && n.clinicId){ klinikAc(n.clinicId, window._kkTab||'gorusme'); ciz(); return; }
++  mKapat(); ciz();
++}
++function notBlokHtml(n){
++  const d=new Date(n.tarih); const s=SEG[n.segment]||SEG.aranmadi;
++  const tarih = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
++  return `<div class="note" style="border-color:${s.renk}">
++    <div class="mt">${segChip(n.segment)} <span>${tarih}</span> <span>· ${esc(usr(n.userId).ad)}</span>
++      ${n.duzenlendi?`<span class="mut">(düzenlendi)</span>`:''}</div>
++    <textarea id="note_edit_${n.id}" rows="3" style="width:100%;margin-top:6px" placeholder="Not metni…">${esc(n.metin||'')}</textarea>
++    <div class="row" style="justify-content:flex-end;margin-top:6px;gap:8px">
++      <button class="btn sm p" onclick="notDuzenleKaydet('${n.id}', true)">Kaydet</button>
++    </div>
++  </div>`;
  }
  
  /* --- Klinik kartı --- */
@@ -382,17 +395,12 @@
 -      <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
 -      <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Harita</a>
 -      <button class="btn" style="flex:none" onclick="mKapat();aramaKaydiAc('${cid}')">+ Görüşme sonucu</button>
--    </div>
--    ${R.length? `<div><label class="f">Randevular</label>${R.map(a=>`<div class="note" style="border-color:var(--brand)"><div class="mt"><b class="mono">${tarihTR(a.tarih)} ${a.saat}</b> · ${a.katilimcilar.map(i=>usr(i).ad.split(' ')[0]).join(', ')} · ${a.durum==='yapildi'?'Yapıldı':'Planlandı'}</div>${a.notu?`<div class="tx sml">${esc(a.notu)}</div>`:''}</div>`).join('')}</div>`:''}
--    <div><label class="f">Görüşme geçmişi (${N.length})</label>
--      ${N.length? N.map(n=>{const d=new Date(n.tarih);const s=SEG[n.segment]||SEG.aranmadi;return `
--        <div class="note" style="border-color:${s.renk}">
--          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span></div>
 +  const offers = S.offers.filter(o=>o.clinicId===cid);
 +  const pays = S.payments.filter(p=>p.clinicId===cid);
 +  const files = S.files.filter(f=>f.clinicId===cid);
 +  const editOk = canEditKlinik();
 +  const tab = sekme || 'detay';
++  window._kkTab = tab;
 +  const nav = (k, label)=> `<button class="kk-nav ${tab===k?'on':''}" onclick="klinikAc('${cid}','${k}')">${label}</button>`;
 +  const val = (x)=> esc(x==null||x===''?'—':x);
 +  const row = (lbl, v)=> `<tr><td class="lbl">${lbl}</td><td>${v}</td></tr>`;
@@ -443,9 +451,13 @@
 +            <a class="btn p" style="flex:none" href="tel:${esc((c.tel||'').replace(/\s/g,''))}">☏ Ara</a>
 +            <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
 +            <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Harita</a>
-+            <button class="btn" style="flex:none" onclick="klinikAc('${cid}','gorusme')">+ Görüşme</button>
++            <button class="btn" style="flex:none" onclick="mKapat();aramaKaydiAc('${cid}')">+ Görüşme sonucu</button>
 +          </div>
 +        </div></div>
++      </div>
++      <div style="margin-top:14px">
++        <div class="kk-sec-h"><h3>Görüşme geçmişi (${N.length})</h3></div>
++        ${N.length? N.map(n=>notBlokHtml(n)).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
 +      </div>`;
 +  } else if(tab==='duzenle'){
 +    if(!editOk){
@@ -537,16 +549,7 @@
 +        </div>
 +      </div></div>
 +      <div class="kk-sec-h"><h3>Görüşme geçmişi (${N.length})</h3></div>
-+      ${N.length? N.map(n=>{
-+        const d=new Date(n.tarih); const s=SEG[n.segment]||SEG.aranmadi;
-+        return `<div class="note" style="border-color:${s.renk}">
-+          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span>
-+            <button class="btn sm" style="margin-left:auto" onclick="notDuzenleAc('${n.id}')">Notu düzenle</button></div>
-           ${n.metin? `<div class="tx">${esc(n.metin)}</div>`:'<div class="tx mut sml">— not girilmemiş —</div>'}
--        </div>`}).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
-+          ${n.duzenlendi?`<div class="sml mut" style="margin-top:4px">Düzenlendi: ${esc(new Date(n.duzenlendi).toLocaleString('tr-TR'))}</div>`:''}
-+        </div>`;
-+      }).join('') : empty('Henüz görüşme kaydı yok. Yukarıdaki formdan ilk görüşmeyi ekleyin.')}`;
++      ${N.length? N.map(n=>notBlokHtml(n)).join('') : empty('Henüz görüşme kaydı yok. Yukarıdaki formdan ilk görüşmeyi ekleyin.')}`;
 +  } else if(tab==='teklif'){
 +    const formOpen = (window._kkTeklifForm===cid);
 +    body = `<div class="kk-sec-h"><h3>Teklifler</h3>
@@ -723,7 +726,14 @@
 +          <button class="btn sm p" onclick="klinikAc('${cid}','gorusme')">Sonuç gir</button>
 +        </div>
 +      </div>
-+    </div>
+     </div>
+-    ${R.length? `<div><label class="f">Randevular</label>${R.map(a=>`<div class="note" style="border-color:var(--brand)"><div class="mt"><b class="mono">${tarihTR(a.tarih)} ${a.saat}</b> · ${a.katilimcilar.map(i=>usr(i).ad.split(' ')[0]).join(', ')} · ${a.durum==='yapildi'?'Yapıldı':'Planlandı'}</div>${a.notu?`<div class="tx sml">${esc(a.notu)}</div>`:''}</div>`).join('')}</div>`:''}
+-    <div><label class="f">Görüşme geçmişi (${N.length})</label>
+-      ${N.length? N.map(n=>{const d=new Date(n.tarih);const s=SEG[n.segment]||SEG.aranmadi;return `
+-        <div class="note" style="border-color:${s.renk}">
+-          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span></div>
+-          ${n.metin? `<div class="tx">${esc(n.metin)}</div>`:'<div class="tx mut sml">— not girilmemiş —</div>'}
+-        </div>`}).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
 +    <div class="kk-wrap">
 +      <div class="kk-side">
 +        ${nav('detay','Detaylar')}
@@ -923,7 +933,7 @@
      .sort((a,b)=>{const p=x=>x.segment==='randevu'?0:(SEG[x.segment]?.kat==='sicak'?1:2); return p(a)-p(b) || (b.skor||0)-(a.skor||0);});
    mAc(`<div class="m-h"><h3>Randevu oluştur — ${tarihTR(t)} · ${s}</h3><button class="x" onclick="mKapat()">×</button></div>
    <div class="m-b">
-@@ -1408,19 +2019,34 @@
+@@ -1408,19 +2029,34 @@
  function randevuAc(aid){
    const a = S.appts.find(x=>x.id===aid); if(!a) return;
    const c = S.clinics.find(x=>x.id===a.clinicId)||{};
@@ -965,7 +975,7 @@
      </div>
    </div>
    <div class="m-f">
-@@ -1607,7 +2233,7 @@
+@@ -1607,7 +2243,7 @@
    rd.onload=e=>{ try{ const j=JSON.parse(e.target.result); if(!j.clinics) throw 0; j.clinics=j.clinics.filter(c=>!isHeaderClinic(c.ad,c.brans,c.tel)); S=j; kaydet(); toast('Yedek yüklendi.'); ciz(); }catch(err){ toast('Dosya okunamadı.'); } inp.value=''; };
    rd.readAsText(f);
  }
@@ -974,7 +984,7 @@
  
  /* ============ ANA EKRAN (giriş öncesi genel durum) ============ */
  function anaCiz(){
-@@ -1693,7 +2319,7 @@
+@@ -1693,7 +2329,7 @@
        <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Semt</th><th>Kim gidiyor</th></tr></thead><tbody>
        ${rnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,6).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
          return `<tr><td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
@@ -983,7 +993,7 @@
          <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td></tr>`}).join('')}
        </tbody></table></div></div>` : `
        <div class="card"><div class="empty"><div class="e">▦</div>Henüz planlanmış randevu yok.<br><span class="sml">Kader Hanım takvimden ilk randevuyu oluşturduğunda burada görünecek.</span></div></div>`}
-@@ -1723,7 +2349,8 @@
+@@ -1723,7 +2359,8 @@
  async function crmYukle(){
    const kayit = await Depo.oku();
    S = (kayit && kayit.clinics && kayit.clinics.length) ? kayit : bosDurum();
@@ -993,7 +1003,7 @@
    if(!(kayit && kayit.clinics && kayit.clinics.length)) await Depo.yaz(S);
  }
  async function girisYap(){
-@@ -1773,7 +2400,8 @@
+@@ -1773,7 +2410,8 @@
  
  (async function init(){
    S = bosDurum();
@@ -1003,7 +1013,7 @@
    anaCiz();
    let m=null; try{ m=sessionStorage.getItem('nfx_me'); }catch(e){}
    if(m && USERS.some(u=>u.id===m)){
-@@ -1782,7 +2410,7 @@
+@@ -1782,7 +2420,7 @@
        const kayit = await Depo.oku();
        if(kayit && kayit.clinics){
          S = kayit;
