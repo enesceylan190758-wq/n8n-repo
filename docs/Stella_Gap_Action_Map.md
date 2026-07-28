@@ -69,14 +69,14 @@ Durum: **VAR** (P0 canlıda / importta), **KISMİ**, **YOK**.
 | 4 | 5× ulaşılamadı kuralı | VAR | `clinic-crm.js` noteSave + `crm_segments.max_dynamic_attempts` | — |
 | 5 | Danışan oluştur / düzenle | KISMİ | Hasta kartı formları; vatandaşlık, adres, meslek alanları | P0 |
 | 6 | Hasta kartı: Not + Segment + Temsilci | KISMİ | `HastaKarti` UI + `clinic-note-save` / assign | P0 |
-| 7 | Hasta kartı: Teklif (EUR, otel) | KISMİ | `crm_offers` · `clinic-offers` — UI derinliği Stella’dan az | P0 |
+| 7 | Hasta kartı: Teklif (EUR, otel) | VAR (UI patch) | `crm_offers` · YeniTeklif otel/transfer · Teklifler otel satırı — Mac deploy bekliyor | P0 |
 | 8 | Hasta kartı: Randevu | KISMİ | `crm_appointments` · `clinic-appointments` — takvim görünümü | P0 |
 | 9 | Hasta kartı: İşlem / tedavi kartı | YOK | Yeni tablo veya stub; HBYS/Estesoft bridge (`directives/estesoft_integration.md`) | P1 |
 | 10 | Hasta kartı: Dosya & Fotoğraf | YOK | Storage + UI | P2 |
 | 11 | Hasta kartı: Satış & Tahsilat / Fatura | KISMİ/YOK | Ödeme KISMİ; fatura YOK | P0 ödeme / P1 fatura |
 | 12 | Hasta kartı: Formlar / şikayet / diyet | YOK | Stella-özel klinik formlar — kesim için şart değil | P2 |
 | 13 | Randevu takvim / yeni randevu | KISMİ | UI + import açık randevular | P0 |
-| 14 | Gelirler: Kasa / satış / bakiye | KISMİ | `crm_payments` · `clinic-payments` · `clinic-reports`; banka özet / fatura YOK | P0 kasa / P1 fatura |
+| 14 | Gelirler: Kasa / satış / bakiye | KISMİ→P0 kasa VAR | `crm_payments` · YeniSatış Kur/yöntem/işlem tipi; banka özet / fatura YOK | P0 kasa ✓ / P1 fatura |
 | 15 | Giderler | YOK | Ayrı gider modeli veya `crm_payments` tip=gider | P1 |
 | 16 | Ana ekran özet panelleri | YOK/KISMİ | Dashboard kartları (aktif, gün randevu, kasa) — `clinic-reports` genişlet | P1 |
 | 17 | Raporlar (finansal/CRM/danışan) | KISMİ | Basit ay sonu VAR; Stella rapor ağacı YOK | P1 |
@@ -133,6 +133,6 @@ Asıl paket: `.tmp/stella-discovery/nefalix-crm/`.
 
 ## Sonraki agent adımı
 
-1. Onat `Onat-Sk.m4a` transkript (mümkünse) → P0 güncelle.  
-2. Landing’de P0 madde 1–4 UI/API fark listesini satır satır kapat.  
-3. Medident paralel koşu; Stella kesim go/no-go.
+1. **Mac deploy:** `bash execution/apply-crm-offers-payments-vps.sh` + `bash execution/deploy-hasta-crm-from-extract.sh` (Vercel).  
+2. Smoke: Yeni Teklif (EUR+otel), Yeni Satış (kur/yöntem), not+segment, randevu geldi/gelmedi.  
+3. Medident paralel koşu; Stella kesim go/no-go (`directives/stella_migration.md`).

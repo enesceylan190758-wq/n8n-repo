@@ -89,6 +89,13 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 - Pack: `execution/pack-nefalix-hasta-crm.py` (`NEFALIX_LANDING` veya `.tmp/nefalix-landing-extract`)
 
 
+### Onat plan doğrulama (2026-07-28)
+
+- Transkript + teklif otel/transfer + kasa EUR: `hasta-crm-app/` (commit `a7e35aa`+)
+- Extract yeniden: canlı HTML unpack + patch overlay + `pack-nefalix-hasta-crm.py`
+- Gap #7/#14 / sonraki adımlar güncellendi
+- **Mac hâlâ:** apply offers/payments + `deploy-hasta-crm-from-extract.sh`
+
 ### Hasta kartı not+segment + randevu durum (2026-07-27 gece)
 
 - `HastaKarti`: not kaydında segment select (boot `getSegments`) → `clinic-note-save` + gun_offset
