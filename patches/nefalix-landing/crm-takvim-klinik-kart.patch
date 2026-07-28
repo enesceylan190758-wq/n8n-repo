@@ -1,6 +1,16 @@
 --- a/crm.html
 +++ b/crm.html
-@@ -147,6 +147,59 @@
+@@ -84,8 +84,7 @@
+ .shell{display:flex;min-height:100vh}
+ aside{width:232px;flex:none;background:var(--ink);color:#AFBCCB;padding:16px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;overflow-y:auto}
+ aside .logo{padding:6px 8px 16px;color:#fff}
+-.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;width:100%;text-align:left;color:#AFBCCB;transition:.12s;text-decoration:none;border:none;background:none;font:inherit;cursor:pointer}
+-a.nav{color:#AFBCCB}
++.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;width:100%;text-align:left;color:#AFBCCB;transition:.12s}
+ .nav:hover{background:#1A2438;color:#fff}
+ .nav.on{background:linear-gradient(90deg,var(--brand),var(--violet));color:#fff}
+ .nav .ic{width:17px;text-align:center;font-size:14px}
+@@ -148,6 +147,59 @@
  .mask.on{display:flex}
  .modal{background:#fff;border-radius:14px;width:100%;max-width:620px;box-shadow:0 24px 70px rgba(0,0,0,.3)}
  .modal.lg{max-width:900px}
@@ -60,7 +70,23 @@
  .m-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center}
  .m-h h3{font-size:15px;font-weight:600}
  .m-h .x{margin-left:auto;font-size:20px;color:var(--mut);width:28px;height:28px;border-radius:6px}
-@@ -381,17 +434,49 @@
+@@ -244,7 +296,6 @@
+     <button class="nav" data-p="takvim"><span class="ic">▦</span><span class="lb">Takvim</span></button>
+     <button class="nav" data-p="randevu"><span class="ic">✓</span><span class="lb">Randevular</span><span class="cnt" id="c-rnd">0</span></button>
+     <button class="nav" data-p="whatsapp"><span class="ic">✆</span><span class="lb">WhatsApp</span></button>
+-    <a class="nav" href="/toplu-mail" title="Toplu mail gönder — şablon, imza, Hostinger"><span class="ic">✉</span><span class="lb">Toplu Mail</span></a>
+     <div class="navgrp">Veri</div>
+     <button class="nav" data-p="havuz"><span class="ic">▤</span><span class="lb">Klinik Havuzu</span><span class="cnt" id="c-hav">0</span></button>
+     <button class="nav" data-p="gorusme"><span class="ic">✎</span><span class="lb">Görüşme Notları</span></button>
+@@ -308,6 +359,7 @@
+ const SEGMENTS = [
+   {k:'aranmadi',  ad:'Aranmadı',                       gun:0,   renk:'#94A3B8', kat:'yeni'},
+   {k:'ulasilamadi',ad:'Ulaşılamadı Tekrar Aranacak',   gun:2,   renk:'#64748B', kat:'takip'},
++  {k:'gun1',      ad:'Gün İçinde Aranacak',            gun:1,   renk:'#E8A317', kat:'takip'},
+   {k:'mesaj',     ad:'Mesajlaşılıyor',                 gun:3,   renk:'#2F6BFF', kat:'takip'},
+   {k:'gun2',      ad:'2 Gün Sonra Aranacak',           gun:2,   renk:'#2F6BFF', kat:'takip'},
+   {k:'kisa',      ad:'Kısa Vadede Düşünecek (2 Hafta)',gun:14,  renk:'#7C5CF5', kat:'takip'},
+@@ -383,17 +435,49 @@
  function usr(id){ return USERS.find(u=>u.id===id) || {ad:'—',renk:'#94A3B8'}; }
  function bas(s){ return (s||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
  function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -112,7 +138,15 @@
  
  async function kaydet(sessiz){
    clearTimeout(kaydetZ);
-@@ -601,8 +686,8 @@
+@@ -415,6 +499,7 @@
+   c.aramaSayisi = (c.aramaSayisi||0)+1;
+   c.hatirlatma = (s.gun===null || s.gun===0) ? null : ekleGun(bugun(), s.gun);
+   if(sk==='randevu') c.hatirlatma = null; // randevu takvimden takip edilir
++  if(sk==='gun1') c.hatirlatma = bugun(); // gün içinde → Dinamik Arama Bugün
+   S.notes.unshift({
+     id:uid(), clinicId:cid, userId:(kimId||ME.id), tarih:new Date().toISOString(),
+     segment:sk, metin:(notMetni||'').trim()
+@@ -603,8 +688,8 @@
     : `<div class="card"><div class="card-h"><h3>Yaklaşan görüşmelerin</h3><div class="r"><button class="btn sm" onclick="git('takvim')">Takvimi aç</button></div></div>
        ${benimRnd.length? `<div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Bölge</th><th></th></tr></thead><tbody>
          ${benimRnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,8).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
@@ -123,7 +157,7 @@
        </tbody></table></div>`
        : `<div class="empty"><div class="e">▦</div>Planlanmış görüşmen yok.<br><span class="sml">Kader Hanım randevu oluşturduğunda burada görünecek.</span></div>`}
        </div>`;
-@@ -620,7 +705,7 @@
+@@ -622,7 +707,7 @@
      <div class="card"><div class="card-h"><h3>Günü gelen / gecikmiş</h3><div class="r"><button class="btn sm" onclick="git('dinamik')">Tümü</button></div></div>
        ${t.filter(x=>x.fark<=0).length ? `<div class="tscroll" style="max-height:none"><table><tbody>
          ${t.filter(x=>x.fark<=0).slice(0,9).map(({c,fark})=>`<tr>
@@ -132,7 +166,7 @@
            <td>${segChip(c.segment)}</td>
            <td class="sml ${fark<0?'':'mut'}" style="${fark<0?'color:var(--dang);font-weight:700':''}">${fark<0?Math.abs(fark)+' gün gecikti':'Bugün'}</td>
            <td><button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button></td></tr>`).join('')}
-@@ -646,7 +731,7 @@
+@@ -648,7 +733,7 @@
        <div class="tscroll" style="max-height:none"><table><thead><tr>
          <th>Klinik</th><th>Branş</th><th>Telefon</th><th>Mevcut sekme</th><th>Dönüş tarihi</th><th>Takip sahibi</th><th></th></tr></thead><tbody>
        ${arr.map(({c,fark})=>`<tr>
@@ -141,7 +175,7 @@
          <td class="sml">${esc(c.brans||'')}</td>
          <td class="mono sml">${esc(c.tel||'—')}</td>
          <td>${segChip(c.segment)}</td>
-@@ -715,7 +800,7 @@
+@@ -717,7 +802,7 @@
      <div class="card">
        <div class="card-h"><h3>Sıradaki klinik</h3><div class="r"><span class="mut sml">${liste.length} klinik bekliyor</span></div></div>
        <div class="card-b">
@@ -150,7 +184,16 @@
          <div style="margin:5px 0 12px"><span class="tag">${esc(hedef.brans||'')}</span> <span class="tag">${esc(hedef.semt||'')}</span> <span class="stars">${'★'.repeat(Math.round(hedef.skor||0))}${'☆'.repeat(5-Math.round(hedef.skor||0))}</span></div>
          <table style="margin-bottom:12px">
            <tr><td class="mut sml" style="width:110px">Telefon</td><td class="mono"><b>${esc(hedef.tel||'—')}</b></td></tr>
-@@ -750,7 +835,7 @@
+@@ -742,7 +827,7 @@
+         <div class="segpick">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`
+           <button class="segbtn" onclick="aramaKaydiAc('${hedef.id}','${s.k}')">
+             <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
+-            <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
++            <div class="gn">${s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner'))}</div>
+           </button>`).join('')}</div>
+       </div>
+     </div>
+@@ -752,7 +837,7 @@
      <div class="tscroll"><table><thead><tr><th>#</th><th>Klinik</th><th>Branş</th><th>Semt</th><th>Telefon</th><th>Skor</th><th>Sorumlu</th><th></th></tr></thead><tbody>
        ${liste.slice(0,120).map((c,i)=>`<tr>
          <td class="mono mut sml">${i+1}</td>
@@ -159,7 +202,7 @@
          <td class="mono sml">${esc(c.tel||'—')}</td><td class="stars">${'★'.repeat(Math.round(c.skor||0))}</td>
          <td class="sml">${esc(c.sorumlu||'—')}</td>
          <td><button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button></td></tr>`).join('')}
-@@ -780,8 +865,9 @@
+@@ -782,8 +867,9 @@
          <span class="dn">${g}</span>
          ${gecmis?'':`<span class="${bosSlot?'free':'full'}" style="margin-left:auto">${bosSlot?bosSlot+' boş':'dolu'}</span>`}
        </div>
@@ -171,7 +214,7 @@
      </button>`;
    }
  
-@@ -796,7 +882,14 @@
+@@ -798,7 +884,14 @@
            const st = slotDurum(g,s);
            const benMesgul = st.mesgul.includes(ME.id);
            if(st.rand){ const c=S.clinics.find(x=>x.id===st.rand.clinicId)||{};
@@ -187,7 +230,7 @@
            if(!st.musait.length) return `<button class="slot busy"><div class="t">${s}</div><div class="s">Kimse müsait değil</div></button>`;
            const cls = ME.saha ? (benMesgul?'busy mine':'') : '';
            const act = ME.saha ? `mesgulTogg('${g}','${s}')` : `randevuYeni('${g}','${s}')`;
-@@ -805,8 +898,8 @@
+@@ -807,8 +900,8 @@
              <div class="s">${ME.saha ? (benMesgul?'Meşgulsün':'Müsaitsin') : st.musait.map(i=>usr(i).ad.split(' ')[0]).join(' · ')}</div>
            </button>`;
          }).join('')}</div>
@@ -198,7 +241,7 @@
        </div></div>`;
    })();
  
-@@ -846,7 +939,7 @@
+@@ -848,7 +941,7 @@
      <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Adres</th><th>Katılımcı</th><th>Durum</th><th></th></tr></thead><tbody>
      ${arr.map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};return `<tr>
        <td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
@@ -207,7 +250,7 @@
        <td class="sml mut">${esc((c.adres||'').slice(0,42))}</td>
        <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td>
        <td>${a.durum==='yapildi'?'<span class="chip" style="background:var(--brand-soft);color:var(--brand-d)"><span class="b"></span>Yapıldı</span>':'<span class="chip" style="background:#FEF6E7;color:#B27A00"><span class="b"></span>Planlandı</span>'}</td>
-@@ -965,7 +1058,7 @@
+@@ -967,7 +1060,7 @@
      <th>Klinik</th><th>Branş</th><th>Yaka</th><th>İlçe</th><th>Telefon</th><th>Skor</th><th>Sekme</th><th>Dönüş</th><th>Sorumlu</th><th></th></tr></thead><tbody>
      ${L.map(c=>{const f=c.hatirlatma?farkGun(c.hatirlatma):null; return `<tr>
        <td><input type="checkbox" class="havuz-chk" value="${c.id}" style="width:auto"></td>
@@ -216,16 +259,32 @@
        <td class="sml">${esc(c.brans||'')}</td>
        <td class="sml"><span class="tag">${esc(yakaOf(c))}</span></td>
        <td class="sml">${esc(ilceOf(c))}</td>
-@@ -987,7 +1080,7 @@
+@@ -989,11 +1082,12 @@
    ${N.length? `<div class="tscroll"><table><thead><tr><th>Tarih</th><th>Klinik</th><th>Sekme</th><th>Not</th><th>Kaydeden</th><th></th></tr></thead><tbody>
      ${N.map(n=>{const c=S.clinics.find(x=>x.id===n.clinicId)||{};const d=new Date(n.tarih);return `<tr>
        <td class="mono sml">${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}<div class="mut" style="font-size:11px">${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</div></td>
 -      <td><b>${esc(c.ad||'—')}</b><div class="sml mut">${esc(c.semt||'')}</div></td>
 +      <td>${klinikLink(n.clinicId, c.ad||'—')}<div class="sml mut">${esc(c.semt||'')}</div></td>
        <td>${segChip(n.segment)}</td>
-       <td class="sml" style="max-width:380px">${esc(n.metin||'—')}</td>
+-      <td class="sml" style="max-width:380px">${esc(n.metin||'—')}</td>
++      <td class="sml" style="max-width:380px">${esc(n.metin||'—')}${n.duzenlendi?' <span class="mut">(düzenlendi)</span>':''}</td>
        <td class="sml">${esc(usr(n.userId).ad.split(' ')[0])}</td>
-@@ -1254,7 +1347,7 @@
+-      <td><button class="btn sm" onclick="klinikAc('${n.clinicId}')">Kart</button></td></tr>`}).join('')}
++      <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${n.clinicId}')">Kart</button>
++        <button class="btn sm p" onclick="notDuzenleAc('${n.id}')">Notu düzenle</button></td></tr>`}).join('')}
+   </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz görüşme notu yok.<br><span class="sml">Arama Ekranı'ndan bir sonuç işaretlediğinde buraya düşer.</span></div>`}
+   </div>`;
+ }
+@@ -1234,7 +1328,7 @@
+ 
+   <div class="card"><div class="card-h"><h3>Sekmeler ve gün süreleri</h3></div>
+     <div class="tscroll" style="max-height:none"><table><thead><tr><th>Sekme</th><th>Otomatik dönüş</th><th>Kategori</th></tr></thead><tbody>
+-      ${SEGMENTS.map(s=>`<tr><td>${segChip(s.k)}</td><td class="mono sml">${s.gun===null?'—':(s.gun===0?'Takvimden':'+'+s.gun+' gün')}</td><td class="sml mut">${s.kat}</td></tr>`).join('')}
++      ${SEGMENTS.map(s=>`<tr><td>${segChip(s.k)}</td><td class="mono sml">${s.k==='gun1'?'Bugün (1 gün)':(s.gun===null?'—':(s.gun===0?'Takvimden':'+'+s.gun+' gün'))}</td><td class="sml mut">${s.kat}</td></tr>`).join('')}
+     </tbody></table></div>
+   </div>
+ 
+@@ -1256,7 +1350,7 @@
  }
  
  /* ============ MODALLAR ============ */
@@ -234,7 +293,59 @@
  function mKapat(){ document.getElementById('mask').classList.remove('on'); }
  document.getElementById('mask').onclick = e=>{ if(e.target.id==='mask') mKapat(); };
  
-@@ -1311,48 +1404,510 @@
+@@ -1278,7 +1372,7 @@
+       <div class="segpick" id="sp">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`
+         <button class="segbtn ${_segSec===s.k?'on':''}" data-k="${s.k}" onclick="segSec('${s.k}')">
+           <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
+-          <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
++          <div class="gn">${s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')))}</div>
+         </button>`).join('')}</div>
+     </div>
+     <div><label class="f">Görüşme notu</label>
+@@ -1296,6 +1390,7 @@
+   const s=SEG[_segSec];
+   e.innerHTML = s.gun===null ? '↳ Bu sekmede otomatik dönüş kurulmaz; klinik listeden düşer.'
+     : s.gun===0 ? '↳ Randevu takvimden takip edilecek.'
++    : s.k==='gun1' ? '↳ Dönüş: <b>bugün</b> — hemen <b>Dinamik Arama → Bugün</b> listesinde görünür.'
+     : `↳ Dönüş tarihi: <b class="mono">${tarihTR(ekleGun(bugun(), s.gun))}</b> — o gün <b>Dinamik Arama</b> panelinde listelenir.`;
+ }
+ function aramaKaydet(cid){
+@@ -1309,58 +1404,574 @@
+     calGun = bugun(); git('takvim');
+     return;
+   }
+-  mKapat(); toast('Kaydedildi: '+SEG[_segSec].ad); ciz();
++  const sonNot = S.notes.find(n=>n.clinicId===cid);
++  toast('Kaydedildi: '+SEG[_segSec].ad);
++  ciz();
++  if(sonNot){ notDuzenleAc(sonNot.id, true); }
++  else mKapat();
++}
++
++/* --- Not düzenle --- */
++function notDuzenleAc(nid, afterSave){
++  const n = S.notes.find(x=>x.id===nid); if(!n) return;
++  const c = S.clinics.find(x=>x.id===n.clinicId)||{};
++  const d = new Date(n.tarih);
++  const tarihStr = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
++  mAc(`<div class="m-h"><h3>${afterSave?'Kayıt tamam — notu düzenle':'Notu düzenle'}</h3><button class="x" onclick="mKapat()">×</button></div>
++  <div class="m-b">
++    <div class="sml mut">${klinikLink(n.clinicId, c.ad||'Klinik')} · ${segChip(n.segment)} · ${esc(tarihStr)} · ${esc(usr(n.userId).ad)}</div>
++    <div><label class="f">Görüşme notu</label>
++      <textarea id="nd_metin" rows="5" placeholder="Not metni…">${esc(n.metin||'')}</textarea></div>
++    ${afterSave?`<div class="sml mut">İstersen notu şimdi düzelt; gerekmezse Kapat ile çık.</div>`:''}
++  </div>
++  <div class="m-f">
++    <button class="btn" onclick="mKapat()">Kapat</button>
++    <button class="btn p" onclick="notDuzenleKaydet('${nid}')">Notu kaydet</button>
++  </div>`);
++}
++function notDuzenleKaydet(nid){
++  const n = S.notes.find(x=>x.id===nid); if(!n) return;
++  n.metin = (document.getElementById('nd_metin')?.value||'').trim();
++  n.duzenlendi = new Date().toISOString();
++  n.duzenleyen = ME.id;
++  kaydet(); toast('Not güncellendi.'); mKapat(); ciz();
  }
  
  /* --- Klinik kartı --- */
@@ -276,6 +387,7 @@
 -    <div><label class="f">Görüşme geçmişi (${N.length})</label>
 -      ${N.length? N.map(n=>{const d=new Date(n.tarih);const s=SEG[n.segment]||SEG.aranmadi;return `
 -        <div class="note" style="border-color:${s.renk}">
+-          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span></div>
 +  const offers = S.offers.filter(o=>o.clinicId===cid);
 +  const pays = S.payments.filter(p=>p.clinicId===cid);
 +  const files = S.files.filter(f=>f.clinicId===cid);
@@ -428,9 +540,11 @@
 +      ${N.length? N.map(n=>{
 +        const d=new Date(n.tarih); const s=SEG[n.segment]||SEG.aranmadi;
 +        return `<div class="note" style="border-color:${s.renk}">
-           <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span></div>
++          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span>
++            <button class="btn sm" style="margin-left:auto" onclick="notDuzenleAc('${n.id}')">Notu düzenle</button></div>
            ${n.metin? `<div class="tx">${esc(n.metin)}</div>`:'<div class="tx mut sml">— not girilmemiş —</div>'}
 -        </div>`}).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
++          ${n.duzenlendi?`<div class="sml mut" style="margin-top:4px">Düzenlendi: ${esc(new Date(n.duzenlendi).toLocaleString('tr-TR'))}</div>`:''}
 +        </div>`;
 +      }).join('') : empty('Henüz görüşme kaydı yok. Yukarıdaki formdan ilk görüşmeyi ekleyin.')}`;
 +  } else if(tab==='teklif'){
@@ -507,8 +621,9 @@
 +      <div style="margin-top:14px">
 +        ${gec.length? gec.map(n=>`
 +          <div class="note" style="border-color:var(--warn)">
-+            <div class="mt"><span>${esc(n.tarihTR||'')}</span><span>· ${esc(n.kim||'')}</span></div>
-+            <div class="tx">${esc(n.metin||'')}</div>
++            <div class="mt"><span>${esc(n.tarihTR||'')}</span><span>· ${esc(n.kim||'')}</span>
++              ${n.id?`<button class="btn sm" style="margin-left:auto" onclick="klinikHizliNotDuzenle('${cid}','${n.id}')">Notu düzenle</button>`:''}</div>
++            <div class="tx" id="hn_${n.id||''}">${esc(n.metin||'')}</div>
 +          </div>`).join('') : (c.hizliNot? '': empty('Henüz not yok.'))}
 +      </div>`;
 +  } else if(tab==='dosya'){
@@ -670,6 +785,27 @@
 +  });
 +  kaydet(); toast('Not kaydedildi.'); klinikAc(cid,'notlar');
 +}
++function klinikHizliNotDuzenle(cid, nid){
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const n = (c.notGecmisi||[]).find(x=>x.id===nid); if(!n) return;
++  mAc(`<div class="m-h"><h3>Notu düzenle</h3><button class="x" onclick="mKapat()">×</button></div>
++  <div class="m-b">
++    <div class="sml mut">${esc(n.tarihTR||'')} · ${esc(n.kim||'')}</div>
++    <textarea id="hn_edit" rows="5">${esc(n.metin||'')}</textarea>
++  </div>
++  <div class="m-f">
++    <button class="btn" onclick="mKapat();klinikAc('${cid}','notlar')">Vazgeç</button>
++    <button class="btn p" onclick="klinikHizliNotDuzenleKaydet('${cid}','${nid}')">Notu kaydet</button>
++  </div>`);
++}
++function klinikHizliNotDuzenleKaydet(cid, nid){
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const n = (c.notGecmisi||[]).find(x=>x.id===nid); if(!n) return;
++  n.metin = (document.getElementById('hn_edit')?.value||'').trim();
++  c.hizliNot = n.metin;
++  kaydet(); toast('Not güncellendi.'); klinikAc(cid,'notlar');
++}
++
 +function klinikKisiEkleForm(cid){
 +  klinikAc(cid,'kisiler');
 +  setTimeout(()=>{ const el=document.getElementById('kk_kisi_form'); if(el) el.style.display='block'; }, 30);
@@ -780,7 +916,14 @@
  }
  
  /* --- Randevu oluştur --- */
-@@ -1406,19 +1961,34 @@
+ function randevuYeni(t,s){
+   const st = slotDurum(t,s);
+-  const secilebilir = S.clinics.filter(c=>['randevu','sicak','teklif','gorusuldu','mesaj','kisa','orta','uzun','gun2','ulasilamadi','karar','aranmadi','pilot'].includes(c.segment))
++  const secilebilir = S.clinics.filter(c=>['randevu','sicak','teklif','gorusuldu','mesaj','kisa','orta','uzun','gun1','gun2','ulasilamadi','karar','aranmadi','pilot'].includes(c.segment))
+     .sort((a,b)=>{const p=x=>x.segment==='randevu'?0:(SEG[x.segment]?.kat==='sicak'?1:2); return p(a)-p(b) || (b.skor||0)-(a.skor||0);});
+   mAc(`<div class="m-h"><h3>Randevu oluştur — ${tarihTR(t)} · ${s}</h3><button class="x" onclick="mKapat()">×</button></div>
+   <div class="m-b">
+@@ -1408,19 +2019,34 @@
  function randevuAc(aid){
    const a = S.appts.find(x=>x.id===aid); if(!a) return;
    const c = S.clinics.find(x=>x.id===a.clinicId)||{};
@@ -822,7 +965,7 @@
      </div>
    </div>
    <div class="m-f">
-@@ -1605,7 +2175,7 @@
+@@ -1607,7 +2233,7 @@
    rd.onload=e=>{ try{ const j=JSON.parse(e.target.result); if(!j.clinics) throw 0; j.clinics=j.clinics.filter(c=>!isHeaderClinic(c.ad,c.brans,c.tel)); S=j; kaydet(); toast('Yedek yüklendi.'); ciz(); }catch(err){ toast('Dosya okunamadı.'); } inp.value=''; };
    rd.readAsText(f);
  }
@@ -831,7 +974,7 @@
  
  /* ============ ANA EKRAN (giriş öncesi genel durum) ============ */
  function anaCiz(){
-@@ -1691,7 +2261,7 @@
+@@ -1693,7 +2319,7 @@
        <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Semt</th><th>Kim gidiyor</th></tr></thead><tbody>
        ${rnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,6).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
          return `<tr><td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
@@ -840,7 +983,7 @@
          <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td></tr>`}).join('')}
        </tbody></table></div></div>` : `
        <div class="card"><div class="empty"><div class="e">▦</div>Henüz planlanmış randevu yok.<br><span class="sml">Kader Hanım takvimden ilk randevuyu oluşturduğunda burada görünecek.</span></div></div>`}
-@@ -1721,7 +2291,8 @@
+@@ -1723,7 +2349,8 @@
  async function crmYukle(){
    const kayit = await Depo.oku();
    S = (kayit && kayit.clinics && kayit.clinics.length) ? kayit : bosDurum();
@@ -850,7 +993,7 @@
    if(!(kayit && kayit.clinics && kayit.clinics.length)) await Depo.yaz(S);
  }
  async function girisYap(){
-@@ -1771,7 +2342,8 @@
+@@ -1773,7 +2400,8 @@
  
  (async function init(){
    S = bosDurum();
@@ -860,7 +1003,7 @@
    anaCiz();
    let m=null; try{ m=sessionStorage.getItem('nfx_me'); }catch(e){}
    if(m && USERS.some(u=>u.id===m)){
-@@ -1780,7 +2352,7 @@
+@@ -1782,7 +2410,7 @@
        const kayit = await Depo.oku();
        if(kayit && kayit.clinics){
          S = kayit;

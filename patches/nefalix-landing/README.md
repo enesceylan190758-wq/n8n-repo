@@ -28,3 +28,7 @@ cd /Users/enesceylan/nefalix-landing
 cp /path/to/patches/nefalix-landing/crm.html ./crm.html
 # Deploy: onay sonrası vercel --prod
 ```
+
+## 2026-07-28 ek
+- Segment: **Gün İçinde Aranacak** (`gun1`, 1 gün) → atanınca Dinamik Arama **Bugün** listesinde
+- Görüşme notlarında **Notu düzenle** (kayıt sonrası + geçmiş + Görüşme Notları sayfası)
