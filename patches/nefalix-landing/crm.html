@@ -491,15 +491,37 @@ function durumIsigi(t){
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2400); }
 
 /* ---- 6) İŞ MANTIĞI ------------------------------------------ */
+function hatirlatmaHesapla(sk){
+  const s = SEG[sk]; if(!s) return null;
+  if(sk==='randevu') return null; // randevu takvimden takip edilir
+  if(sk==='gun1') return bugun(); // gün içinde → Dinamik Arama Bugün
+  if(s.gun===null || s.gun===0) return null;
+  return ekleGun(bugun(), s.gun);
+}
+function segmentUygulaKlinik(c, sk){
+  if(!c || !SEG[sk]) return;
+  c.segment = sk;
+  c.hatirlatma = hatirlatmaHesapla(sk);
+}
+function notEnSonMu(n){
+  if(!n) return false;
+  const list = S.notes.filter(x=>x.clinicId===n.clinicId);
+  if(!list.length) return false;
+  const latest = list.reduce((a,b)=> new Date(a.tarih)>=new Date(b.tarih)?a:b);
+  return latest.id===n.id;
+}
+function segSelectHtml(id, selected){
+  const cur = selected || 'aranmadi';
+  return `<select id="${id}" style="max-width:100%">
+    ${SEGMENTS.map(s=>`<option value="${s.k}" ${s.k===cur?'selected':''}>${esc(s.ad)}</option>`).join('')}
+  </select>`;
+}
 function segmentAta(cid, sk, notMetni, kimId){
   const c = S.clinics.find(x=>x.id===cid); if(!c) return;
-  const s = SEG[sk];
-  c.segment = sk;
+  if(!SEG[sk]) return;
+  segmentUygulaKlinik(c, sk);
   c.sonArama = bugun();
   c.aramaSayisi = (c.aramaSayisi||0)+1;
-  c.hatirlatma = (s.gun===null || s.gun===0) ? null : ekleGun(bugun(), s.gun);
-  if(sk==='randevu') c.hatirlatma = null; // randevu takvimden takip edilir
-  if(sk==='gun1') c.hatirlatma = bugun(); // gün içinde → Dinamik Arama Bugün
   S.notes.unshift({
     id:uid(), clinicId:cid, userId:(kimId||ME.id), tarih:new Date().toISOString(),
     segment:sk, metin:(notMetni||'').trim()
@@ -1087,7 +1109,7 @@ function pGorusme(){
       <td class="sml" style="max-width:380px">${esc(n.metin||'—')}${n.duzenlendi?' <span class="mut">(düzenlendi)</span>':''}</td>
       <td class="sml">${esc(usr(n.userId).ad.split(' ')[0])}</td>
       <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${n.clinicId}','gorusme')">Kart</button>
-        <button class="btn sm p" onclick="klinikAc('${n.clinicId}','gorusme')">Notu düzenle</button></td></tr>`}).join('')}
+        <button class="btn sm p" onclick="notDuzenleAc('${n.id}')">Notu düzenle</button></td></tr>`}).join('')}
   </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz görüşme notu yok.<br><span class="sml">Arama Ekranı'ndan bir sonuç işaretlediğinde buraya düşer.</span></div>`}
   </div>`;
 }
@@ -1409,18 +1431,24 @@ function aramaKaydet(cid){
   klinikAc(cid, 'gorusme');
 }
 
-/* --- Not düzenle --- */
+/* --- Not düzenle (metin + segment her zaman değiştirilebilir) --- */
 function notDuzenleAc(nid, afterSave){
   const n = S.notes.find(x=>x.id===nid); if(!n) return;
   const c = S.clinics.find(x=>x.id===n.clinicId)||{};
   const d = new Date(n.tarih);
   const tarihStr = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  const latest = notEnSonMu(n);
   mAc(`<div class="m-h"><h3>${afterSave?'Kayıt tamam — notu düzenle':'Notu düzenle'}</h3><button class="x" onclick="mKapat()">×</button></div>
   <div class="m-b">
-    <div class="sml mut">${klinikLink(n.clinicId, c.ad||'Klinik')} · ${segChip(n.segment)} · ${esc(tarihStr)} · ${esc(usr(n.userId).ad)}</div>
+    <div class="sml mut">${klinikLink(n.clinicId, c.ad||'Klinik')} · ${esc(tarihStr)} · ${esc(usr(n.userId).ad)}</div>
+    <div><label class="f">Sekme / segment</label>${segSelectHtml('nd_seg', n.segment)}</div>
     <div><label class="f">Görüşme notu</label>
       <textarea id="nd_metin" rows="5" placeholder="Not metni…">${esc(n.metin||'')}</textarea></div>
-    ${afterSave?`<div class="sml mut">İstersen notu şimdi düzelt; gerekmezse Kapat ile çık.</div>`:''}
+    <label class="sml" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px">
+      <input type="checkbox" id="nd_sync" ${latest?'checked':''} style="margin-top:3px">
+      <span>Klinik aşamasını da bu sekme ile güncelle${latest?' <span class="mut">(en son kayıt)</span>':''} — Dinamik Arama dönüş tarihi yeniden hesaplanır.</span>
+    </label>
+    ${afterSave?`<div class="sml mut">İstersen notu / sekme şimdi düzelt; gerekmezse Kapat ile çık.</div>`:''}
   </div>
   <div class="m-f">
     <button class="btn" onclick="mKapat()">Kapat</button>
@@ -1430,20 +1458,37 @@ function notDuzenleAc(nid, afterSave){
 function notDuzenleKaydet(nid, stay){
   const n = S.notes.find(x=>x.id===nid); if(!n) return;
   const el = document.getElementById('note_edit_'+nid) || document.getElementById('nd_metin');
+  const segEl = document.getElementById('note_seg_'+nid) || document.getElementById('nd_seg');
+  const syncEl = document.getElementById('note_sync_'+nid) || document.getElementById('nd_sync');
   n.metin = (el?.value||'').trim();
+  const sk = (segEl?.value||n.segment||'aranmadi');
+  if(SEG[sk]) n.segment = sk;
   n.duzenlendi = new Date().toISOString();
   n.duzenleyen = ME.id;
-  kaydet(); toast('Not güncellendi.');
+  const syncKlinik = syncEl ? !!syncEl.checked : notEnSonMu(n);
+  if(syncKlinik && SEG[n.segment]){
+    const c = S.clinics.find(x=>x.id===n.clinicId);
+    if(c) segmentUygulaKlinik(c, n.segment);
+  }
+  kaydet(); toast(syncKlinik ? 'Not ve klinik aşaması güncellendi.' : 'Not güncellendi.');
   if(stay && n.clinicId){ klinikAc(n.clinicId, window._kkTab||'gorusme'); ciz(); return; }
   mKapat(); ciz();
 }
 function notBlokHtml(n){
   const d=new Date(n.tarih); const s=SEG[n.segment]||SEG.aranmadi;
   const tarih = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  const latest = notEnSonMu(n);
   return `<div class="note" style="border-color:${s.renk}">
-    <div class="mt">${segChip(n.segment)} <span>${tarih}</span> <span>· ${esc(usr(n.userId).ad)}</span>
-      ${n.duzenlendi?`<span class="mut">(düzenlendi)</span>`:''}</div>
+    <div class="mt"><span>${tarih}</span> <span>· ${esc(usr(n.userId).ad)}</span>
+      ${n.duzenlendi?`<span class="mut">(düzenlendi)</span>`:''}
+      ${latest?`<span class="mut">· en son</span>`:''}</div>
+    <label class="f" style="margin-top:8px">Sekme / segment</label>
+    ${segSelectHtml('note_seg_'+n.id, n.segment)}
     <textarea id="note_edit_${n.id}" rows="3" style="width:100%;margin-top:6px" placeholder="Not metni…">${esc(n.metin||'')}</textarea>
+    <label class="sml" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px">
+      <input type="checkbox" id="note_sync_${n.id}" ${latest?'checked':''} style="margin-top:3px">
+      <span>Klinik aşamasını da güncelle${latest?' (önerilen)':''}</span>
+    </label>
     <div class="row" style="justify-content:flex-end;margin-top:6px;gap:8px">
       <button class="btn sm p" onclick="notDuzenleKaydet('${n.id}', true)">Kaydet</button>
     </div>
