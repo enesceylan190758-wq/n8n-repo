@@ -15,9 +15,12 @@ from stella_api import iter_customers, list_appointments, load_env, slug_code
 ROOT = Path(__file__).resolve().parents[1]
 CLINIC_ID = "51738ea8-c12e-40ce-a0e2-42869496d76b"
 
-CLOSED_SEGMENTS = {
+# Kapanış / arşiv segmentleri — ARTIK ATLENMEZ; stage=danisan + status=arsiv.
+# (Eski davranış Satıldı vb. satışı olan hastaları dışarıda bırakıyordu.)
+ARCHIVE_SEGMENTS = {
     "5 Kez Ulaşılamadı",
     "10 Kez Ulaşılamadı",
+    "10 kez ulaşılamadı.",
     "Satıldı",
     "Süreci Biten",
     "Tedaviye Uygun Değil",
@@ -26,7 +29,17 @@ CLOSED_SEGMENTS = {
     "Geçersiz Numara (Yanlış)",
     "Başka Yerde Yaptırmış",
     "Olumsuz / İlgilenmiyor",
+    "İlgilenmiyor",
     "İptal",
+    "Mevcut Hasta",
+    "Çok Pahalı",
+}
+
+# Stella "yeni" lead segmentleri — yalnızca bunlar stage=lead
+NEW_LEAD_SEGMENTS = {
+    "YENİ DATA",
+    "Yeni Lead",
+    "Yeni Gelen",
 }
 
 
@@ -86,33 +99,54 @@ def load_segment_codes() -> dict[str, str]:
 
 
 def map_customer(c: dict, users: dict[str, str], seg_map: dict[str, str]) -> dict | None:
+    """Map Stella customer → crm_contacts row. Never skips; imports all customers.
+
+    Stage policy (align Stella lead list):
+      - segment in NEW_LEAD_SEGMENTS → stage=lead, status=aktif
+      - ARCHIVE_SEGMENTS → stage=danisan, status=arsiv, next_call_date=null
+      - else → stage=danisan (Aktif Hasta / takip / null segment)
+    """
     seg_name = (c.get("segmentName") or "").strip()
-    if seg_name in CLOSED_SEGMENTS:
-        return None
-    ctype = c.get("customerTypeName") or ""
-    stage = "danisan" if "aktif" in ctype.lower() else "lead"
     rep = (c.get("represent") or "").strip().lower()
     assigned = users.get(rep)
-    seg_code = seg_map.get(seg_name.lower())
+    seg_code = seg_map.get(seg_name.lower()) if seg_name else None
+
+    new_lead_lower = {s.lower() for s in NEW_LEAD_SEGMENTS}
+    is_new_lead = bool(seg_name) and seg_name.lower() in new_lead_lower
+    is_archive = seg_name in ARCHIVE_SEGMENTS
+
+    if is_new_lead:
+        stage, status = "lead", "aktif"
+        next_call = date.today().isoformat()
+    elif is_archive:
+        stage, status = "danisan", "arsiv"
+        next_call = None
+    else:
+        # Null/other segments → danışan (Stella lead listesi yalnızca yeni* gösterir)
+        stage, status = "danisan", "aktif"
+        next_call = date.today().isoformat() if assigned else None
+
     kampanya_parts = []
     for k in ("facebookCampaign", "facebookAdSet", "facebookAd"):
         if c.get(k):
             kampanya_parts.append(f"{k}: {c[k]}")
-    return {
+    row = {
         "clinic_id": CLINIC_ID,
         "stella_customer_id": str(c["id"]),
         "stage": stage,
-        "status": "aktif",
+        "status": status,
         "ad": (c.get("name") or "(İsimsiz)")[:120],
         "telefon": (c.get("phone") or "")[:30],
         "ulke": (c.get("countryName") or "")[:80],
         "kaynak": (c.get("referenceSource") or "")[:80],
         "email": ((c.get("email") or "")[:120] or None),
-        "assigned_to": assigned,
         "segment_code": seg_code,
-        "next_call_date": date.today().isoformat(),
+        "next_call_date": next_call,
         "kampanya": " | ".join(kampanya_parts)[:500] if kampanya_parts else None,
     }
+    if assigned:
+        row["assigned_to"] = assigned
+    return row
 
 
 def parse_appt_dt(d: str, t: str) -> str:
@@ -159,39 +193,89 @@ def _flush_contacts(batch: list[dict], dry_run: bool, id_map: dict[str, str], to
     return []
 
 
-def import_customers(dry_run: bool, limit: int | None, skip: int = 0) -> tuple[int, dict[str, str]]:
+def _load_existing_stella_ids() -> set[str]:
+    """Page through all contacts with stella_customer_id (PostgREST caps ~1000/req)."""
+    existing: set[str] = set()
+    offset = 0
+    page = 1000
+    while True:
+        rows = (
+            sb(
+                "GET",
+                f"crm_contacts?select=stella_customer_id&stella_customer_id=not.is.null"
+                f"&clinic_id=eq.{CLINIC_ID}&limit={page}&offset={offset}",
+            )
+            or []
+        )
+        if not isinstance(rows, list) or not rows:
+            break
+        for r in rows:
+            if isinstance(r, dict) and r.get("stella_customer_id"):
+                existing.add(r["stella_customer_id"])
+        if len(rows) < page:
+            break
+        offset += page
+    return existing
+
+
+def _load_id_map() -> dict[str, str]:
+    id_map: dict[str, str] = {}
+    offset = 0
+    page = 1000
+    while True:
+        rows = (
+            sb(
+                "GET",
+                f"crm_contacts?select=id,stella_customer_id&stella_customer_id=not.is.null"
+                f"&clinic_id=eq.{CLINIC_ID}&limit={page}&offset={offset}",
+            )
+            or []
+        )
+        if not isinstance(rows, list) or not rows:
+            break
+        for r in rows:
+            if isinstance(r, dict) and r.get("stella_customer_id"):
+                id_map[r["stella_customer_id"]] = r["id"]
+        if len(rows) < page:
+            break
+        offset += page
+    return id_map
+
+
+def import_customers(
+    dry_run: bool, limit: int | None, skip: int = 0, *, update_existing: bool = False
+) -> tuple[int, dict[str, str]]:
     users = {} if dry_run else load_users()
     seg_map = {} if dry_run else load_segment_codes()
     id_map: dict[str, str] = {}
     batch: list[dict] = []
     n = 0
-    # Zaten import edilmişleri atlamak için mevcut Stella id seti
-    existing = set()
-    if not dry_run:
-        rows = sb("GET", "crm_contacts?select=stella_customer_id&stella_customer_id=not.is.null&limit=10000") or []
-        existing = {r["stella_customer_id"] for r in rows if isinstance(r, dict) and r.get("stella_customer_id")}
-        print(f"Existing Stella contacts: {len(existing)}")
+    skipped_existing = 0
+    existing: set[str] = set()
+    if not dry_run and not update_existing:
+        existing = _load_existing_stella_ids()
+        print(f"Existing Stella contacts: {len(existing)} (skip unless --update-existing)")
+    elif update_existing:
+        print("Mode: upsert ALL (update existing stage/segment/status)")
     for c in iter_customers(page_size=100, max_rows=limit, skip=skip):
         row = map_customer(c, users, seg_map)
         if not row:
             continue
-        if row["stella_customer_id"] in existing:
+        if not update_existing and row["stella_customer_id"] in existing:
+            skipped_existing += 1
             continue
         batch.append(row)
         n += 1
         if len(batch) >= 50:
-            print(f"Flushing {len(batch)} new contacts (imported so far {n})...")
+            print(f"Flushing {len(batch)} contacts (imported so far {n})...")
             batch = _flush_contacts(batch, dry_run, id_map, n)
             existing.update(id_map.keys())
     if batch:
         print(f"Flushing final {len(batch)} contacts...")
         _flush_contacts(batch, dry_run, id_map, n)
     if not dry_run:
-        rows = sb("GET", "crm_contacts?select=id,stella_customer_id&stella_customer_id=not.is.null&limit=10000") or []
-        for r in rows:
-            if isinstance(r, dict) and r.get("stella_customer_id"):
-                id_map[r["stella_customer_id"]] = r["id"]
-    print(f"New customers imported this run: {n}")
+        id_map.update(_load_id_map())
+    print(f"Customers upserted this run: {n} (skipped existing: {skipped_existing})")
     return n, id_map
 
 
@@ -265,16 +349,22 @@ def main() -> None:
     ap.add_argument("--days-fwd", type=int, default=90)
     ap.add_argument("--customers-only", action="store_true")
     ap.add_argument("--appointments-only", action="store_true")
+    ap.add_argument(
+        "--update-existing",
+        action="store_true",
+        help="Upsert all Stella customers (fix stage/segment/status on existing rows)",
+    )
     args = ap.parse_args()
     if args.prod:
         use_vps_proxy()
     if not args.appointments_only:
-        _, id_map = import_customers(args.dry_run, args.limit, skip=args.skip)
+        _, id_map = import_customers(
+            args.dry_run, args.limit, skip=args.skip, update_existing=args.update_existing
+        )
     elif args.dry_run:
         id_map = {}
     else:
-        rows = sb("GET", "crm_contacts?select=id,stella_customer_id&stella_customer_id=not.is.null&limit=10000") or []
-        id_map = {r["stella_customer_id"]: r["id"] for r in rows}
+        id_map = _load_id_map()
     if not args.customers_only:
         import_appointments(args.dry_run, id_map, args.days_back, args.days_fwd)
 
