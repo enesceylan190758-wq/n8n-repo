@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -76,6 +77,19 @@ def main() -> None:
         ok = 200 <= code < 400
         # soft: geo_today may 404 if not published yet — still report
         entry = {"name": name, "url": url, "status": code, "ok": ok}
+        if name == "geo_sitemap" and ok:
+            future = [
+                m.group(1)
+                for m in re.finditer(
+                    r"<loc>https?://[^<]+/geo/(\d{4}-\d{2}-\d{2})</loc>", body
+                )
+                if m.group(1) > day
+            ]
+            if future:
+                entry["ok"] = False
+                entry["error"] = f"gelecek tarihli URL: {future[:3]}"
+                entry["future_dates"] = future[:10]
+                ok = False
         if name == "llms" and ok and "nefalix" not in body.lower():
             entry["ok"] = False
             entry["error"] = "llms.txt Nefalix içermiyor"

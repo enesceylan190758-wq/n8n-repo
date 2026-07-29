@@ -61,6 +61,7 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Günlük GEO (AI alıntı) | `directives/geo.md` |
 | GEO citation skor / rapor | `execution/record-geo-citation.py` · `execution/report-geo-citation.py` |
 | YouTube + GEO (kanal) | `directives/youtube_geo.md` |
+| Google SERP görünürlük | `directives/google_serp_visibility.md` |
 
 ## Self-Annealing Döngüsü
 

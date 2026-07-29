@@ -6,7 +6,8 @@ Kapak URL: GitHub raw (branch/main push sonrası).
 
   export NEFALIX_INTERNAL_KEY=...
   python3 execution/publish-geo-seo-10.py --dry-run
-  python3 execution/publish-geo-seo-10.py
+  python3 execution/publish-geo-seo-10.py --start today
+  python3 execution/publish-geo-seo-10.py --include-future  # sitemap için önerilmez
 """
 from __future__ import annotations
 
@@ -30,7 +31,11 @@ INTERNAL_KEY = os.environ.get("NEFALIX_INTERNAL_KEY", "")
 REPO = "enesceylan190758-wq/n8n-repo"
 BRANCH = os.environ.get("GEO_SEO_ASSET_BRANCH", "cursor/geo-seo-10-packs-c5e3")
 
-START = date(2026, 7, 28)  # 10 gün: 28 Tem → 6 Ağu
+def resolve_start(value: str | None) -> date:
+    """İlk paket günü — default bugün; gelecek tarih sitemap'e gitmemeli."""
+    if value is None or value == "today":
+        return date.today()
+    return date.fromisoformat(value)
 
 
 def slugify(text: str) -> str:
@@ -621,11 +626,33 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--geo-only", action="store_true")
     parser.add_argument("--blog-only", action="store_true")
+    parser.add_argument(
+        "--start",
+        default="today",
+        help="İlk paket günü: today veya YYYY-MM-DD (default: today)",
+    )
+    parser.add_argument(
+        "--include-future",
+        action="store_true",
+        help="run_date > bugün olan paketleri de yaz (sitemap için önerilmez)",
+    )
     args = parser.parse_args()
 
-    results = {"geo": [], "blog": []}
+    start = resolve_start(args.start)
+    today = date.today()
+    results: dict = {"geo": [], "blog": [], "skipped": []}
     for i, pack in enumerate(PACKS):
-        run_date = (START + timedelta(days=i)).isoformat()
+        run_date_obj = start + timedelta(days=i)
+        if run_date_obj > today and not args.include_future:
+            results["skipped"].append(
+                {
+                    "index": i,
+                    "run_date": run_date_obj.isoformat(),
+                    "reason": "future_date",
+                }
+            )
+            continue
+        run_date = run_date_obj.isoformat()
         geo_url = f"{SITE}/geo/{run_date}"
         links = [
             geo_url,
@@ -651,8 +678,13 @@ def main() -> None:
         }
         slug = slugify(pack["title"])
         published_at = datetime(
-            START.year, START.month, START.day, 9, 5, tzinfo=timezone.utc
-        ) + timedelta(days=i)
+            run_date_obj.year,
+            run_date_obj.month,
+            run_date_obj.day,
+            9,
+            5,
+            tzinfo=timezone.utc,
+        )
         blog_row = {
             "slug": slug,
             "title": pack["title"],

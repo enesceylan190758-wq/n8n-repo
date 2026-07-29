@@ -29,6 +29,8 @@ Ortak lib: `execution/lib/content_quality.py` · konu seçimi: `execution/lib/to
 > Supabase + yönetici maili GEO değildir. “GEO” etiketli blog yazısı da GEO değildir.
 > Başarı kriteri = `https://nefalix.com/geo/YYYY-MM-DD` 200 + answer-first/SSS + `geo-sitemap.xml` + `llms.txt`.
 
+> **GEO ≠ Google klasik SEO.** Kategori sorguları (`klinik itibar yazılımı`) için ayrıca `directives/google_serp_visibility.md` (title/meta, host 301, intent landing).
+
 ## Kalite kapısı (`publish-daily-geo.py`)
 
 Üretim sonrası otomatik reddeder / yeniden dener (`retry_log`):

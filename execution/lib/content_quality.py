@@ -9,6 +9,7 @@ SITE = "https://nefalix.com"
 
 ALLOWED_PATHS = {
     "/",
+    "/klinik-itibar-yonetimi",
     "/urunler",
     "/urunler#geri-bildirim",
     "/urunler#mesaj",
