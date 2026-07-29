@@ -1,6 +1,7 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-07-23  
+**Tarih:** 2026-07-29 (Stella import lead filtresi + danışan limit fix live)  
+
 **Pilot `clinic_id`:** `51738ea8-c12e-40ce-a0e2-42869496d76b` (MediDent Kartal)
 
 ## Takım ayrımı + n8n → Next.js (Arif brief)
@@ -32,6 +33,13 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 - Komut: `python3 execution/publish-batch-seo-geo.py`
 - Log: `/var/log/nefalix-batch-seo-geo.log`
 
+### SEO/GEO ajan planı (2026-07-29)
+
+- Araştırma planı: `docs/nefalix-seo-geo-ajan-plani.md`
+- Gap notları: `docs/nefalix-seo-geo-gap-notes.md`
+- Faz 0: API’de blog + GEO var; **indeks SSR** landed (`action=blog-index` / `geo-index`, rewrite `/blog` + `/geo`). Detay SSR + sitemap önceki gibi.
+- Sonraki: GSC indeks doğrulama (plan §9); Vertex batch bu turda yok.
+
 ## Abdülkadir — Klinik CRM düzenlemesi
 
 **Sorumlu:** Abdülkadir Yaşar (Medident pilot)  
@@ -62,6 +70,26 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 
 ## Bu sohbette yapılanlar
 
+### Stella import — lead filtresi + danışan limit (2026-07-29)
+
+**Status:** pack + **vercel --prod OK**  
+**Deploy:** `dpl_6zvUNmFzVU8vUxw7AJ4QZX2brXgw` → `https://nefalix.com/hasta-crm`
+
+**Veri sayıları (import raporu 2b674594):**
+
+| Kaynak | Adet |
+|--------|------|
+| Stella API | ~7501 |
+| VPS `crm_contacts` (stage=danisan) | 7655 |
+| Lead (yeni segment) | 1 |
+| Danışan aktif | ~1997 |
+
+**Fix:**
+- `isNewLeadSegment`: segmentsiz kayıt artık lead **değil** — yalnızca `NEW_LEAD_LABELS` (YENİ DATA / Yeni Lead / Yeni Gelen)
+- `refreshData`: `clinic-leads` fetch limit **10000** (önce 300/5000; ~7654 danışan yüklenemiyordu)
+- Pack: `python3 execution/pack-nefalix-hasta-crm.py`
+- Prod bundle doğrulandı: `_assets/a90a0ed2…js` → `limit=10000`, `NEW_LEAD_LABELS.has(s)` (eski `!s ||` yok)
+
 ### CRM Next.js geçiş kararı (2026-07-27)
 
 - Plan: `docs/CRM_NextJS_Gecis_Plani.md`
@@ -74,17 +102,86 @@ Swell CX Resources seviyesine yaklaştırma yapıldı (canlı):
 | Git LFS | `discovery/stella-discovery-2026-07-27.zip` | `0aae4bc` (~171MB) |
 | Cloud `.tmp` | `.tmp/stella-discovery/` | unzip sonrası 390 PNG + 4 XLSX + Onat |
 | VPS | `root@93.127.186.45:/opt/nefalix/.tmp/stella-discovery/` | 397 dosya (yedek) |
-| Gap map | `docs/Stella_Gap_Action_Map.md` | ~35 ekran örnek + 4 Excel |
+| Gap map | `docs/Stella_Gap_Action_Map.md` | stage crawl + Excel + Onat |
 | Path doc | `docs/stella_discovery_assets.md` | |
+| **Crawl orchestrator** | `.tmp/stella-crawl-state.json` | **13/13 done** (2026-07-28); lock **off** |
+| Stage docs | `docs/stella_crawl/stage-01` … `stage-13` | SOP: `directives/stella_screenshot_crawl.md` |
 
-**Sonraki:** Mac `apply-crm-offers-payments-vps.sh` + `deploy-hasta-crm-from-extract.sh`; smoke teklif/kasa.
+
+### Hasta CRM P1c LIVE (2026-07-28)
+
+**Status:** Transfer Takvimi + clinic-reports segment/temsilci · vercel OK  
+**Deploy:** `dpl_ERPXbhQGJNorYPWdhDKBVwMVCetG` → `https://nefalix.com/hasta-crm`  
+**State:** `.tmp/hasta-crm-p1c-state.json` · `docs/hasta_crm_p1c_backlog.md`
+
+- `TransferTakvim.dc.html` — teklif hotel/transfer + tip=Transfer randevu
+- HastaKarti **Transfer & Konaklama** sekmesi wired
+- `clinic-reports`: `by_segment`, `by_temsilci` → Raporlar Ay Sonu panelleri
+
+### Hasta CRM P1b LIVE (2026-07-28)
+
+**Status:** Son İşlemler + Bakiye + Raporlar ay sonu · pack + vercel OK  
+**Deploy:** `dpl_CMvaSdJ5asH712bNdLLK6TBwZhGC` → `https://nefalix.com/hasta-crm`  
+**State:** `.tmp/hasta-crm-p1b-state.json` · `docs/hasta_crm_p1b_backlog.md`
+
+- `getRecentActivity` — fake audit kaldırıldı
+- `getBakiye` — kabul teklif − tahsilat
+- Raporlar: indeks kartları + `clinic-reports` Ay Sonu sekmesi
+
+### Hasta CRM P1 daily-ops COMPLETE (2026-07-28)
+
+**Status:** p1-01…p1-05 **done** · 2× vercel prod · smoke OK  
+**Latest deploy:** `dpl_6exgkcuGbMz1sofgVZ6WW8UvqYKi` → `https://nefalix.com/hasta-crm`  
+**State:** `.tmp/hasta-crm-p1-state.json` · Backlog: `docs/hasta_crm_p1_backlog.md`
+
+| ID | Özet |
+|----|------|
+| p1-01 | Dashboard KPI canlı (`dashboardKpis`) — fake kaldırıldı |
+| p1-02 | Lead segment/temsilci/ülke filtre |
+| p1-03 | Giderler TRY/EUR/yöntem kartları |
+| p1-04 | Salesline pack + 5 kolon |
+| p1-05 | Firma LS CRUD + Firma Ödemesi → `clinic-payments` (`Firma:` description) |
+
+**Sonraki öneri:** Son İşlemler · Bakiye · Rapor indeks · WA inbox
+
+### Hasta CRM P0 cutover LIVE (2026-07-28 18:23 TR)
+
+**Status:** VPS apply OK · pack OK · **vercel --prod OK** · smoke `/hasta-crm` **HTTP 200**
+
+Deploy: `dpl_CczCEmnLvySNAPWUHckGWfiZpoWW` → aliased `https://nefalix.com`  
+URL: **https://nefalix.com/hasta-crm** (bundle 267000 bytes)  
+State: `.tmp/hasta-crm-p0-state.json` → `cutover_live: live`
+
+### Hasta CRM P0-01 — Lead + Dinamik parity (2026-07-28)
+
+**Status:** code done · pack done · **LIVE**
+
+Acceptance:
+- [x] Landing `LeadListesi`: Ülke + Temsilci + Referans + işlem menü (Görüntüle / Danışana Aktar / WA)
+- [x] `YeniLead`: Dil, Konu, Mesaj (+ E-Posta, Ülke TR default) → `store.addDanisan` → `clinic-leads`
+- [x] Persist: `email` kolonu; Dil/Konu → `kampanya` meta (`Dil: … | Konu: …`); Mesaj → `clinic-note-save` (yeni DB kolonu yok)
+- [x] `DinamikArama`: Ülke kolonu
+- [x] Pack: `YeniLead` + `DinamikArama` eklendi → `nefalix-hasta-crm.html`
+- [x] Prod deploy 2026-07-28
+
+Dosyalar: `hasta-crm-app/{LeadListesi,YeniLead,DinamikArama,store}.js|html`, landing sync, `api/_lib/clinic-crm.js` (email), `execution/pack-nefalix-hasta-crm.py`
+
+### Stella screenshot aşamalı crawl (2026-07-28)
+
+- SOP: `directives/stella_screenshot_crawl.md`
+- Orchestrator: `python3 execution/stella-screenshot-stage.py` (state `.tmp/stella-crawl-state.json`)
+- Stage 01 CRM/Lead: **done** → `docs/stella_crawl/stage-01-crm_lead.md` (17/17)
+- Stage 02 Hasta kartı: **in_progress** (33 PNG, sample 25)
+- Stella UI tıkla: bu ortamda browser MCP yok; API token OK (`.env` ESTESOFT_*). Panel için ayrı kullanıcı+browser lazım.
+
+**Sonraki:** Stella crawl stage zinciri; UI smoke (teklif otel / kasa EUR) manuel.
 
 ### Hasta CRM hotfix (2026-07-27) — kart + Lead filtresi
 
 Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 
 - `patientHistory` senkron return + notlar fire-and-forget (HastaKarti `.slice` kırığı yok)
-- `getLeads` → `NEW_LEAD_LABELS` (YENİ DATA / Yeni Lead / Yeni Gelen) + boş segment
+- `getLeads` → `NEW_LEAD_LABELS` (YENİ DATA / Yeni Lead / Yeni Gelen); segmentsiz lead **değil** (2026-07-29 düzeltildi)
 - Stage: atanmış non-yeni → danisan (reclassify 0 bekleyen; `execution/reclassify-crm-stages.py`)
 - Pack: `execution/pack-nefalix-hasta-crm.py` (`NEFALIX_LANDING` veya `.tmp/nefalix-landing-extract`)
 
@@ -94,14 +191,14 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 - Transkript + teklif otel/transfer + kasa EUR: `hasta-crm-app/` (commit `a7e35aa`+)
 - Extract yeniden: canlı HTML unpack + patch overlay + `pack-nefalix-hasta-crm.py`
 - Gap #7/#14 / sonraki adımlar güncellendi
-- **Mac hâlâ:** apply offers/payments + `deploy-hasta-crm-from-extract.sh`
+- **Mac DONE (2026-07-28):** apply offers/payments + `vercel --prod`
 
 ### Hasta kartı not+segment + randevu durum (2026-07-27 gece)
 
 - `HastaKarti`: not kaydında segment select (boot `getSegments`) → `clinic-note-save` + gun_offset
 - `RandevuListe` + kart sekmesi: durum select (Geldi/Gelmedi/…) renkli; `setRandevuStatus`
 - Pack: `RandevuListe`/`RandevuTakvim` eklendi; `hasta-crm-app/` sync
-- **Mac:** `bash execution/apply-crm-offers-payments-vps.sh` sonra `bash execution/deploy-hasta-crm-from-extract.sh`
+- **Mac DONE (2026-07-28):** VPS apply + vercel prod
 
 ### Teklif/Kasa 502 + Lead kolon (2026-07-27 akşam)
 
@@ -193,11 +290,22 @@ Canlı doğrulandı (`https://nefalix.com/hasta-crm` bundle):
 - `nefalix-site-v2/` bu repoda kopya; canlı site kaynağı **`nefalix-landing`**.
 - WhatsApp gönderim: `WHATSAPP_SEND_ENABLED`, rate limit env’leri VPS’te kontrol et.
 
+## Hasta CRM P0 director (2026-07-28)
+
+- State: `.tmp/hasta-crm-p0-state.json` · Backlog: `docs/hasta_crm_p0_backlog.md`
+- **Coding slice p0-01…p0-06:** DONE
+- **cutover_live: live** — VPS `crm_offers`/`crm_payments` apply OK; pack 15 files; `vercel --prod` aliased `nefalix.com`; smoke HTTP 200
+
 ## Sonraki 3 adım
 
-1. **Mac:** VPS `crm_offers`/`crm_payments` apply + `deploy-hasta-crm-from-extract.sh` (Vercel).
-2. Smoke: teklif/kasa, not+segment dinamik, randevu geldi/gelmedi.
-3. Paralel koşu go/no-go (`directives/stella_migration.md`); P1 Meta FB lead sonra.
+### 1. P1+ (opsiyonel)
+- Stella satış raporu satır detay · WA inbox (Evolution)
+
+### 2. Paralel koşu go/no-go
+- `directives/stella_migration.md`
+
+### 3. Transfer veri
+- YeniTeklif’te otel/transfer doldur → Transfer Takvimi satırları görünür
 
 ## Önemli env değişkenleri (sadece isimler)
 

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9;">
+  <dc-import name="NavHeader" active-page="giderler" hint-size="100%,132px"></dc-import>
+  <div style="max-width:900px; margin:0 auto; padding:22px 28px 60px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <a href="Giderler.dc.html" style="width:34px; height:34px; border-radius:8px; background:#fff; border:1px solid #e6e2f5; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg></a>
+      <span style="font-size:18px; font-weight:700; color:#241854;">Gider Kaydet</span>
+    </div>
+    <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><div style="background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:13.5px; border-radius:10px; padding:13px 16px; margin-bottom:16px;">✓ Gider kaydedildi. <a href="Giderler.dc.html" style="color:#15803d; font-weight:700;">Giderler listesine dön →</a></div></sc-if>
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; padding:13px 22px; font-size:14px; font-weight:700;">💸 Gider Bilgileri</div>
+      <div style="padding:22px; display:grid; grid-template-columns:1fr 1fr; gap:16px 20px;">
+        <div><label style="{{ lbl }}">Kategori *</label><select class="nf-f" data-k="Bilgi" onChange="{{ onIn }}" style="{{ inp }}"><option value="">Seçiniz</option><option>Kira</option><option>Personel Maaş</option><option>Malzeme / Ürün Alımı</option><option>Laboratuvar</option><option>Pazarlama / Reklam</option><option>Fatura (Elektrik/Su/İnternet)</option><option>Vergi / SGK</option><option>Diğer</option></select></div>
+        <div><label style="{{ lbl }}">Gider Kalemi</label><input class="nf-f" data-k="Kalem" onInput="{{ onIn }}" placeholder="Örn: Temmuz kira" style="{{ inp }}" /></div>
+        <div style="grid-column:1 / -1;"><label style="{{ lbl }}">Fatura No / Ek Bilgi</label><input class="nf-f" data-k="Referans kodu" onInput="{{ onIn }}" style="{{ inp }}" /></div>
+        <div><label style="{{ lbl }}">Gider tarihi</label><input class="nf-f" type="date" data-k="tarihISO" onChange="{{ onIn }}" style="{{ inp }}" /></div>
+        <div><label style="{{ lbl }}">Tutar *</label><div style="display:flex; gap:8px;"><input class="nf-f" data-k="Tutar" onInput="{{ onIn }}" placeholder="0,00" style="{{ inp }} flex:1;" /><select class="nf-f" data-k="Kur" onChange="{{ onIn }}" style="{{ inp }} width:90px;"><option>TRY</option><option>EUR</option><option>USD</option></select></div></div>
+        <div><label style="{{ lbl }}">Ödeme Yöntemi</label><select class="nf-f" data-k="Ödeme Yöntemi" onChange="{{ onIn }}" style="{{ inp }}"><option>Nakit</option><option>Banka Hesabı</option><option>Kredi Kartı</option><option>Çek</option></select></div>
+        <div><label style="{{ lbl }}">Firma</label><input class="nf-f" data-k="Danışan / Firma" onInput="{{ onIn }}" placeholder="Tedarikçi / firma adı" style="{{ inp }}" /></div>
+        <div style="grid-column:1 / -1;"><label style="{{ lbl }}">Notlar</label><textarea class="nf-f" data-k="Notlar" onInput="{{ onIn }}" style="{{ inp }} min-height:70px; resize:vertical; font-family:inherit;"></textarea></div>
+      </div>
+      <div style="padding:0 22px 22px; display:flex; justify-content:flex-end; gap:12px;">
+        <a href="Giderler.dc.html" style="padding:12px 22px; border-radius:9px; border:1px solid #d9d5ee; font-size:13.5px; color:#4b4770; font-weight:600;">Vazgeç</a>
+        <div class="nf-btn" onClick="{{ save }}" style="background:linear-gradient(135deg,#ef4444,#dc2626); border-radius:9px; padding:12px 28px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Gider Kaydet</div>
+      </div>
+    </div>
+    <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; font-size:13px; border-radius:9px; padding:11px 14px;">{{ err }}</div></sc-if>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:720}}">
+class Component extends DCLogic {
+  state = { ready: false, saved: false, err: '' };
+  form = { 'İşlem tipi': 'Para çıkışı', 'Kur': 'TRY', 'Ödeme Yöntemi': 'Nakit' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; outline:none; background:#fff; transition:box-shadow .15s,border-color .15s;';
+    return {
+      lbl, inp, saved: this.state.saved, err: this.state.err,
+      onIn: (e) => {
+        const k = e.target.getAttribute('data-k');
+        if (k === 'tarihISO') { const v = e.target.value; if (v) { const p = v.split('-'); this.form['Ödeme tarihi'] = p[2] + '.' + p[1] + '.' + p[0]; } }
+        else this.form[k] = e.target.value;
+      },
+      save: () => {
+        const t = parseFloat(String(this.form['Tutar']).replace(',', '.'));
+        if (!this.form['Bilgi']) { this.setState({ err: 'Kategori seçiniz.' }); return; }
+        if (!t || t <= 0) { this.setState({ err: 'Geçerli bir tutar giriniz.' }); return; }
+        const rec = Object.assign({}, this.form, { 'Tutar': -Math.abs(t) });
+        window.Nefalix.addKasa(rec);
+        this.setState({ saved: true, err: '' }); window.scrollTo(0, 0);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

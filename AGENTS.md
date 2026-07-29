@@ -60,6 +60,8 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Estesoft CRM (Medident) | `directives/estesoft_integration.md` |
 | Klinik CRM düzenleme (Medident) | `directives/clinic_crm.md` |
 | Stella → Hasta CRM geçişi (P0) | `directives/stella_migration.md` |
+| Stella ekran arşivi (aşamalı crawl) | `directives/stella_screenshot_crawl.md` |
+| Koordinatör + işçi ajan | `directives/agent_orchestrator.md` |
 | Kurum CRM (yeni, saha) | `directives/nefalix_crm.md` |
 | İletişim / mail kalıpları | `directives/nefalix_mail.md` |
 | Evolution API (WhatsApp pilot) | `directives/evolution_setup.md` |

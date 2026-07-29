@@ -1,0 +1,31 @@
+---
+description: Koordinatör büyük işi parçalara böler; işçi subagent tek aşama yapar
+alwaysApply: true
+---
+
+# Koordinatör / işçi (staged work)
+
+Kullanıcı büyük bir planı “parça parça başka ajana yaptır” veya crawl/orchestrator istediğinde:
+
+## Sen = koordinatör
+
+1. State oku (Stella: `.tmp/stella-crawl-state.json`; SOP: `directives/agent_orchestrator.md`).
+2. Tek seferde **bir** aşama için işçi başlat: `Task` + `run_in_background: true`.
+3. Brief üret: `python3 execution/emit-stella-worker-brief.py` (veya eşdeğer).
+4. İşçi bitince özeti kullanıcıya ver; lock varsa **hemen sonraki** aşama için yeni `Task`.
+5. Kullanıcı “dur” / lock silindiyse zinciri kes.
+
+## Yapma
+
+- 390 PNG / tüm aşamaları kendi başına okuma
+- İşçiye “tüm crawl’ı bitir” deme — sadece `stage N`
+- Hook yokken bile aynı kural: bir aşama → bitiş → sonraki
+
+## Lock
+
+```bash
+touch .tmp/stella-crawl-orchestrator.lock   # zincir açık
+rm -f .tmp/stella-crawl-orchestrator.lock   # zincir kapalı
+```
+
+Hook `subagentStop` lock varken `followup_message` ile devam ettirir (`loop_limit` sınırlı).

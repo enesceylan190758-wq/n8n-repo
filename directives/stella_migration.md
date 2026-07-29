@@ -8,7 +8,8 @@ Medident günlük Stella akışını `/hasta-crm` üzerinden sürdürmek; 2–4 
 **Motor:** `nefalix-landing/api/_lib/clinic-crm.js` → Supabase `crm_*` (cloud: `SUPABASE_URL_PROD`)  
 **Spec:** `docs/Stella_Phase1_Spec.md`  
 **Gap / nerede ne:** `docs/Stella_Gap_Action_Map.md`  
-**Discovery paket (ekran/Excel/ses):** `docs/stella_discovery_assets.md` · Git LFS `discovery/stella-discovery-2026-07-27.zip` · VPS `/opt/nefalix/.tmp/stella-discovery/`
+**Discovery paket (ekran/Excel/ses):** `docs/stella_discovery_assets.md` · Git LFS `discovery/stella-discovery-2026-07-27.zip` · VPS `/opt/nefalix/.tmp/stella-discovery/`  
+**Aşamalı ekran crawl:** `directives/stella_screenshot_crawl.md` · `execution/stella-screenshot-stage.py` · `docs/stella_crawl/`
 
 ## Mimari
 
@@ -65,10 +66,11 @@ Vercel env: `SUPABASE_URL_PROD`, `SUPABASE_SERVICE_ROLE_KEY_PROD`, `DASHBOARD_SE
 - Cookie: `nefalix_clinic`, 90 gün HttpOnly
 - Yenilemede oturum: `clinic-me` + `restoreServerSession()`
 
-**Lead listesi:** yalnızca segment `YENİ DATA` / `Yeni Lead` / `Yeni Gelen` veya segmentsiz (`store.js` `NEW_LEAD_LABELS` + boş). Diğer potansiyel/takip → Danışan + Dinamik.  
-**Teklif/Kasa 502:** VPS’te tablolar yoksa `bash execution/apply-crm-offers-payments-vps.sh`
-**Stage reclassify:** `python3 execution/reclassify-crm-stages.py` (atanmış + non-yeni → `danisan`).  
-**Hasta kartı:** `patientHistory` senkron obje döner; notlar arka planda (`clinic-contact`).
+**Lead listesi:** yalnızca segment `YENİ DATA` / `Yeni Lead` / `Yeni Gelen` (`store.js` `NEW_LEAD_LABELS`). Segmentsiz kayıtlar lead sayılmaz (Stella lead listesi boşken Nefalix’in ~300 göstermesinin nedeni buydu). Manuel lead create → `segment_code=yeni_lead`.  
+**Teklif/Kasa 502:** VPS’te tablolar yoksa `bash execution/apply-crm-offers-payments-vps.sh`  
+**Stage reclassify:** `python3 execution/reclassify-crm-stages.py` (yeni* dışı → `danisan`).  
+**Hasta kartı:** `patientHistory` senkron obje döner; notlar arka planda (`clinic-contact`).  
+**Import:** tüm Stella müşteriler (kapanış segmentleri dahil `status=arsiv`); `python3 execution/import-stella-crm.py --update-existing --customers-only` (VPS’te `SUPABASE_URL=http://127.0.0.1:54321`).
 
 ## Paralel koşu checklist (2 hafta)
 

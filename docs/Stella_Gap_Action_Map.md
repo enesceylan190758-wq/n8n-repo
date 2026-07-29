@@ -10,11 +10,25 @@
 | Ne | Sayı |
 |----|------|
 | Pakette PNG | 390 |
-| Bu turda okunan örnek ekran | **~35** (her üst klasörden 1–3 + sistem/rapor alt) |
+| İlk örnekleme (2026-07-27) | **~35** |
+| Aşamalı crawl (2026-07-28+) | State: `.tmp/stella-crawl-state.json` · SOP: `directives/stella_screenshot_crawl.md` · çıktı: `docs/stella_crawl/` |
+| Stage 01 CRM/Lead | **17/17 done** → `docs/stella_crawl/stage-01-crm_lead.md` |
+| Stage 02 Hasta kartı | **done** (15/25 örnek) → `docs/stella_crawl/stage-02-hasta_karti.md` |
+| Stage 03 Danışan | **22/22 done** → `docs/stella_crawl/stage-03-danisan.md` — P0: YeniDanışan alanları, liste birleştir/Excel, Notlar&Görevler, Teklif KPI |
+| Stage 04 Randevu | **25/25 sample done** → `docs/stella_crawl/stage-04-randevu.md` — P0: takvim görünümleri/oda, durum renkleri, liste KPI |
+| Stage 05 Gelirler | **25/25 sample done** → `docs/stella_crawl/stage-05-gelirler.md` — P0: YeniSatış yöntem/kur, Kasa özet, satış/bakiye KPI |
+| Stage 06 Ana ekran | **18/18 done** → `docs/stella_crawl/stage-06-ana_ekran.md` — P0/P1: Dashboard KPI + widget grid; Son İşlemler; Transfer Takvimi menü |
+| Stage 07 Giderler | **20/20 done** → `docs/stella_crawl/stage-07-giderler.md` — P0: GiderKaydet kategori/yöntem; Firma CRUD; firma ödeme; Giderler kur kartları |
+| Stage 08 WhatsApp | **17/17 done** → `docs/stella_crawl/stage-08-whatsapp.md` — P0: WA hesap/template/hatırlatma; autoresponder/atama; inbox/rapor |
+| Stage 09 Rapor (1/2) | **25/25 sample done** → `docs/stella_crawl/stage-09-rapor_a.md` — P0: Satış raporu; CRM KPI/FB beta; gelmeyen danışan |
+| Stage 10 Rapor (2/2) | **15/25 sample done** → `docs/stella_crawl/stage-10-rapor_b.md` — P0: Rapor indeks; teklif raporu KPI |
+| Stage 11 Sistem (1/3) | **8/25 sample done** → `docs/stella_crawl/stage-11-sistem_a.md` — P0: Genel ayarlar; personel; API/entegrasyon |
+| Stage 12 Sistem (2/3) | **6/25 sample done** → `docs/stella_crawl/stage-12-sistem_b.md` — P0: Yetki grupları; hizmet/ürün/paket |
+| Stage 13 Sistem (3/3)+Destek | **5/30 sample done** → `docs/stella_crawl/stage-13-sistem_c.md` — P0: Tanımlamalar ağacı; P2: Helpdesk |
 | Excel | 4/4 başlık+örnek satır |
 | Onat ses (`Onat-Sk.m4a`) | **tamam** → `docs/Onat_Sk_Transcript.md` |
 
-Tam 390 ekran okunmadı; klasör envanteri + örnek görseller + Excel + mevcut P0 spec birleştirildi.
+Aşamalı crawl **tamamlandı** (13/13); gap satırları `docs/stella_crawl/stage-*.md` dosyalarında.
 
 ---
 
@@ -28,12 +42,12 @@ Tam 390 ekran okunmadı; klasör envanteri + örnek görseller + Excel + mevcut 
 | CRM | `/lead-new`, lead listesi, `/dynamicSearch` | `crm sekmesi içerikleri` (15) |
 | DANIŞAN | `/customer-new`, liste | `danışan sekmesi içerikleri` (22) |
 | RANDEVU | `/appointment-new`, takvim | `randevu sekmesi` (26) |
-| GELİRLER | `/bill-new` · Kasa · Satış · Bakiye · Banka · Fatura | `gelirler sekmesi` (30) |
-| GİDERLER | gider kayıtları | `giderler sekmesi` (20) |
-| WHATSAPP | `/integrations/whatsappManagementPanel` | `whatsapp sekmesi` (17) |
-| RAPOR | satış, CRM, danışan, finansal… | `rapor sekmesi` (85) |
-| SİSTEM | yetki, personel, tanımlamalar, ayarlar… | `sistem sekmesi` (119) |
-| DESTEK | destek paneli | `destek sekmesi` (3) |
+| GELİRLER | `/bill-new` · `/accounting/summary` (Kasa) · `/bill` · `/accounting/customerDebtList` · `/reporting/bankStatementList` · `/invoice` · `/accounting/incomings` | `gelirler sekmesi` (30) |
+| GİDERLER | `/menu/expense/new` · `/company-new` · `/company` · `/companyBill-new` · `/companyBill` · `/accounting/companyDebtList` · `/confirmation` · `/accounting/expenses` | `giderler sekmesi` (20) |
+| WHATSAPP | `/integrations/whatsappManagementPanel` · `/reporting/whatsappReports` · `/integrations/metaManagementPanel` · `/sirius/messages` | `whatsapp sekmesi` (17) |
+| RAPOR | `/reporting/index` · `/reporting/sales` · `/reporting/crm` · `/reporting/propose` · … | `rapor sekmesi` (85) |
+| SİSTEM | `/management/generalSettings` · `/staff` · `/authGroup` · `/service` · `/definitions/*` · `/integrations` | `sistem sekmesi` (119) |
+| DESTEK | `/helpdesk/index` | `destek sekmesi` (3) |
 
 ### Hasta kartı (dinamik arama → isim tık)
 
@@ -133,6 +147,7 @@ Asıl paket: `.tmp/stella-discovery/nefalix-crm/`.
 
 ## Sonraki agent adımı
 
-1. **Mac deploy:** `bash execution/apply-crm-offers-payments-vps.sh` + `bash execution/deploy-hasta-crm-from-extract.sh` (Vercel).  
-2. Smoke: Yeni Teklif (EUR+otel), Yeni Satış (kur/yöntem), not+segment, randevu geldi/gelmedi.  
-3. Medident paralel koşu; Stella kesim go/no-go (`directives/stella_migration.md`).
+1. ~~Screenshot crawl~~ **DONE** (13/13, lock off).
+2. **Stella UI tıkla-doğrula:** Cursor browser MCP (Chrome/AppleScript kullanılmıyor).  
+3. **Mac deploy:** `apply-crm-offers-payments-vps.sh` + `deploy-hasta-crm-from-extract.sh`.  
+4. Paralel koşu → Stella kesim (`directives/stella_migration.md`).

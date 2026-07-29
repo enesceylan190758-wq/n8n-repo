@@ -15,6 +15,8 @@ Alıntı yüzeyleri: ChatGPT, Perplexity, Gemini, Google AI Overviews.
 > **Kritik:** AI motorları yalnızca public crawlable sayfaları alıntılar.
 > Supabase + yönetici maili GEO değildir. Başarı kriteri = `https://nefalix.com/geo/YYYY-MM-DD` 200 + cevap/SSS içeriği.
 
+> **İndeks notu (2026-07-29):** `/geo` ve `/blog` listeleri client-side hydrate (`geo-list.js` / `blog-kaynaklar.js`); curl’de «yükleniyor…» kalır. Detay `/geo/YYYY-MM-DD` SSR + FAQPage. Strateji / sektör araştırması + director prompt: `docs/nefalix-seo-geo-ajan-plani.md`. Çapraz kontrol: `docs/nefalix-seo-geo-gap-notes.md`.
+
 ## Akış
 
 ```
@@ -126,7 +128,9 @@ Her satır: motor · mention · URL · rakip. İlk sürüm manuel; Pazar maili h
 | `execution/setup-geo-cron.sh` | Cron 09:15 + Pazar 10:00 |
 | `execution/send-geo-weekly-reminder.py` | Citation checklist mail |
 | `docs/geo-prompt-baseline.md` | 25 prompt skor şablonu |
+| `docs/nefalix-seo-geo-ajan-plani.md` | B2B sektör araştırması + ajan mimarisi + director prompt |
+| `docs/nefalix-seo-geo-gap-notes.md` | Plan ↔ canlı sistem gap / Faz 0 |
 | `directives/daily_blog.md` | Blog (GEO gövde) |
 | `nefalix-landing/api/blog.js` | Public GEO list / render / sitemap (geo-* actions) |
-| `nefalix-landing/geo.html` | İndeks sayfası |
+| `nefalix-landing/geo.html` | İndeks sayfası (JS hydrate — SSR backlog) |
 | `nefalix-landing/llms.txt` | AI crawler özeti |

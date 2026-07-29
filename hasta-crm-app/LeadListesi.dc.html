@@ -16,7 +16,7 @@
   .nf-row:hover { background:#f3f1fb !important; }
   .nf-page:hover { background:#ece9f9 !important; }
   .nf-btn:hover { filter:brightness(1.07); }
-  .nf-conv:hover { filter:brightness(1.08); }
+  .nf-menu-item:hover { background:#f4f2fb !important; }
   .nf-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
 </style>
 </helmet>
@@ -34,37 +34,62 @@
         </div>
       </div>
 
-      <div style="padding:16px 24px; display:flex; gap:12px; align-items:center; border-bottom:1px solid #f0eef8;">
-        <div style="display:flex; align-items:center; gap:8px; border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; flex:1;">
+      <div style="padding:16px 24px; display:flex; gap:12px; align-items:center; border-bottom:1px solid #f0eef8; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:8px; border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; flex:1; min-width:220px;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b87a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input class="nf-input" placeholder="Lead ara (ad, telefon)..." onInput="{{ onQ }}" onKeyDown="{{ onKey }}" style="border:none; outline:none; font-size:13.5px; color:#241854; width:100%; background:transparent;" />
+          <input class="nf-input" placeholder="Lead ara (ad, telefon, ülke)..." onInput="{{ onQ }}" onKeyDown="{{ onKey }}" style="border:none; outline:none; font-size:13.5px; color:#241854; width:100%; background:transparent;" />
         </div>
+        <select class="nf-input" onChange="{{ onSeg }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 12px; font-size:13px; color:#241854; background:#fff; min-width:150px;">
+          <option value="">Tüm segmentler</option>
+          <sc-for list="{{ segOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.v }}</option></sc-for>
+        </select>
+        <select class="nf-input" onChange="{{ onTem }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 12px; font-size:13px; color:#241854; background:#fff; min-width:150px;">
+          <option value="">Tüm temsilciler</option>
+          <sc-for list="{{ temOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.v }}</option></sc-for>
+        </select>
+        <select class="nf-input" onChange="{{ onUlke }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 12px; font-size:13px; color:#241854; background:#fff; min-width:130px;">
+          <option value="">Tüm ülkeler</option>
+          <sc-for list="{{ ulkeOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.v }}</option></sc-for>
+        </select>
         <div class="nf-btn" onClick="{{ doSearch }}" style="background:linear-gradient(135deg,#2563eb,#22d3ee); border-radius:9px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">Ara</div>
+        <div class="nf-btn" onClick="{{ doClear }}" style="background:#f4f2fb; border-radius:9px; padding:10px 14px; font-size:13px; font-weight:600; color:#4338ca; cursor:pointer;">Temizle</div>
       </div>
 
       <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
       <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
-        <div style="display:grid; grid-template-columns:40px 1.1fr 1.3fr 1.1fr 1.2fr 1.1fr 1.1fr 200px; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
-          <span></span><span>Kayıt tarihi</span><span>Lead</span><span>Telefon</span><span>Segment</span><span>Temsilci</span><span>Referans</span><span style="text-align:right;">İşlemler</span>
-        </div>
-        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
-          <div class="nf-row" style="{{ r.rowStyle }}">
-            <span style="font-size:16px;">{{ r.flag }}</span>
-            <span style="color:#4b4770; font-size:12.5px;">{{ r.kayit }}</span>
-            <a href="{{ r.href }}" style="font-weight:600; color:#241854; font-size:13px;">{{ r.ad }}</a>
-            <span style="color:#4b4770; font-size:13px;">{{ r.tel }}</span>
-            <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#4b4770;"><span style="{{ r.segDot }}"></span>{{ r.segment }}</span>
-            <span style="color:#4b4770; font-size:12px;">{{ r.temsilci }}</span>
-            <span style="color:#4b4770; font-size:12px;">{{ r.referans }}</span>
-            <div style="display:flex; gap:7px; justify-content:flex-end; align-items:center;">
-              <sc-if value="{{ r.converted }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px; font-weight:700; color:#16a34a; background:#dcfce7; padding:5px 11px; border-radius:20px;">✓ Danışan oldu</span></sc-if>
-              <sc-if value="{{ r.notConverted }}" hint-placeholder-val="{{ true }}">
-                <div class="nf-conv" onClick="{{ r.convert }}" style="display:flex; align-items:center; gap:6px; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; font-size:12px; font-weight:600; padding:7px 13px; border-radius:8px; cursor:pointer;" title="Danışana dönüştür">→ Danışana Aktar</div>
-              </sc-if>
-              <a href="{{ r.href }}" style="width:30px; height:30px; border-radius:8px; background:#f4f2fb; display:flex; align-items:center; justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg></a>
+        <div style="overflow-x:auto;">
+          <div style="min-width:1100px;">
+            <div style="display:grid; grid-template-columns:1.2fr 1fr 1.5fr 1.1fr 1.2fr 1.1fr 1.1fr 140px; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+              <span>Kayıt tarihi</span><span>Ülke</span><span>Lead</span><span>Telefon</span><span>Segment</span><span>Temsilci</span><span>Referans</span><span style="text-align:right;">İşlemler</span>
             </div>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+              <div class="nf-row" style="{{ r.rowStyle }}">
+                <span style="color:#4b4770; font-size:12.5px;">{{ r.kayit }}</span>
+                <span style="display:flex; align-items:center; gap:7px; color:#4b4770; font-size:12.5px;"><span style="font-size:15px;">{{ r.flag }}</span>{{ r.ulke }}</span>
+                <a href="{{ r.href }}" style="font-weight:600; color:#241854; font-size:13px;">{{ r.ad }}</a>
+                <span style="color:#4b4770; font-size:13px;">{{ r.tel }}</span>
+                <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#4b4770;"><span style="{{ r.segDot }}"></span>{{ r.segment }}</span>
+                <span style="color:#4b4770; font-size:12px;">{{ r.temsilci }}</span>
+                <span style="color:#4b4770; font-size:12px;">{{ r.referans }}</span>
+                <div style="display:flex; justify-content:flex-end; align-items:center; position:relative;">
+                  <div class="nf-btn" onClick="{{ r.toggleMenu }}" style="width:32px; height:32px; border-radius:8px; background:#f4f2fb; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="İşlemler">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg>
+                  </div>
+                  <div style="{{ r.menuStyle }}">
+                    <a href="{{ r.href }}" class="nf-menu-item" style="display:block; padding:10px 14px; font-size:13px; color:#241854; white-space:nowrap;">👁 Görüntüle</a>
+                    <sc-if value="{{ r.notConverted }}" hint-placeholder-val="{{ true }}">
+                      <div class="nf-menu-item" onClick="{{ r.convert }}" style="padding:10px 14px; font-size:13px; color:#15803d; cursor:pointer; white-space:nowrap;">→ Danışana Aktar</div>
+                    </sc-if>
+                    <sc-if value="{{ r.converted }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:10px 14px; font-size:12px; color:#16a34a; font-weight:600;">✓ Danışan oldu</div>
+                    </sc-if>
+                    <a href="{{ r.waHref }}" class="nf-menu-item" style="display:block; padding:10px 14px; font-size:13px; color:#241854; white-space:nowrap;">💬 WhatsApp</a>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
           </div>
-        </sc-for>
+        </div>
         <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px;">
           <span style="font-size:13px; color:#8b87a8;">{{ countLabel }}</span>
           <div style="display:flex; gap:6px;">
@@ -82,43 +107,65 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
 const FLAGS = { 'Almanya': '🇩🇪', 'Türkiye': '🇹🇷', 'Avusturya': '🇦🇹', 'Hollanda': '🇳🇱', 'İsviçre': '🇨🇭', 'Fransa': '🇫🇷', 'Belçika': '🇧🇪', 'İngiltere': '🇬🇧' };
-function segColor(s) { s = (s || '').toLowerCase(); if (s.includes('ulaşılamadı')) return '#f59e0b'; if (s.includes('sıcak') || s.includes('sonra aranacak')) return '#2563eb'; if (s.includes('uzun vade')) return '#7c3aed'; if (s.includes('olumsuz')) return '#ef4444'; if (s.includes('yeni lead')) return '#16a34a'; return '#9ca3af'; }
+function segColor(s) { s = (s || '').toLowerCase(); if (s.includes('ulaşılamadı')) return '#f59e0b'; if (s.includes('sıcak') || s.includes('sonra aranacak')) return '#2563eb'; if (s.includes('uzun vade')) return '#7c3aed'; if (s.includes('olumsuz')) return '#ef4444'; if (s.includes('yeni')) return '#16a34a'; return '#9ca3af'; }
 class Component extends DCLogic {
-  state = { ready: false, page: 1, q: '', ver: 0 };
+  state = { ready: false, page: 1, q: '', segment: '', temsilci: '', ulke: '', ver: 0, openMenu: null };
   _q = '';
   componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
   renderVals() {
     if (!this.state.ready) return { loading: true, ready: false };
-    const res = window.Nefalix.getLeads({ q: this.state.q, page: this.state.page, size: 30 });
+    const filters = { q: this.state.q, segment: this.state.segment, temsilci: this.state.temsilci, ulke: this.state.ulke, page: this.state.page, size: 30 };
+    const res = window.Nefalix.getLeads(filters);
+    const opts = window.Nefalix.leadFilterOptions ? window.Nefalix.leadFilterOptions() : { segments: [], temsilciler: [], ulkeler: [] };
+    const openMenu = this.state.openMenu;
     const rows = res.rows.map((d, i) => {
       const conv = (d['Danışan tipi'] || '') === 'Aktif Hasta';
+      const id = d._id;
+      const open = openMenu === id;
       return {
+        kayit: d['Kayıt tarihi'] || '-',
         flag: FLAGS[d['Ülke']] || '🌍',
-        kayit: d['Kayıt tarihi'] || '-', ad: d['Ad'] || '(İsimsiz)', tel: d['Telefon'] || '-',
+        ulke: d['Ülke'] || '—',
+        ad: d['Ad'] || '(İsimsiz)', tel: d['Telefon'] || '-',
         segment: d['Segment'] || 'Yeni Lead',
         temsilci: d['Satış temsilcisi'] || '—',
         referans: d['Referans kaynağı'] || '—',
         segDot: { width: '9px', height: '9px', borderRadius: '50%', background: segColor(d['Segment'] || 'Yeni Lead'), display: 'inline-block', flexShrink: 0 },
-        href: 'HastaKarti.dc.html?id=' + encodeURIComponent(d._id),
+        href: 'HastaKarti.dc.html?id=' + encodeURIComponent(id),
+        waHref: 'WhatsappPanel.dc.html',
         converted: conv, notConverted: !conv,
-        convert: () => { window.Nefalix.convertLead(d._id); this.setState(s => ({ ver: s.ver + 1 })); },
-        rowStyle: { display: 'grid', gridTemplateColumns: '40px 1.1fr 1.3fr 1.1fr 1.2fr 1.1fr 1.1fr 200px', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+        toggleMenu: () => this.setState(s => ({ openMenu: s.openMenu === id ? null : id })),
+        convert: () => { window.Nefalix.convertLead(id); this.setState(s => ({ ver: s.ver + 1, openMenu: null })); },
+        menuStyle: {
+          display: open ? 'block' : 'none',
+          position: 'absolute', top: '36px', right: 0, background: '#fff', borderRadius: '10px',
+          boxShadow: '0 12px 30px rgba(15,10,50,0.18)', padding: '6px 0', zIndex: 50, minWidth: '170px', border: '1px solid #ece9f7'
+        },
+        rowStyle: { display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.5fr 1.1fr 1.2fr 1.1fr 1.1fr 140px', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
       };
     });
+    const mapOpt = (arr, cur) => arr.map(v => ({ v, sel: v === cur ? 'selected' : undefined }));
     return {
       ready: true, loading: false, rows,
+      segOpts: mapOpt(opts.segments, this.state.segment),
+      temOpts: mapOpt(opts.temsilciler, this.state.temsilci),
+      ulkeOpts: mapOpt(opts.ulkeler, this.state.ulke),
       countLabel: res.total.toLocaleString('tr-TR') + ' lead • ' + ((res.page - 1) * res.size + 1) + '-' + Math.min(res.page * res.size, res.total) + ' arası',
       pageLabel: res.page + ' / ' + res.pages,
-      onQ: (e) => { this._q = e.target.value; }, onKey: (e) => { if (e.key === 'Enter') this.setState({ q: this._q, page: 1 }); },
-      doSearch: () => this.setState({ q: this._q, page: 1 }),
-      prev: () => this.setState(s => ({ page: Math.max(1, s.page - 1) })), next: () => this.setState(s => ({ page: Math.min(res.pages, s.page + 1) })),
+      onQ: (e) => { this._q = e.target.value; }, onKey: (e) => { if (e.key === 'Enter') this.setState({ q: this._q, page: 1, openMenu: null }); },
+      onSeg: (e) => this.setState({ segment: e.target.value, page: 1, openMenu: null }),
+      onTem: (e) => this.setState({ temsilci: e.target.value, page: 1, openMenu: null }),
+      onUlke: (e) => this.setState({ ulke: e.target.value, page: 1, openMenu: null }),
+      doSearch: () => this.setState({ q: this._q, page: 1, openMenu: null }),
+      doClear: () => { this._q = ''; this.setState({ q: '', segment: '', temsilci: '', ulke: '', page: 1, openMenu: null }); },
+      prev: () => this.setState(s => ({ page: Math.max(1, s.page - 1), openMenu: null })), next: () => this.setState(s => ({ page: Math.min(res.pages, s.page + 1), openMenu: null })),
       doExcel: () => this.exp('excel'), doPdf: () => this.exp('pdf')
     };
   }
   exp(kind) {
-    const full = window.Nefalix.getLeads({ q: this.state.q, size: 100000 }).rows;
-    const headers = ['Kayıt tarihi', 'Lead', 'Telefon', 'Segment', 'Ülke', 'Temsilci', 'Referans', 'Durum'];
-    const rows = full.map(d => [d['Kayıt tarihi'] || '', d['Ad'] || '', d['Telefon'] || '', d['Segment'] || 'Yeni Lead', d['Ülke'] || '', d['Satış temsilcisi'] || '', d['Referans kaynağı'] || '', (d['Danışan tipi'] === 'Aktif Hasta' ? 'Danışan oldu' : 'Lead')]);
+    const full = window.Nefalix.getLeads({ q: this.state.q, segment: this.state.segment, temsilci: this.state.temsilci, ulke: this.state.ulke, size: 100000 }).rows;
+    const headers = ['Kayıt tarihi', 'Ülke', 'Lead', 'Telefon', 'Segment', 'Temsilci', 'Referans', 'Dil', 'Durum'];
+    const rows = full.map(d => [d['Kayıt tarihi'] || '', d['Ülke'] || '', d['Ad'] || '', d['Telefon'] || '', d['Segment'] || 'Yeni Lead', d['Satış temsilcisi'] || '', d['Referans kaynağı'] || '', d['Dil'] || '', (d['Danışan tipi'] === 'Aktif Hasta' ? 'Danışan oldu' : 'Lead')]);
     if (kind === 'excel') window.Nefalix.exportExcel('lead-listesi', headers, rows);
     else window.Nefalix.exportPDF('Lead Listesi', headers, rows);
   }

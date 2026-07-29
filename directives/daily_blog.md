@@ -112,4 +112,6 @@ python3 execution/schedule-blog-batch.py --count 3 --interval-hours 2
 | `execution/pick_youtube_video.py` | Konuya video eşlemesi |
 | `execution/youtube-videos.json` | @Nefalixai video kataloğu |
 | `nefalix-landing/api/blog.js` | Site API |
-| `nefalix-landing/blog.html` | Blog listesi |
+| `nefalix-landing/blog.html` | Blog listesi (JS hydrate — SSR backlog: `docs/nefalix-seo-geo-gap-notes.md`) |
+| `docs/nefalix-seo-geo-ajan-plani.md` | SEO/GEO sektör araştırması + ajan planı |
+| `directives/geo.md` | Günlük GEO paketi |

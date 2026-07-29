@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """crm_contacts stage reclassify (Stella → Hasta CRM hotfix).
 
-Kural (P0):
-  - segment yeni-set dışı VE assigned_to dolu → stage=danisan
-  - yeni-set / segmentsiz / atanmamış → stage=lead
+Kural (P0 — Stella lead listesi ile hizalı):
+  - segment yeni_data / yeni_lead / yeni_gelen → stage=lead
+  - diğer her şey (segmentsiz dahil) → stage=danisan
 
 Çalıştırma (oturumlu clinic API — VPS SSH gerekmez):
   python3 execution/reclassify-crm-stages.py
@@ -11,6 +11,11 @@ Kural (P0):
 
 Proxy/SQL alternatifi (VPS veya laptop + NEFALIX_INTERNAL_KEY):
   NEFALIX_CRM_FORCE_PROXY=1 python3 execution/reclassify-crm-stages.py --via-proxy
+
+VPS SQL (hızlı):
+  UPDATE crm_contacts SET stage='danisan'
+  WHERE clinic_id='51738ea8-...' AND stage='lead'
+    AND COALESCE(segment_code,'') NOT IN ('yeni_data','yeni_lead','yeni_gelen');
 """
 from __future__ import annotations
 
@@ -53,23 +58,16 @@ def fetch_stage(opener, stage: str, limit: int = 300) -> list[dict]:
 
 
 def should_be_danisan(c: dict) -> bool:
+    """Lead listesi yalnızca yeni* — segmentsiz / diğer → danisan."""
     seg = (c.get("segment_code") or "").strip()
-    assigned = c.get("assigned_to")
-    if not assigned:
-        return False
-    if not seg or seg in NEW_SEG_CODES:
+    if seg in NEW_SEG_CODES:
         return False
     return True
 
 
 def should_be_lead(c: dict) -> bool:
     seg = (c.get("segment_code") or "").strip()
-    assigned = c.get("assigned_to")
-    if seg in NEW_SEG_CODES or not seg:
-        return True
-    if not assigned:
-        return True
-    return False
+    return seg in NEW_SEG_CODES
 
 
 def patch_stage(opener, contact_id: str, stage: str, dry: bool) -> None:
@@ -116,7 +114,7 @@ def via_proxy(dry: bool) -> int:
     if isinstance(rows, dict):
         rows = rows.get("data") or rows.get("rows") or []
     to_danisan = [r for r in rows if r.get("stage") == "lead" and should_be_danisan(r)]
-    to_lead = [r for r in rows if r.get("stage") == "danisan" and should_be_lead(r) and not r.get("assigned_to")]
+    to_lead = [r for r in rows if r.get("stage") == "danisan" and should_be_lead(r)]
     print(f"proxy rows={len(rows)} → danisan {len(to_danisan)}, → lead {len(to_lead)}")
     if dry:
         return 0
@@ -139,9 +137,9 @@ def main() -> int:
         return via_proxy(args.dry_run)
 
     opener = clinic_opener(args.kod)
-    leads = fetch_stage(opener, "lead", 300)
-    danisan = fetch_stage(opener, "danisan", 300)
-    print(f"API leads={len(leads)} danisan={len(danisan)} (cap 300/stage)")
+    leads = fetch_stage(opener, "lead", 5000)
+    danisan = fetch_stage(opener, "danisan", 5000)
+    print(f"API leads={len(leads)} danisan={len(danisan)}")
 
     to_danisan = [c for c in leads if should_be_danisan(c)]
     print(f"lead → danisan: {len(to_danisan)}")
@@ -149,9 +147,9 @@ def main() -> int:
         print(f"  {c.get('ad')} seg={c.get('segment_code')} assigned={c.get('assigned_to')}")
         patch_stage(opener, c["id"], "danisan", args.dry_run)
 
-    # Özet: null/yeni unassigned lead kalmalı
+    # Özet: yalnızca yeni* lead kalmalı
     keep = sum(1 for c in leads if should_be_lead(c))
-    print(f"lead kalan (kurala uygun): {keep}/{len(leads)}")
+    print(f"lead kalan (yeni*): {keep}/{len(leads)}")
     print("ok" if not to_danisan else ("dry-run" if args.dry_run else "patched"))
     return 0
 
