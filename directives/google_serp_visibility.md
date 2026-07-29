@@ -38,12 +38,24 @@ Kategori/ticari sorgularda (`klinik itibar yönetimi yazılımı`, WhatsApp NPS,
 4. geo/blog sitemap `HEAD` → 200
 5. Sitemap’e **future-dated** `/geo/YYYY-MM-DD` koyma
 
+## Repo patch checklist (Ajan C — `nefalix-site-v2`)
+
+- [x] Tüm v2 HTML: `<title>` **Nefalix** entity (`Nefalix —` veya `… — Nefalix`)
+- [x] `meta description` — itibar / NPS / yorum intent (ilgili sayfalarda)
+- [x] `link rel="canonical"` → `https://nefalix.com/...`
+- [x] `og:site_name` = `Nefalix` (+ `og:title` / `og:description` hizası)
+- [x] `nefalix-site-v2/sitemap.xml` — `/klinik-itibar-yonetimi` dahil
+- [ ] `nefalix-landing/` (ayrı repo) — aynı SEO blokları `<!-- nefalix-seo-start -->` ile canlıya
+- [ ] Vercel deploy + curl ile canlı title doğrulama (`NefalixAI — Yapay Zeka…` kalkmalı)
+
 ## Bu repoda (n8n-repo)
 
 | Dosya | Rol |
 |-------|-----|
 | `execution/geo-topics.json` | Q1–Q5 ticari prompt’lar + NefalixAI marka netleştirme |
 | `nefalix-site-v2/index.html` / `urunler.html` | Title/meta/H1 senkron iskelet (canlı SEO asıl Vercel landing’de) |
+| `nefalix-site-v2/*.html` | Tüm sayfalarda canonical + og:site_name Nefalix |
+| `nefalix-site-v2/sitemap.xml` | Statik sitemap (`/klinik-itibar-yonetimi` dahil) |
 | `docs/geo-prompt-baseline.md` | Citation ölçüm şablonu |
 | `directives/geo.md` | GEO ≠ klasik SEO |
 
