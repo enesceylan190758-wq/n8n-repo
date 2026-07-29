@@ -35,3 +35,8 @@ cp /path/to/patches/nefalix-landing/crm.html ./crm.html
 
 ## 2026-07-29 ek
 - Geçmiş görüşme notlarında **sekme/segment her zaman seçilebilir**; Kaydet ile not + (isteğe bağlı) klinik aşaması / `hatirlatma` güncellenir
+
+## 2026-07-30 ek
+- **Manuel hatırlatma / dönüş tarihi**: Bugün, +1…+5, +7 gün kısayolları + tarih seçici
+- Yerler: Görüşme sonucu, klinik kartı Detaylar, Görüşmeler formu, Dinamik Arama → Hatırlatma
+- Tarih seçilince klinik `hatirlatma` alanına yazılır → Dinamik Arama listesine düşer

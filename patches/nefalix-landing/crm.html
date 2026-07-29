@@ -516,6 +516,42 @@ function segSelectHtml(id, selected){
     ${SEGMENTS.map(s=>`<option value="${s.k}" ${s.k===cur?'selected':''}>${esc(s.ad)}</option>`).join('')}
   </select>`;
 }
+function hatirlatmaHizliSet(inputId, gun){
+  const el = document.getElementById(inputId); if(!el) return;
+  if(gun===null){ el.value=''; }
+  else { el.value = ekleGun(bugun(), gun); }
+  el.dispatchEvent(new Event('change'));
+}
+function hatirlatmaAlanHtml(inputId, cur, opts){
+  const o = opts||{};
+  const chips = [0,1,2,3,4,5,7].map(g=>{
+    const label = g===0?'Bugün':('+'+g+' gün');
+    return `<button type="button" class="btn sm" onclick="hatirlatmaHizliSet('${inputId}',${g})">${label}</button>`;
+  }).join('');
+  return `<div>
+    <label class="f">${o.label||'Manuel dönüş / hatırlatma tarihi'}</label>
+    <input type="date" id="${inputId}" value="${esc(cur||'')}" style="max-width:240px">
+    <div class="row" style="gap:6px;margin-top:6px;flex-wrap:wrap">${chips}
+      <button type="button" class="btn sm" onclick="hatirlatmaHizliSet('${inputId}',null)">Temizle</button>
+    </div>
+    <div class="sml mut" style="margin-top:4px">${o.hint||'Doluysa sekmenin varsayılan gününü ezer; seçilen gün Dinamik Arama\'da görünür.'}</div>
+  </div>`;
+}
+function hatirlatmaOku(inputId){
+  const v = (document.getElementById(inputId)?.value||'').trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
+}
+function klinikHatirlatmaAta(cid, tarih, sessiz){
+  const c = S.clinics.find(x=>x.id===cid); if(!c) return false;
+  c.hatirlatma = tarih || null;
+  kaydet();
+  if(!sessiz){
+    toast(tarih
+      ? ('Hatırlatma: '+tarihTR(tarih)+' — Dinamik Arama\'ya düşer.')
+      : 'Hatırlatma temizlendi.');
+  }
+  return true;
+}
 function segmentAta(cid, sk, notMetni, kimId){
   const c = S.clinics.find(x=>x.id===cid); if(!c) return;
   if(!SEG[sk]) return;
@@ -763,6 +799,7 @@ function pDinamik(){
         <td class="sml">${esc(sahipAd(c))}</td>
         <td style="white-space:nowrap">
           <button class="btn sm" onclick="klinikAc('${c.id}')">Kart</button>
+          <button class="btn sm" onclick="hatirlatmaDuzenleAc('${c.id}')">Hatırlatma</button>
           <button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button>
         </td></tr>`).join('')}
       </tbody></table></div>
@@ -780,7 +817,7 @@ function pDinamik(){
   ${blok('Bugün dönülecek', grup.bugun, '#E8A317')}
   ${blok('Yarın', grup.yarin, '#3B76D9')}
   ${blok('Bu hafta', grup.hafta, '#7C5CD6')}
-  ${!hepsi.length? `<div class="card"><div class="empty"><div class="e">✓</div>Bekleyen dönüş yok.<br><span class="sml">Bir klinik bir sekmeye atandığında, sekmenin gün süresi kadar sonra burada belirir.</span></div></div>`:''}
+  ${!hepsi.length? `<div class="card"><div class="empty"><div class="e">✓</div>Bekleyen dönüş yok.<br><span class="sml">Sekme sonucu veya manuel hatırlatma tarihi girildiğinde burada belirir (+1…+7 gün kısayolları).</span></div></div>`:''}
   `;
 }
 
@@ -1399,10 +1436,13 @@ function aramaKaydiAc(cid, presel){
     </div>
     <div><label class="f">Görüşme notu</label>
       <textarea id="nt" rows="4" placeholder="Kiminle görüşüldü, ne dedi, bir sonraki adım ne?"></textarea></div>
+    ${hatirlatmaAlanHtml('ar_hat', '', {label:'Manuel dönüş tarihi (opsiyonel)', hint:'Boş bırakırsan sekmenin varsayılan günü kullanılır. 4–5 gün sonra gibi özel tarihler için buradan seç.'})}
     <div id="sonuc" class="sml mut"></div>
   </div>
   <div class="m-f"><button class="btn" onclick="mKapat()">Vazgeç</button>
     <button class="btn p" onclick="aramaKaydet('${cid}')">Kaydet</button></div>`);
+  const arHat = document.getElementById('ar_hat');
+  if(arHat){ arHat.addEventListener('change', segOnizle); arHat.addEventListener('input', segOnizle); }
   segOnizle();
 }
 function segSec(k){ _segSec=k; document.querySelectorAll('#sp .segbtn').forEach(b=>b.classList.toggle('on', b.dataset.k===k)); segOnizle(); }
@@ -1410,6 +1450,11 @@ function segOnizle(){
   const e=document.getElementById('sonuc'); if(!e) return;
   if(!_segSec){ e.innerHTML='Bir sekme seç.'; return; }
   const s=SEG[_segSec];
+  const manuel = hatirlatmaOku('ar_hat');
+  if(manuel){
+    e.innerHTML = `↳ Manuel dönüş: <b class="mono">${tarihTR(manuel)}</b> — o gün <b>Dinamik Arama</b>'da listelenir.`;
+    return;
+  }
   e.innerHTML = s.gun===null ? '↳ Bu sekmede otomatik dönüş kurulmaz; klinik listeden düşer.'
     : s.gun===0 ? '↳ Randevu takvimden takip edilecek.'
     : s.k==='gun1' ? '↳ Dönüş: <b>bugün</b> — hemen <b>Dinamik Arama → Bugün</b> listesinde görünür.'
@@ -1418,6 +1463,7 @@ function segOnizle(){
 function aramaKaydet(cid){
   if(!_segSec){ toast('Önce bir sekme seç.'); return; }
   const nt = document.getElementById('nt').value;
+  const manuel = hatirlatmaOku('ar_hat');
   segmentAta(cid, _segSec, nt);
   const c = S.clinics.find(x=>x.id===cid);
   if(_segSec==='randevu'){
@@ -1426,12 +1472,18 @@ function aramaKaydet(cid){
     calGun = bugun(); git('takvim');
     return;
   }
-  toast('Kaydedildi: '+SEG[_segSec].ad);
+  if(c && manuel){
+    c.hatirlatma = manuel;
+    kaydet();
+  }
+  toast(manuel
+    ? ('Kaydedildi: '+SEG[_segSec].ad+' · dönüş '+tarihTR(manuel))
+    : ('Kaydedildi: '+SEG[_segSec].ad));
   ciz();
   klinikAc(cid, 'gorusme');
 }
 
-/* --- Not düzenle (metin + segment her zaman değiştirilebilir) --- */
+/* --- Not düzenle (metin + segment + isteğe bağlı hatırlatma) --- */
 function notDuzenleAc(nid, afterSave){
   const n = S.notes.find(x=>x.id===nid); if(!n) return;
   const c = S.clinics.find(x=>x.id===n.clinicId)||{};
@@ -1444,11 +1496,12 @@ function notDuzenleAc(nid, afterSave){
     <div><label class="f">Sekme / segment</label>${segSelectHtml('nd_seg', n.segment)}</div>
     <div><label class="f">Görüşme notu</label>
       <textarea id="nd_metin" rows="5" placeholder="Not metni…">${esc(n.metin||'')}</textarea></div>
+    ${hatirlatmaAlanHtml('nd_hat', '', {label:'Manuel dönüş / hatırlatma (klinik)', hint:'Boş = sekme varsayılanı. Doluysa Dinamik Arama bu tarihe düşer.'})}
     <label class="sml" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px">
       <input type="checkbox" id="nd_sync" ${latest?'checked':''} style="margin-top:3px">
-      <span>Klinik aşamasını da bu sekme ile güncelle${latest?' <span class="mut">(en son kayıt)</span>':''} — Dinamik Arama dönüş tarihi yeniden hesaplanır.</span>
+      <span>Klinik aşamasını / hatırlatmayı da güncelle${latest?' <span class="mut">(en son kayıt)</span>':''} — Dinamik Arama buna göre çalışır.</span>
     </label>
-    ${afterSave?`<div class="sml mut">İstersen notu / sekme şimdi düzelt; gerekmezse Kapat ile çık.</div>`:''}
+    ${afterSave?`<div class="sml mut">İstersen notu / sekme / dönüş tarihini şimdi düzelt; gerekmezse Kapat ile çık.</div>`:''}
   </div>
   <div class="m-f">
     <button class="btn" onclick="mKapat()">Kapat</button>
@@ -1460,6 +1513,8 @@ function notDuzenleKaydet(nid, stay){
   const el = document.getElementById('note_edit_'+nid) || document.getElementById('nd_metin');
   const segEl = document.getElementById('note_seg_'+nid) || document.getElementById('nd_seg');
   const syncEl = document.getElementById('note_sync_'+nid) || document.getElementById('nd_sync');
+  const hatId = document.getElementById('note_hat_'+nid) ? 'note_hat_'+nid : 'nd_hat';
+  const hatEl = document.getElementById(hatId);
   n.metin = (el?.value||'').trim();
   const sk = (segEl?.value||n.segment||'aranmadi');
   if(SEG[sk]) n.segment = sk;
@@ -1468,14 +1523,22 @@ function notDuzenleKaydet(nid, stay){
   const syncKlinik = syncEl ? !!syncEl.checked : notEnSonMu(n);
   if(syncKlinik && SEG[n.segment]){
     const c = S.clinics.find(x=>x.id===n.clinicId);
-    if(c) segmentUygulaKlinik(c, n.segment);
+    if(c){
+      segmentUygulaKlinik(c, n.segment);
+      if(hatEl){
+        const manuel = hatirlatmaOku(hatId);
+        // date field present: empty = keep segment default; filled = override
+        if(manuel) c.hatirlatma = manuel;
+      }
+    }
   }
-  kaydet(); toast(syncKlinik ? 'Not ve klinik aşaması güncellendi.' : 'Not güncellendi.');
+  kaydet(); toast(syncKlinik ? 'Not, aşama ve hatırlatma güncellendi.' : 'Not güncellendi.');
   if(stay && n.clinicId){ klinikAc(n.clinicId, window._kkTab||'gorusme'); ciz(); return; }
   mKapat(); ciz();
 }
 function notBlokHtml(n){
   const d=new Date(n.tarih); const s=SEG[n.segment]||SEG.aranmadi;
+  const c = S.clinics.find(x=>x.id===n.clinicId)||{};
   const tarih = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
   const latest = notEnSonMu(n);
   return `<div class="note" style="border-color:${s.renk}">
@@ -1485,9 +1548,10 @@ function notBlokHtml(n){
     <label class="f" style="margin-top:8px">Sekme / segment</label>
     ${segSelectHtml('note_seg_'+n.id, n.segment)}
     <textarea id="note_edit_${n.id}" rows="3" style="width:100%;margin-top:6px" placeholder="Not metni…">${esc(n.metin||'')}</textarea>
+    ${latest? hatirlatmaAlanHtml('note_hat_'+n.id, '', {label:'Manuel dönüş / hatırlatma', hint:'Boş = sekme varsayılanı. Kaydet + klinik güncelle ile Dinamik\'e düşer.'}) : ''}
     <label class="sml" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px">
       <input type="checkbox" id="note_sync_${n.id}" ${latest?'checked':''} style="margin-top:3px">
-      <span>Klinik aşamasını da güncelle${latest?' (önerilen)':''}</span>
+      <span>Klinik aşamasını / hatırlatmayı da güncelle${latest?' (önerilen)':''}</span>
     </label>
     <div class="row" style="justify-content:flex-end;margin-top:6px;gap:8px">
       <button class="btn sm p" onclick="notDuzenleKaydet('${n.id}', true)">Kaydet</button>
@@ -1547,6 +1611,13 @@ function klinikAc(cid, sekme){
           ${row('Dönüş (hatırlatma)', c.hatirlatma?`<span class="mono"><b>${tarihTR(c.hatirlatma)}</b></span>`:'Planlı dönüş yok')}
           ${row('Klinik ID', `<span class="mono sml">${esc(c.id)}</span>`)}
         </table></div></div>
+        <div class="kk-panel"><h4>Manuel hatırlatma</h4><div class="body">
+          ${hatirlatmaAlanHtml('kk_hat', c.hatirlatma||'', {hint:'Tarih seç → Kaydet. O gün (veya bu hafta içinde) Dinamik Arama listesinde görünür.'})}
+          <div class="row" style="justify-content:flex-end;margin-top:10px;gap:8px">
+            <button class="btn sm" onclick="hatirlatmaDuzenleAc('${cid}')">Hızlı ayarla</button>
+            <button class="btn sm p" onclick="klinikHatirlatmaKaydet('${cid}')">Hatırlatmayı kaydet</button>
+          </div>
+        </div></div>
         <div class="kk-panel"><h4>Hızlı özet</h4><div class="body">
           <div class="row" style="gap:10px;margin:0">
             <div class="kpi" style="flex:1;padding:10px"><div class="n" style="font-size:18px">${N.length}</div><div class="l">Görüşme</div></div>
@@ -1571,7 +1642,7 @@ function klinikAc(cid, sekme){
     } else {
       body = `
         <div class="kk-sec-h"><h3>Kurum bilgilerini düzenle</h3></div>
-        <div class="warnbox" style="margin:0 0 10px">Aşama / <span class="mono">hatirlatma</span> burada değiştirilmez — Dinamik Arama bozulmasın diye sonuç <b>Görüşmeler</b> veya Arama ekranından girilir.</div>
+        <div class="warnbox" style="margin:0 0 10px">Kurum alanları burada. <b>Hatırlatma / dönüş tarihi</b> için Detaylar → Manuel hatırlatma veya Görüşme sonucu ekranını kullanın (Dinamik Arama buna bağlı).</div>
         <div class="kk-panel" style="margin-bottom:12px"><h4>Kurum &amp; yetkili</h4><div class="body"><div class="kk-grid">
           <div>
             <label class="f">Kurum adı *</label><input id="kk_ad" type="text" value="${esc(c.ad||'')}">
@@ -1644,10 +1715,9 @@ function klinikAc(cid, sekme){
           <div>
             <label class="f">Sonuç (sekme)</label>
             <select id="kk_g_son">${SEGMENTS.map(s=>`<option value="${s.k}" ${s.k===(c.segment||'aranmadi')?'selected':''}>${esc(s.ad)}</option>`).join('')}</select>
-            <label class="f">Sonraki adım tarihi (opsiyonel)</label>
-            <input id="kk_g_next" type="date" title="Boş bırakırsan sekmenin varsayılan gün kuralı uygulanır">
           </div>
         </div>
+        ${hatirlatmaAlanHtml('kk_g_next', '', {label:'Manuel dönüş / hatırlatma tarihi (opsiyonel)', hint:'Boş bırakırsan sekmenin varsayılan gün kuralı uygulanır. Doluysa Dinamik Arama bu tarihe düşer.'})}
         <label class="f">Konu / notlar</label>
         <textarea id="kk_g_not" rows="3" placeholder="Görüşmede konuşulanlar..."></textarea>
         <div class="row" style="justify-content:flex-end;margin-top:8px">
@@ -1876,8 +1946,33 @@ function klinikGuncelle(cid){
   c.uluslararasi = (document.getElementById('kk_ul')?.value||'').trim();
   c.skor = Number(document.getElementById('kk_sk')?.value)||c.skor||3;
   c.sorumlu = document.getElementById('kk_sr')?.value||'';
-  // hatirlatma / segment dokunulmaz
+  // hatirlatma / segment: Detaylar → Manuel hatırlatma veya görüşme sonucu
   kaydet(); toast('Klinik kartı güncellendi.'); klinikAc(cid,'detay'); ciz();
+}
+function klinikHatirlatmaKaydet(cid){
+  const manuel = hatirlatmaOku('kk_hat');
+  klinikHatirlatmaAta(cid, manuel || null);
+  klinikAc(cid, window._kkTab||'detay');
+  ciz();
+}
+function hatirlatmaDuzenleAc(cid){
+  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
+  mAc(`<div class="m-h"><h3>Hatırlatma tarihi — ${esc(c.ad)}</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <div class="sml mut" style="margin-bottom:8px">${segChip(c.segment)} · mevcut: <b class="mono">${c.hatirlatma?tarihTR(c.hatirlatma):'yok'}</b></div>
+    ${hatirlatmaAlanHtml('hd_hat', c.hatirlatma||'', {hint:'Kaydetince klinik Dinamik Arama listesine düşer (tarih bu hafta içindeyse veya gelince).'})}
+  </div>
+  <div class="m-f">
+    <button class="btn" onclick="mKapat()">Vazgeç</button>
+    <button class="btn p" onclick="hatirlatmaDuzenleKaydet('${cid}')">Hatırlatmayı kaydet</button>
+  </div>`);
+}
+function hatirlatmaDuzenleKaydet(cid){
+  const manuel = hatirlatmaOku('hd_hat');
+  klinikHatirlatmaAta(cid, manuel || null);
+  mKapat();
+  ciz();
+  if(window._kkTab) klinikAc(cid, window._kkTab);
 }
 function klinikHizliNotKaydet(cid){
   const c = S.clinics.find(x=>x.id===cid); if(!c) return;
@@ -1944,7 +2039,7 @@ function klinikGorusmeKaydet(cid){
   const kisi = (document.getElementById('kk_g_kisi')?.value||'').trim();
   const sk = document.getElementById('kk_g_son')?.value||'gorusuldu';
   const notu = (document.getElementById('kk_g_not')?.value||'').trim();
-  const next = document.getElementById('kk_g_next')?.value||'';
+  const next = hatirlatmaOku('kk_g_next');
   const metin = [tip, kisi?('Kişi: '+kisi):'', notu].filter(Boolean).join(' · ');
   segmentAta(cid, sk, metin);
   // Opsiyonel sonraki adım: yalnızca kullanıcı tarih girdiyse ve randevu değilse override
@@ -1952,7 +2047,11 @@ function klinikGorusmeKaydet(cid){
   if(c && next && sk!=='randevu'){
     c.hatirlatma = next;
   }
-  kaydet(); toast('Görüşme kaydedildi.'); klinikAc(cid,'gorusme'); ciz();
+  kaydet();
+  toast(next && sk!=='randevu'
+    ? ('Görüşme kaydedildi · dönüş '+tarihTR(next))
+    : 'Görüşme kaydedildi.');
+  klinikAc(cid,'gorusme'); ciz();
 }
 function klinikTeklifKaydet(cid){
   ensureExtras();
