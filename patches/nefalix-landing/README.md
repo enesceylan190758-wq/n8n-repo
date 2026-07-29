@@ -32,3 +32,6 @@ cp /path/to/patches/nefalix-landing/crm.html ./crm.html
 ## 2026-07-28 ek
 - Segment: **Gün İçinde Aranacak** (`gun1`, 1 gün) → atanınca Dinamik Arama **Bugün** listesinde
 - Görüşme notlarında **Notu düzenle** (kayıt sonrası + geçmiş + Görüşme Notları sayfası)
+
+## 2026-07-29 ek
+- Geçmiş görüşme notlarında **sekme/segment her zaman seçilebilir**; Kaydet ile not + (isteğe bağlı) klinik aşaması / `hatirlatma` güncellenir
