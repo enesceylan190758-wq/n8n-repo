@@ -177,12 +177,12 @@
   {
     "bucket": "kategori",
     "prompt": "Klinik itibar yönetimi yazılımı nedir?",
-    "internal_path": "/urunler"
+    "internal_path": "/klinik-itibar-yonetimi"
   },
   {
     "bucket": "karsilastirma",
     "prompt": "Klinik itibar uygulaması ile klinik yönetim (HBYS/KYS) uygulaması arasındaki fark nedir?",
-    "internal_path": "/urunler"
+    "internal_path": "/klinik-itibar-yonetimi"
   },
   {
     "bucket": "problem",

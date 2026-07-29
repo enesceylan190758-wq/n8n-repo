@@ -20,6 +20,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/geo-sitemap.xml", "destination": "/api/geo-sitemap" }
+    { "source": "/geo-sitemap.xml", "destination": "/api/geo-sitemap" },
+    { "source": "/klinik-itibar-yonetimi", "destination": "/klinik-itibar-yonetimi.html" }
   ]
 }

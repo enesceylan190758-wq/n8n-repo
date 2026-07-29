@@ -1,25 +1,35 @@
 # Cursor Handoff — Nefalix
 
-**Tarih:** 2026-07-28
+**Tarih:** 2026-07-29
 
-## Bu oturum (Google SERP / 3 ajan)
+## Bu oturum (SERP — 3 ajan implementasyon)
 
 Branch: `cursor/nefalix-serp-gorunurluk-5b76`  
-Lead: https://cursor.com/agents/bc-cd41d924-157e-418b-a188-d8bb12955b76  
-Brief: `.tmp/nefalix-serp-brief.md` · SOP: `directives/google_serp_visibility.md`
+PR: https://github.com/enesceylan190758-wq/n8n-repo/pull/12
 
-**Verdict:** Site crawlable; kategori sorgusunda yokluk = intent mismatch + entity/host parçalanma + zayıf marka index. GEO ≠ Google SEO.
+### Ajan çıktıları (uygulandı)
 
-| Ajan | Bulgu |
-|------|--------|
-| A Teknik | Host duplikasyonu (nefalix.com / www / nefalixai); title NefalixAI vs schema Nefalix; geo-sitemap HEAD 405; future-dated GEO |
-| B SERP | “uygulama” → KYS/App Store; asıl fırsat Q2–Q5 (yazılım/NPS/yorum); rakipler ePrestij, eKlinisyen, Esinix |
-| C Patch | Bu repoda geo-topics + v2 title/meta; canlı patch `nefalix-landing` (Vercel) |
+| Ajan | Yapılan |
+|------|---------|
+| A Teknik | `nefalix-landing/vercel.json` (301), `api/geo-sitemap.js`, `publish-geo-seo-10.py --start today`, `smoke-serp-public.py` |
+| B Intent | `nefalix-site-v2/klinik-itibar-yonetimi.html` (yeni landing) |
+| C Meta | Tüm v2 sayfalar title=Nefalix + `sitemap.xml` |
 
-## Sonraki (canlı)
+### Patch kit (canlı deploy)
 
-1. **nefalix-landing:** host 301 + homepage/`/urunler` title/meta (Nefalix + kategori kelimeleri)
-2. GSC: `nefalix.com` sitemap + Coverage; `site:nefalix.com` manuel
-3. Opsiyonel: `/klinik-itibar-yonetimi` landing (Ajan B #1)
-4. Future GEO tarihlerini düzelt / sitemap filtre
-5. Önceki GEO checklist (handoff 2026-07-23) hâlâ açık: prod migration, tek cron yolu, smoke
+```bash
+bash execution/sync-serp-to-landing.sh   # ~/nefalix-landing gerekli
+# Manuel: nefalix-landing/patches/*.html → index/urunler SEO blokları
+cd ~/nefalix-landing && npx vercel --prod
+python3 execution/smoke-serp-public.py --check-redirects
+```
+
+### Canlı smoke (deploy öncesi — hâlâ kırmızı)
+
+- title: `NefalixAI — …` (patch deploy edilmedi)
+- geo-sitemap: 8 future URL + HEAD 405
+- www → 301 yok
+
+### GSC (manuel)
+
+`nefalix.com` sitemap + `/klinik-itibar-yonetimi` URL ekle
