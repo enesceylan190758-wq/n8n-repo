@@ -78,4 +78,4 @@ Kategori/ticari sorgularda (`klinik itibar yönetimi yazılımı`, WhatsApp NPS,
 
 - Brief: `.tmp/nefalix-serp-brief.md`
 - GEO: `directives/geo.md`
-- Smoke: `execution/smoke-geo-public.py`
+- Smoke: `execution/smoke-geo-public.py` · `execution/smoke-serp-public.py`

@@ -1,0 +1,25 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.nefalix.com" }],
+      "destination": "https://nefalix.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "nefalixai.com" }],
+      "destination": "https://nefalix.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.nefalixai.com" }],
+      "destination": "https://nefalix.com/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/geo-sitemap.xml", "destination": "/api/geo-sitemap" }
+  ]
+}

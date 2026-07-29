@@ -15,6 +15,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -556,8 +557,14 @@ def main() -> None:
     args = parser.parse_args()
 
     dates = args.date or sorted(REWRITES.keys())
+    today = date.today().isoformat()
     results = []
     for run_date in dates:
+        if run_date > today:
+            results.append(
+                {"run_date": run_date, "ok": False, "error": "gelecek tarih — atlandı"}
+            )
+            continue
         row = REWRITES.get(run_date)
         if not row:
             results.append({"run_date": run_date, "ok": False, "error": "rewrite yok"})
