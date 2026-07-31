@@ -38,6 +38,11 @@ echo "▶ Review approve: $REVIEW_URL"
 echo "▶ Site chat:     $CHAT_URL"
 
 cd "$LANDING"
+
+# shellcheck source=lib/assert-landing-preflight.sh
+source "$SCRIPT_DIR/lib/assert-landing-preflight.sh"
+assert_landing_preflight "$LANDING" || exit 1
+
 "$NPX" vercel env rm N8N_DASHBOARD_URL production -y 2>/dev/null || true
 printf '%s' "$DASH_URL" | "$NPX" vercel env add N8N_DASHBOARD_URL production
 "$NPX" vercel env rm N8N_INBOX_SEND_URL production -y 2>/dev/null || true
@@ -53,5 +58,10 @@ if [[ -f nefalix-chat.js ]] && [[ "$CHAT_URL" != *"CHAT_WEBHOOK_ID"* ]]; then
   echo "▶ nefalix-chat.js güncellendi"
 fi
 "$NPX" vercel --prod --yes
+
+bash "$REPO/execution/smoke-nefalix-public.sh" || {
+  echo "⚠ Deploy oldu ama smoke FAIL — /k veya CSS kontrol et" >&2
+  exit 1
+}
 
 echo "✓ Vercel güncellendi — https://nefalixai.com/dashboard"

@@ -40,9 +40,16 @@ python3 ~/n8n-repo/execution/smoke-kartvizit.py
 ## Smoke
 
 ```bash
-python3 execution/smoke-kartvizit.py
-# beklenen: /k/enes, /k/abdulkadir, /k/card.css, /k/enes.vcf → 200
+bash execution/smoke-nefalix-public.sh
+# veya: python3 execution/smoke-kartvizit.py
 ```
+
+## Deploy kuralı (tekrar kırılmasın)
+
+1. `vercel --prod` **öncesi** preflight: `k/enes.html` + `shared.css` zorunlu (`assert-landing-preflight.sh`).
+2. Landing’den `k/` silme yasak; CRM-only deploy bile tüm siteyi publish eder.
+3. `deploy-kartvizit-cards.sh`, `fix-landing-shared-assets.sh`, `update-vercel-vps-urls.sh` preflight’ı otomatik çalıştırır.
+4. Deploy sonrası: `bash execution/smoke-nefalix-public.sh`
 
 ## QR URL’leri (değiştirme)
 
@@ -68,5 +75,7 @@ Yeniden PNG üretmek için: `python3 execution/generate-brand-qr.py --preset ene
 |-------|-----|
 | `nefalix-landing/k/*.html` | Dijital kart sayfaları |
 | `execution/deploy-kartvizit-cards.sh` | Sync + Vercel prod |
-| `execution/smoke-kartvizit.py` | Canlı 404 kontrolü |
+| `execution/lib/assert-landing-preflight.sh` | Deploy öncesi /k + CSS kilidi |
+| `execution/smoke-nefalix-public.sh` | Asset + kartvizit smoke |
+| `execution/smoke-kartvizit.py` | Canlı /k 404 kontrolü |
 | `execution/generate-brand-qr.py` | Baskı QR PNG |

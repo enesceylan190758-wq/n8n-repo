@@ -47,10 +47,10 @@ Telefon/browser: hard refresh.
 
 ## Deploy kuralı (tekrar kırılmasın)
 
-1. `vercel --prod` **önce** `ls shared.css shared.js` — ikisi de kökte olmalı.
+1. `vercel --prod` **önce** preflight: `shared.css` + `shared.js` + `k/enes.html` (`assert-landing-preflight.sh`).
 2. Landing'den dosya silme / “temizlik” deploy'u yasak; CRM-only değişiklik bile tüm projeyi publish eder.
 3. `nefalix-site-v2/` → landing'e **kör kopyalama** yapma (refresh CSS ezilir).
-4. Guardian / smoke: `python3 execution/smoke-site-assets.py` (blog/GEO smoke'a ekle).
+4. Guardian / smoke: `bash execution/smoke-nefalix-public.sh` (CSS + kartvizit).
 
 ## Edge case
 
@@ -60,11 +60,14 @@ Telefon/browser: hard refresh.
 | 200 ama stil bozuk | Yanlış CSS deploy (site-v2 kopyası); Mac landing git history |
 | Sadece `/blog/slug` bozuk | Relative `shared.css` — absolute `/shared.css` kullan |
 | `/nefalix-chat.css` 404 | Chat stili ikincil; asıl kırık `shared.css` |
+| `/k/enes` 404 | `directives/kartvizit_qr.md` — `deploy-kartvizit-cards.sh` |
 
 ## Araçlar
 
 | Dosya | Rol |
 |-------|-----|
 | `execution/fix-landing-shared-assets.sh` | Mac hotfix + deploy + smoke |
-| `execution/smoke-site-assets.py` | Canlı 404 kontrolü |
-| `execution/update-vercel-vps-urls.sh` | Env + `vercel --prod` (CSS'i taşımaz; deploy öncesi asset kontrol et) |
+| `execution/lib/assert-landing-preflight.sh` | Deploy öncesi kilit |
+| `execution/smoke-nefalix-public.sh` | CSS + kartvizit smoke |
+| `execution/smoke-site-assets.py` | Canlı CSS/JS 404 kontrolü |
+| `execution/update-vercel-vps-urls.sh` | Env + `vercel --prod` (preflight + smoke) |

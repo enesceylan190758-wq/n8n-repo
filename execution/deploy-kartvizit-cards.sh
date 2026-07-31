@@ -105,6 +105,10 @@ PY
 
 merge_vercel_rewrites
 
+# shellcheck source=lib/assert-landing-preflight.sh
+source "$ROOT/execution/lib/assert-landing-preflight.sh"
+assert_landing_preflight "$LANDING" || exit 1
+
 if [[ "$DRY" -eq 1 ]]; then
   echo "dry-run: vercel atlandı"
   exit 0
@@ -115,5 +119,5 @@ echo "▶ vercel --prod"
 "$NPX" vercel --prod --yes
 
 echo "▶ smoke"
-python3 "$ROOT/execution/smoke-kartvizit.py"
+bash "$ROOT/execution/smoke-nefalix-public.sh"
 echo "✓ Kartvizit QR canlı — https://nefalix.com/k/enes"
