@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Ceylan;Enes;;;
+FN:Enes Ceylan
+ORG:Nefalix
+TITLE:Co Founder
+TEL;TYPE=CELL,VOICE:+905491190819
+TEL;TYPE=CELL,VOICE:+905359288250
+EMAIL;TYPE=INTERNET:enes@nefalix.com
+ADR;TYPE=WORK:;;Kartal;İstanbul;;;Türkiye
+URL:https://nefalix.com/k/enes
+END:VCARD
