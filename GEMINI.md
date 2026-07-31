@@ -60,6 +60,8 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | Günlük blog (playbook) | `directives/daily_blog.md` |
 | Günlük GEO (AI alıntı) | `directives/geo.md` |
 | YouTube + GEO (kanal) | `directives/youtube_geo.md` |
+| Kartvizit QR (`/k/enes`) | `directives/kartvizit_qr.md` |
+| Site CSS/asset kırığı | `directives/site_assets.md` |
 
 ## Self-Annealing Döngüsü
 
