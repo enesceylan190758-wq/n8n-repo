@@ -30,13 +30,19 @@ assert_landing_preflight() {
     fi
   done
 
-  # vercel.json içinde /k rewrite
+  # vercel.json içinde /k rewrite + GitHub auto-deploy kapalı
   if [[ -f "$landing/vercel.json" ]]; then
     if ! grep -q '"/k/enes"' "$landing/vercel.json"; then
       echo "  ✗ vercel.json içinde /k/enes rewrite yok" >&2
       missing=1
     else
       echo "  ✓ vercel.json /k rewrite"
+    fi
+    if ! grep -q 'deploymentEnabled' "$landing/vercel.json"; then
+      echo "  ! UYARI: git.deploymentEnabled yok — n8n-repo push prod'u silebilir" >&2
+      echo "    deploy-kartvizit-cards.sh çalıştır veya vercel.json'a git.deploymentEnabled:false ekle" >&2
+    else
+      echo "  ✓ vercel.json git.deploymentEnabled ayarı var"
     fi
   else
     echo "  ✗ vercel.json yok" >&2
