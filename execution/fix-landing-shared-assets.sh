@@ -55,6 +55,22 @@ if ! grep -q 'home-refresh\|refresh-hero\|liquid-sapphire\|logo-lockup\|\-\-purp
   echo "  git checkout <iyi-commit> -- shared.css shared.js" >&2
 fi
 
+# Kartvizit silinmesin — CSS hotfix bile /k/* korur
+if [[ ! -f k/enes.html || ! -f k/abdulkadir.html ]]; then
+  echo "  ! /k kartları eksik — n8n-repo sync"
+  mkdir -p k public
+  if [[ -d "$ROOT/nefalix-landing/k" ]]; then
+    cp -R "$ROOT/nefalix-landing/k/." k/
+    [[ -f "$ROOT/nefalix-landing/public/nefalix-logo-512.png" ]] \
+      && cp "$ROOT/nefalix-landing/public/nefalix-logo-512.png" public/ \
+      && cp "$ROOT/nefalix-landing/public/nefalix-logo-512.png" ./nefalix-logo-512.png
+  fi
+fi
+
+# shellcheck source=lib/assert-landing-preflight.sh
+source "$ROOT/execution/lib/assert-landing-preflight.sh"
+assert_landing_preflight "$LANDING" || exit 1
+
 if [[ "$DRY" -eq 1 ]]; then
   echo "dry-run: vercel atlandı"
   exit 0
@@ -64,5 +80,5 @@ echo "▶ vercel --prod"
 "$NPX" vercel --prod --yes
 
 echo "▶ smoke"
-python3 "$ROOT/execution/smoke-site-assets.py"
+bash "$ROOT/execution/smoke-nefalix-public.sh"
 echo "✓ Bitti — https://nefalix.com hard refresh (cache temizle)"

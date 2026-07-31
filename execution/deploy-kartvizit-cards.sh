@@ -58,8 +58,8 @@ if [[ -f "$SRC/public/favicon-192.png" ]]; then
   copy_file "$SRC/public/favicon-192.png" "$LANDING/favicon-192.png"
 fi
 
-# vercel.json: /k rewrite yoksa ekle (jq yoksa python)
-merge_vercel_rewrites() {
+# vercel.json: /k rewrite + GitHub auto-deploy KAPALI (eksik kit prod'u silmesin)
+merge_vercel_json() {
   local vf="$LANDING/vercel.json"
   if [[ ! -f "$vf" ]]; then
     cp "$SRC/vercel.json" "$vf"
@@ -74,36 +74,42 @@ with open(path, encoding="utf-8") as f:
 with open(src_path, encoding="utf-8") as f:
     src = json.load(f)
 
+# Kritik: n8n-repo GitHub push → Vercel prod'u eksik kit ile ezmesin
+data["git"] = {"deploymentEnabled": False}
+
 def ensure(key, items):
     cur = data.get(key) or []
-    existing = {json.dumps(x, sort_keys=True) for x in cur}
-    for item in items:
-        # rewrite match by source
-        if key == "rewrites":
-            sources = {x.get("source") for x in cur}
-            if item.get("source") in sources:
-                continue
-        elif key == "headers":
-            sources = {x.get("source") for x in cur}
-            if item.get("source") in sources:
-                continue
-        cur.append(item)
+    if key == "rewrites":
+        sources = {x.get("source") for x in cur}
+        for item in items:
+            if item.get("source") not in sources:
+                cur.append(item)
+    elif key == "headers":
+        sources = {x.get("source") for x in cur}
+        for item in items:
+            if item.get("source") not in sources:
+                cur.append(item)
+    else:
+        cur.extend(items)
     data[key] = cur
 
 ensure("rewrites", src.get("rewrites") or [])
 ensure("headers", src.get("headers") or [])
-# host redirects only if missing entirely
 if not data.get("redirects") and src.get("redirects"):
     data["redirects"] = src["redirects"]
 
 with open(path, "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2, ensure_ascii=False)
     f.write("\n")
-print("  ✓ vercel.json (k rewrite merge)")
+print("  ✓ vercel.json (k rewrite + git.deploymentEnabled=false)")
 PY
 }
 
-merge_vercel_rewrites
+merge_vercel_json
+
+# shellcheck source=lib/assert-landing-preflight.sh
+source "$ROOT/execution/lib/assert-landing-preflight.sh"
+assert_landing_preflight "$LANDING" || exit 1
 
 if [[ "$DRY" -eq 1 ]]; then
   echo "dry-run: vercel atlandı"
@@ -115,5 +121,5 @@ echo "▶ vercel --prod"
 "$NPX" vercel --prod --yes
 
 echo "▶ smoke"
-python3 "$ROOT/execution/smoke-kartvizit.py"
+bash "$ROOT/execution/smoke-nefalix-public.sh"
 echo "✓ Kartvizit QR canlı — https://nefalix.com/k/enes"
