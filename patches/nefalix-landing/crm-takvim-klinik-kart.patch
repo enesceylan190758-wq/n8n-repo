@@ -1,0 +1,1024 @@
+--- a/crm.html
++++ b/crm.html
+@@ -84,8 +84,7 @@
+ .shell{display:flex;min-height:100vh}
+ aside{width:232px;flex:none;background:var(--ink);color:#AFBCCB;padding:16px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;overflow-y:auto}
+ aside .logo{padding:6px 8px 16px;color:#fff}
+-.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;width:100%;text-align:left;color:#AFBCCB;transition:.12s;text-decoration:none;border:none;background:none;font:inherit;cursor:pointer}
+-a.nav{color:#AFBCCB}
++.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;width:100%;text-align:left;color:#AFBCCB;transition:.12s}
+ .nav:hover{background:#1A2438;color:#fff}
+ .nav.on{background:linear-gradient(90deg,var(--brand),var(--violet));color:#fff}
+ .nav .ic{width:17px;text-align:center;font-size:14px}
+@@ -148,6 +147,59 @@
+ .mask.on{display:flex}
+ .modal{background:#fff;border-radius:14px;width:100%;max-width:620px;box-shadow:0 24px 70px rgba(0,0,0,.3)}
+ .modal.lg{max-width:900px}
++.modal.xl{max-width:1100px}
++.klinik-link{color:var(--brand);cursor:pointer;text-decoration:none;font-weight:700;border-bottom:1px solid transparent}
++.klinik-link:hover{border-bottom-color:var(--brand)}
++.slot.appt{cursor:pointer;text-align:left;padding:8px 10px}
++.slot.appt .s{line-height:1.25}
++.slot.appt .who{font-size:9px;font-weight:600;color:var(--mut);margin-top:3px}
++.mini.appt-mini{cursor:pointer}
++.mini.appt-mini:hover{filter:brightness(.95)}
++.kk-wrap{display:grid;grid-template-columns:200px 1fr;gap:0;min-height:420px}
++.kk-side{border-right:1px solid var(--line);background:#FAFBFC;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
++.kk-nav{text-align:left;padding:9px 12px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--mut);border:0;background:transparent;width:100%}
++.kk-nav:hover{background:#EEF2F7;color:var(--ink)}
++.kk-nav.on{background:var(--brand-soft);color:var(--brand-d)}
++.kk-nav:disabled{opacity:.45;cursor:not-allowed}
++.kk-main{padding:16px 18px;display:grid;gap:14px;max-height:68vh;overflow-y:auto}
++.kk-head{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
++.kk-ico{width:48px;height:48px;border-radius:12px;background:var(--brand-soft);color:var(--brand-d);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
++.kk-meta{display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:6px}
++.kk-meta span{font-size:12px;color:var(--mut)}
++.kk-meta b{color:var(--ink);font-weight:600}
++.kk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
++@media (max-width:820px){
++  .kk-wrap{grid-template-columns:1fr}
++  .kk-side{border-right:0;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap}
++  .kk-grid{grid-template-columns:1fr}
++}
++.kk-panel{border:1px solid var(--line);border-radius:10px;overflow:hidden}
++.kk-panel h4{margin:0;padding:10px 12px;background:#F5F7FB;font-size:12px;font-weight:700;color:var(--brand-d);border-bottom:1px solid var(--line)}
++.kk-panel .body{padding:10px 12px}
++.kk-panel table{width:100%}
++.kk-panel td{padding:6px 0;vertical-align:top;font-size:13px}
++.kk-panel td.lbl{width:38%;color:var(--mut);font-size:12px}
++.kk-empty{background:#FFF8E8;border:1px solid #F0E0B8;border-radius:10px;padding:14px 16px;color:#8A6A20;font-size:13px}
++.kk-sec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
++.kk-sec-h h3{font-size:15px;font-weight:700;margin:0}
++.kk-person{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
++.kk-person .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex:none}
++.kk-drop{border:2px dashed var(--line);border-radius:12px;padding:28px 16px;text-align:center;color:var(--mut);background:#FAFBFC}
++.kk-act{display:grid;gap:0}
++.kk-act .it{display:grid;grid-template-columns:28px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
++.kk-act .it:last-child{border-bottom:0}
++.kk-act .ic{width:28px;height:28px;border-radius:8px;background:var(--brand-soft);display:flex;align-items:center;justify-content:center;font-size:13px}
++.kk-pay{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
++.kk-pay .box{border-radius:10px;padding:14px;border:1px solid var(--line)}
++.kk-pay .box .n{font-size:20px;font-weight:700;font-family:"JetBrains Mono",monospace}
++.kk-pay .box .l{font-size:11px;color:var(--mut);font-weight:600;margin-top:2px}
++.mini.appt-mini{background:#1A9C6B;color:#fff;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
++.mini.appt-mini.plan{background:#1A9C6B}
++.mini.appt-mini.done{background:#E08A2E}
++.day{min-height:96px}
++.slot.appt{background:#E8F7F0;border-color:#1A9C6B}
++.slot.appt .s{color:#0F6B4A}
++.slot.appt .who{color:#5A6A7A}
+ .m-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+ .m-h h3{font-size:15px;font-weight:600}
+ .m-h .x{margin-left:auto;font-size:20px;color:var(--mut);width:28px;height:28px;border-radius:6px}
+@@ -244,7 +296,6 @@
+     <button class="nav" data-p="takvim"><span class="ic">▦</span><span class="lb">Takvim</span></button>
+     <button class="nav" data-p="randevu"><span class="ic">✓</span><span class="lb">Randevular</span><span class="cnt" id="c-rnd">0</span></button>
+     <button class="nav" data-p="whatsapp"><span class="ic">✆</span><span class="lb">WhatsApp</span></button>
+-    <a class="nav" href="/toplu-mail" title="Toplu mail gönder — şablon, imza, Hostinger"><span class="ic">✉</span><span class="lb">Toplu Mail</span></a>
+     <div class="navgrp">Veri</div>
+     <button class="nav" data-p="havuz"><span class="ic">▤</span><span class="lb">Klinik Havuzu</span><span class="cnt" id="c-hav">0</span></button>
+     <button class="nav" data-p="gorusme"><span class="ic">✎</span><span class="lb">Görüşme Notları</span></button>
+@@ -308,6 +359,7 @@
+ const SEGMENTS = [
+   {k:'aranmadi',  ad:'Aranmadı',                       gun:0,   renk:'#94A3B8', kat:'yeni'},
+   {k:'ulasilamadi',ad:'Ulaşılamadı Tekrar Aranacak',   gun:2,   renk:'#64748B', kat:'takip'},
++  {k:'gun1',      ad:'Gün İçinde Aranacak',            gun:1,   renk:'#E8A317', kat:'takip'},
+   {k:'mesaj',     ad:'Mesajlaşılıyor',                 gun:3,   renk:'#2F6BFF', kat:'takip'},
+   {k:'gun2',      ad:'2 Gün Sonra Aranacak',           gun:2,   renk:'#2F6BFF', kat:'takip'},
+   {k:'kisa',      ad:'Kısa Vadede Düşünecek (2 Hafta)',gun:14,  renk:'#7C5CF5', kat:'takip'},
+@@ -383,17 +435,49 @@
+ function usr(id){ return USERS.find(u=>u.id===id) || {ad:'—',renk:'#94A3B8'}; }
+ function bas(s){ return (s||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+ function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
++function canEditKlinik(){ return !!(ME && (ME.id==='ak' || ME.id==='en')); }
++function klinikLink(cid, ad, extraClass){
++  const label = esc(ad||'—');
++  if(!cid) return `<b class="${extraClass||''}">${label}</b>`;
++  return `<a href="#" class="klinik-link ${extraClass||''}" onclick="event.preventDefault();event.stopPropagation();klinikAc('${cid}')">${label}</a>`;
++}
+ 
+ function bosDurum(){
+   return {
+     rev:0,
+     clinics: SEED.map((c,i)=>({
+       id:'c'+(i+1), ...c,
+-      segment:'aranmadi', sonArama:null, hatirlatma:null, aramaSayisi:0
++      segment:'aranmadi', sonArama:null, hatirlatma:null, aramaSayisi:0,
++      yetkili:'', unvan:'', email:'', sehir:'İstanbul', vergi:'', kaynak:'', hekimSayisi:'',
++      kisiler:[], sozlesme:null, hizliNot:'', notGecmisi:[]
+     })),
+-    notes:[], busy:[], appts:[], notifs:[]
++    notes:[], busy:[], appts:[], notifs:[], offers:[], payments:[], files:[]
+   };
+ }
++function ensureExtras(){
++  if(!S) return;
++  S.offers = S.offers || [];
++  S.payments = S.payments || [];
++  S.files = S.files || [];
++  S.notifs = S.notifs || [];
++  (S.clinics||[]).forEach(c=>{
++    if(!Array.isArray(c.kisiler)) c.kisiler = [];
++    if(!Array.isArray(c.notGecmisi)) c.notGecmisi = [];
++    if(c.sozlesme===undefined) c.sozlesme = null;
++    if(c.hizliNot===undefined) c.hizliNot = '';
++    if(c.yetkili===undefined) c.yetkili = '';
++    if(c.unvan===undefined) c.unvan = '';
++    if(c.email===undefined) c.email = '';
++    if(c.sehir===undefined) c.sehir = 'İstanbul';
++    if(c.vergi===undefined) c.vergi = '';
++    if(c.kaynak===undefined) c.kaynak = '';
++    if(c.hekimSayisi===undefined) c.hekimSayisi = '';
++    // yetkili varsa ilgili kişilere bir kez ekle
++    if(c.yetkili && !c.kisiler.length){
++      c.kisiler.push({id:uid(), ad:c.yetkili, unvan:c.unvan||'', tel:c.tel||'', email:c.email||''});
++    }
++  });
++}
+ 
+ async function kaydet(sessiz){
+   clearTimeout(kaydetZ);
+@@ -415,6 +499,7 @@
+   c.aramaSayisi = (c.aramaSayisi||0)+1;
+   c.hatirlatma = (s.gun===null || s.gun===0) ? null : ekleGun(bugun(), s.gun);
+   if(sk==='randevu') c.hatirlatma = null; // randevu takvimden takip edilir
++  if(sk==='gun1') c.hatirlatma = bugun(); // gün içinde → Dinamik Arama Bugün
+   S.notes.unshift({
+     id:uid(), clinicId:cid, userId:(kimId||ME.id), tarih:new Date().toISOString(),
+     segment:sk, metin:(notMetni||'').trim()
+@@ -603,8 +688,8 @@
+    : `<div class="card"><div class="card-h"><h3>Yaklaşan görüşmelerin</h3><div class="r"><button class="btn sm" onclick="git('takvim')">Takvimi aç</button></div></div>
+       ${benimRnd.length? `<div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Bölge</th><th></th></tr></thead><tbody>
+         ${benimRnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,8).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+-        return `<tr><td class="mono">${tarihTR(a.tarih)}</td><td class="mono"><b>${a.saat}</b></td><td><b>${esc(c.ad||a.baslik||'—')}</b></td><td class="sml mut">${esc(c.semt||'')}</td>
+-        <td><button class="btn sm" onclick="klinikAc('${a.clinicId}')">Aç</button></td></tr>`}).join('')}
++        return `<tr><td class="mono">${tarihTR(a.tarih)}</td><td class="mono"><b>${a.saat}</b></td><td>${klinikLink(a.clinicId, c.ad||a.baslik||'—')}</td><td class="sml mut">${esc(c.semt||'')}</td>
++        <td><button class="btn sm" onclick="klinikAc('${a.clinicId}')">Kart</button></td></tr>`}).join('')}
+       </tbody></table></div>`
+       : `<div class="empty"><div class="e">▦</div>Planlanmış görüşmen yok.<br><span class="sml">Kader Hanım randevu oluşturduğunda burada görünecek.</span></div>`}
+       </div>`;
+@@ -622,7 +707,7 @@
+     <div class="card"><div class="card-h"><h3>Günü gelen / gecikmiş</h3><div class="r"><button class="btn sm" onclick="git('dinamik')">Tümü</button></div></div>
+       ${t.filter(x=>x.fark<=0).length ? `<div class="tscroll" style="max-height:none"><table><tbody>
+         ${t.filter(x=>x.fark<=0).slice(0,9).map(({c,fark})=>`<tr>
+-          <td><b>${esc(c.ad)}</b><div class="sml mut">${esc(c.semt||'')} · ${esc(c.brans||'')}</div></td>
++          <td>${klinikLink(c.id, c.ad)}<div class="sml mut">${esc(c.semt||'')} · ${esc(c.brans||'')}</div></td>
+           <td>${segChip(c.segment)}</td>
+           <td class="sml ${fark<0?'':'mut'}" style="${fark<0?'color:var(--dang);font-weight:700':''}">${fark<0?Math.abs(fark)+' gün gecikti':'Bugün'}</td>
+           <td><button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button></td></tr>`).join('')}
+@@ -648,7 +733,7 @@
+       <div class="tscroll" style="max-height:none"><table><thead><tr>
+         <th>Klinik</th><th>Branş</th><th>Telefon</th><th>Mevcut sekme</th><th>Dönüş tarihi</th><th>Takip sahibi</th><th></th></tr></thead><tbody>
+       ${arr.map(({c,fark})=>`<tr>
+-        <td><b>${esc(c.ad)}</b><div class="sml mut">${esc(c.semt||'')}</div></td>
++        <td>${klinikLink(c.id, c.ad)}<div class="sml mut">${esc(c.semt||'')}</div></td>
+         <td class="sml">${esc(c.brans||'')}</td>
+         <td class="mono sml">${esc(c.tel||'—')}</td>
+         <td>${segChip(c.segment)}</td>
+@@ -717,7 +802,7 @@
+     <div class="card">
+       <div class="card-h"><h3>Sıradaki klinik</h3><div class="r"><span class="mut sml">${liste.length} klinik bekliyor</span></div></div>
+       <div class="card-b">
+-        <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">${esc(hedef.ad)}</div>
++        <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">${klinikLink(hedef.id, hedef.ad)}</div>
+         <div style="margin:5px 0 12px"><span class="tag">${esc(hedef.brans||'')}</span> <span class="tag">${esc(hedef.semt||'')}</span> <span class="stars">${'★'.repeat(Math.round(hedef.skor||0))}${'☆'.repeat(5-Math.round(hedef.skor||0))}</span></div>
+         <table style="margin-bottom:12px">
+           <tr><td class="mut sml" style="width:110px">Telefon</td><td class="mono"><b>${esc(hedef.tel||'—')}</b></td></tr>
+@@ -742,7 +827,7 @@
+         <div class="segpick">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`
+           <button class="segbtn" onclick="aramaKaydiAc('${hedef.id}','${s.k}')">
+             <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
+-            <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
++            <div class="gn">${s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner'))}</div>
+           </button>`).join('')}</div>
+       </div>
+     </div>
+@@ -752,7 +837,7 @@
+     <div class="tscroll"><table><thead><tr><th>#</th><th>Klinik</th><th>Branş</th><th>Semt</th><th>Telefon</th><th>Skor</th><th>Sorumlu</th><th></th></tr></thead><tbody>
+       ${liste.slice(0,120).map((c,i)=>`<tr>
+         <td class="mono mut sml">${i+1}</td>
+-        <td><b>${esc(c.ad)}</b></td><td class="sml">${esc(c.brans||'')}</td><td class="sml">${esc(c.semt||'')}</td>
++        <td>${klinikLink(c.id, c.ad)}</td><td class="sml">${esc(c.brans||'')}</td><td class="sml">${esc(c.semt||'')}</td>
+         <td class="mono sml">${esc(c.tel||'—')}</td><td class="stars">${'★'.repeat(Math.round(c.skor||0))}</td>
+         <td class="sml">${esc(c.sorumlu||'—')}</td>
+         <td><button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button></td></tr>`).join('')}
+@@ -782,8 +867,9 @@
+         <span class="dn">${g}</span>
+         ${gecmis?'':`<span class="${bosSlot?'free':'full'}" style="margin-left:auto">${bosSlot?bosSlot+' boş':'dolu'}</span>`}
+       </div>
+-      ${rnd.slice(0,2).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};return `<div class="mini">${a.saat} ${esc((c.ad||a.baslik||'').slice(0,14))}</div>`}).join('')}
+-      ${rnd.length>2?`<div class="mini busy">+${rnd.length-2} daha</div>`:''}
++      ${rnd.slice(0,4).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};const kim=(a.katilimcilar||[]).map(i=>usr(i).ad.split(' ')[0]).join(',');
++        return `<div class="mini appt-mini ${a.durum==='yapildi'?'done':'plan'}" title="${esc(c.ad||'')} · ${esc(kim)}" onclick="event.stopPropagation();calGun='${t}';randevuAc('${a.id}')">${a.saat} ${esc((c.ad||a.baslik||'').slice(0,18))}</div>`;}).join('')}
++      ${rnd.length>4?`<div class="mini busy">+${rnd.length-4} daha</div>`:''}
+     </button>`;
+   }
+ 
+@@ -798,7 +884,14 @@
+           const st = slotDurum(g,s);
+           const benMesgul = st.mesgul.includes(ME.id);
+           if(st.rand){ const c=S.clinics.find(x=>x.id===st.rand.clinicId)||{};
+-            return `<button class="slot appt" onclick="randevuAc('${st.rand.id}')"><div class="t">${s}</div><div class="s">${esc((c.ad||'Randevu').slice(0,16))}</div></button>`; }
++            const kim=(st.rand.katilimcilar||[]).map(i=>usr(i).ad.split(' ')[0]).join(' · ')||'—';
++            const tip = (st.rand.notu||c.brans||'Saha görüşmesi').slice(0,28);
++            return `<button class="slot appt" onclick="randevuAc('${st.rand.id}')" title="Randevu detayı">
++              <div class="t">${s}</div>
++              <div class="s">${klinikLink(st.rand.clinicId, (c.ad||'Randevu').slice(0,22))}</div>
++              <div class="who">${esc(tip)}</div>
++              <div class="who">${esc(kim)} · ${st.rand.durum==='yapildi'?'Yapıldı':'Planlandı'}</div>
++            </button>`; }
+           if(!st.musait.length) return `<button class="slot busy"><div class="t">${s}</div><div class="s">Kimse müsait değil</div></button>`;
+           const cls = ME.saha ? (benMesgul?'busy mine':'') : '';
+           const act = ME.saha ? `mesgulTogg('${g}','${s}')` : `randevuYeni('${g}','${s}')`;
+@@ -807,8 +900,8 @@
+             <div class="s">${ME.saha ? (benMesgul?'Meşgulsün':'Müsaitsin') : st.musait.map(i=>usr(i).ad.split(' ')[0]).join(' · ')}</div>
+           </button>`;
+         }).join('')}</div>
+-        ${ME.saha? `<div class="mut sml" style="margin-top:12px">Meşgul işaretlediğin saatler Kader Hanım'a <b>müsait değil</b> olarak görünür — o saate randevu yazamaz.</div>`
+-                 : `<div class="mut sml" style="margin-top:12px">Yeşil saatlerde yazan isimler o saatte müsait olan kişilerdir. Tıkla, randevu oluştur; ilgili kişilere bildirim düşer.</div>`}
++        ${ME.saha? `<div class="mut sml" style="margin-top:12px">Randevu olan saatler yeşil blokta klinik adıyla görünür — tıklayınca detay açılır; klinik adına tıklayınca klinik kartı açılır. Meşgul işaretlediğin saatler Kader Hanım'a <b>müsait değil</b> olarak görünür.</div>`
++                 : `<div class="mut sml" style="margin-top:12px">Yeşil saatlerde yazan isimler o saatte müsait olan kişilerdir. Tıkla, randevu oluştur; ilgili kişilere bildirim düşer. Mevcut randevular yeşil blokta otomatik görünür.</div>`}
+       </div></div>`;
+   })();
+ 
+@@ -848,7 +941,7 @@
+     <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Adres</th><th>Katılımcı</th><th>Durum</th><th></th></tr></thead><tbody>
+     ${arr.map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};return `<tr>
+       <td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
+-      <td><b>${esc(c.ad||a.baslik||'—')}</b><div class="sml mut">${esc(c.brans||'')}</div></td>
++      <td>${klinikLink(a.clinicId, c.ad||a.baslik||'—')}<div class="sml mut">${esc(c.brans||'')}</div></td>
+       <td class="sml mut">${esc((c.adres||'').slice(0,42))}</td>
+       <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td>
+       <td>${a.durum==='yapildi'?'<span class="chip" style="background:var(--brand-soft);color:var(--brand-d)"><span class="b"></span>Yapıldı</span>':'<span class="chip" style="background:#FEF6E7;color:#B27A00"><span class="b"></span>Planlandı</span>'}</td>
+@@ -967,7 +1060,7 @@
+     <th>Klinik</th><th>Branş</th><th>Yaka</th><th>İlçe</th><th>Telefon</th><th>Skor</th><th>Sekme</th><th>Dönüş</th><th>Sorumlu</th><th></th></tr></thead><tbody>
+     ${L.map(c=>{const f=c.hatirlatma?farkGun(c.hatirlatma):null; return `<tr>
+       <td><input type="checkbox" class="havuz-chk" value="${c.id}" style="width:auto"></td>
+-      <td><b>${esc(c.ad)}</b></td>
++      <td>${klinikLink(c.id, c.ad)}</td>
+       <td class="sml">${esc(c.brans||'')}</td>
+       <td class="sml"><span class="tag">${esc(yakaOf(c))}</span></td>
+       <td class="sml">${esc(ilceOf(c))}</td>
+@@ -989,11 +1082,12 @@
+   ${N.length? `<div class="tscroll"><table><thead><tr><th>Tarih</th><th>Klinik</th><th>Sekme</th><th>Not</th><th>Kaydeden</th><th></th></tr></thead><tbody>
+     ${N.map(n=>{const c=S.clinics.find(x=>x.id===n.clinicId)||{};const d=new Date(n.tarih);return `<tr>
+       <td class="mono sml">${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}<div class="mut" style="font-size:11px">${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</div></td>
+-      <td><b>${esc(c.ad||'—')}</b><div class="sml mut">${esc(c.semt||'')}</div></td>
++      <td>${klinikLink(n.clinicId, c.ad||'—')}<div class="sml mut">${esc(c.semt||'')}</div></td>
+       <td>${segChip(n.segment)}</td>
+-      <td class="sml" style="max-width:380px">${esc(n.metin||'—')}</td>
++      <td class="sml" style="max-width:380px">${esc(n.metin||'—')}${n.duzenlendi?' <span class="mut">(düzenlendi)</span>':''}</td>
+       <td class="sml">${esc(usr(n.userId).ad.split(' ')[0])}</td>
+-      <td><button class="btn sm" onclick="klinikAc('${n.clinicId}')">Kart</button></td></tr>`}).join('')}
++      <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${n.clinicId}','gorusme')">Kart</button>
++        <button class="btn sm p" onclick="klinikAc('${n.clinicId}','gorusme')">Notu düzenle</button></td></tr>`}).join('')}
+   </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz görüşme notu yok.<br><span class="sml">Arama Ekranı'ndan bir sonuç işaretlediğinde buraya düşer.</span></div>`}
+   </div>`;
+ }
+@@ -1234,7 +1328,7 @@
+ 
+   <div class="card"><div class="card-h"><h3>Sekmeler ve gün süreleri</h3></div>
+     <div class="tscroll" style="max-height:none"><table><thead><tr><th>Sekme</th><th>Otomatik dönüş</th><th>Kategori</th></tr></thead><tbody>
+-      ${SEGMENTS.map(s=>`<tr><td>${segChip(s.k)}</td><td class="mono sml">${s.gun===null?'—':(s.gun===0?'Takvimden':'+'+s.gun+' gün')}</td><td class="sml mut">${s.kat}</td></tr>`).join('')}
++      ${SEGMENTS.map(s=>`<tr><td>${segChip(s.k)}</td><td class="mono sml">${s.k==='gun1'?'Bugün (1 gün)':(s.gun===null?'—':(s.gun===0?'Takvimden':'+'+s.gun+' gün'))}</td><td class="sml mut">${s.kat}</td></tr>`).join('')}
+     </tbody></table></div>
+   </div>
+ 
+@@ -1256,7 +1350,7 @@
+ }
+ 
+ /* ============ MODALLAR ============ */
+-function mAc(html, lg){ const m=document.getElementById('modal'); m.className='modal'+(lg?' lg':''); m.innerHTML=html; document.getElementById('mask').classList.add('on'); }
++function mAc(html, lg){ const m=document.getElementById('modal'); const size = lg===true?' lg':(lg?' '+lg:''); m.className='modal'+size; m.innerHTML=html; document.getElementById('mask').classList.add('on'); }
+ function mKapat(){ document.getElementById('mask').classList.remove('on'); }
+ document.getElementById('mask').onclick = e=>{ if(e.target.id==='mask') mKapat(); };
+ 
+@@ -1278,7 +1372,7 @@
+       <div class="segpick" id="sp">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`
+         <button class="segbtn ${_segSec===s.k?'on':''}" data-k="${s.k}" onclick="segSec('${s.k}')">
+           <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
+-          <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
++          <div class="gn">${s.k==='gun1'?'Bugün Dinamik Arama\'da':(s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner'))}</div>
+         </button>`).join('')}</div>
+     </div>
+     <div><label class="f">Görüşme notu</label>
+@@ -1296,6 +1390,7 @@
+   const s=SEG[_segSec];
+   e.innerHTML = s.gun===null ? '↳ Bu sekmede otomatik dönüş kurulmaz; klinik listeden düşer.'
+     : s.gun===0 ? '↳ Randevu takvimden takip edilecek.'
++    : s.k==='gun1' ? '↳ Dönüş: <b>bugün</b> — hemen <b>Dinamik Arama → Bugün</b> listesinde görünür.'
+     : `↳ Dönüş tarihi: <b class="mono">${tarihTR(ekleGun(bugun(), s.gun))}</b> — o gün <b>Dinamik Arama</b> panelinde listelenir.`;
+ }
+ function aramaKaydet(cid){
+@@ -1309,58 +1404,584 @@
+     calGun = bugun(); git('takvim');
+     return;
+   }
+-  mKapat(); toast('Kaydedildi: '+SEG[_segSec].ad); ciz();
++  toast('Kaydedildi: '+SEG[_segSec].ad);
++  ciz();
++  klinikAc(cid, 'gorusme');
++}
++
++/* --- Not düzenle --- */
++function notDuzenleAc(nid, afterSave){
++  const n = S.notes.find(x=>x.id===nid); if(!n) return;
++  const c = S.clinics.find(x=>x.id===n.clinicId)||{};
++  const d = new Date(n.tarih);
++  const tarihStr = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
++  mAc(`<div class="m-h"><h3>${afterSave?'Kayıt tamam — notu düzenle':'Notu düzenle'}</h3><button class="x" onclick="mKapat()">×</button></div>
++  <div class="m-b">
++    <div class="sml mut">${klinikLink(n.clinicId, c.ad||'Klinik')} · ${segChip(n.segment)} · ${esc(tarihStr)} · ${esc(usr(n.userId).ad)}</div>
++    <div><label class="f">Görüşme notu</label>
++      <textarea id="nd_metin" rows="5" placeholder="Not metni…">${esc(n.metin||'')}</textarea></div>
++    ${afterSave?`<div class="sml mut">İstersen notu şimdi düzelt; gerekmezse Kapat ile çık.</div>`:''}
++  </div>
++  <div class="m-f">
++    <button class="btn" onclick="mKapat()">Kapat</button>
++    <button class="btn p" onclick="notDuzenleKaydet('${nid}')">Notu kaydet</button>
++  </div>`);
++}
++function notDuzenleKaydet(nid, stay){
++  const n = S.notes.find(x=>x.id===nid); if(!n) return;
++  const el = document.getElementById('note_edit_'+nid) || document.getElementById('nd_metin');
++  n.metin = (el?.value||'').trim();
++  n.duzenlendi = new Date().toISOString();
++  n.duzenleyen = ME.id;
++  kaydet(); toast('Not güncellendi.');
++  if(stay && n.clinicId){ klinikAc(n.clinicId, window._kkTab||'gorusme'); ciz(); return; }
++  mKapat(); ciz();
++}
++function notBlokHtml(n){
++  const d=new Date(n.tarih); const s=SEG[n.segment]||SEG.aranmadi;
++  const tarih = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
++  return `<div class="note" style="border-color:${s.renk}">
++    <div class="mt">${segChip(n.segment)} <span>${tarih}</span> <span>· ${esc(usr(n.userId).ad)}</span>
++      ${n.duzenlendi?`<span class="mut">(düzenlendi)</span>`:''}</div>
++    <textarea id="note_edit_${n.id}" rows="3" style="width:100%;margin-top:6px" placeholder="Not metni…">${esc(n.metin||'')}</textarea>
++    <div class="row" style="justify-content:flex-end;margin-top:6px;gap:8px">
++      <button class="btn sm p" onclick="notDuzenleKaydet('${n.id}', true)">Kaydet</button>
++    </div>
++  </div>`;
+ }
+ 
+ /* --- Klinik kartı --- */
+-function klinikAc(cid){
++function klinikAc(cid, sekme){
++  ensureExtras();
+   const c = S.clinics.find(x=>x.id===cid); if(!c) return;
+   const N = S.notes.filter(n=>n.clinicId===cid);
+   const R = S.appts.filter(a=>a.clinicId===cid && a.durum!=='iptal');
+-  mAc(`<div class="m-h"><h3>${esc(c.ad)}</h3><button class="x" onclick="mKapat()">×</button></div>
+-  <div class="m-b">
+-    <div class="row" style="align-items:center">
+-      <div style="flex:none">${segChip(c.segment)}</div>
+-      <div style="flex:none"><span class="tag">${esc(c.brans||'')}</span></div>
+-      <div style="flex:none"><span class="stars">${'★'.repeat(Math.round(c.skor||0))}${'☆'.repeat(5-Math.round(c.skor||0))}</span></div>
+-      <div style="flex:1"></div>
+-      <div style="flex:none" class="sml mut">${c.hatirlatma?`Dönüş: <b class="mono">${tarihTR(c.hatirlatma)}</b>`:'Planlı dönüş yok'}</div>
+-    </div>
+-    <div class="cols" style="gap:14px">
+-      <table>
+-        <tr><td class="mut sml" style="width:92px">Telefon</td><td class="mono"><b>${esc(c.tel||'—')}</b></td></tr>
+-        <tr><td class="mut sml" style="width:92px">İlçe</td><td class="sml">${esc(ilceOf(c))}</td></tr>
+-        <tr><td class="mut sml">Adres</td><td class="sml">${esc(c.adres||'—')}</td></tr>
+-      </table>
+-      <table>
+-        <tr><td class="mut sml" style="width:92px">Web</td><td class="sml">${esc(c.web||'—')}</td></tr>
+-        <tr><td class="mut sml">Ölçek</td><td class="sml">${esc(c.olcek||'—')}</td></tr>
+-        <tr><td class="mut sml">Uluslararası</td><td class="sml">${esc(c.uluslararasi||'—')}</td></tr>
+-        <tr><td class="mut sml">Sorumlu</td><td class="sml">${esc(c.sorumlu||'—')}</td></tr>
+-      </table>
+-    </div>
+-    <div class="row" style="gap:8px">
+-      <a class="btn p" style="flex:none" href="tel:${esc((c.tel||'').replace(/\s/g,''))}">☏ Ara</a>
+-      <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
+-      <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Harita</a>
+-      <button class="btn" style="flex:none" onclick="mKapat();aramaKaydiAc('${cid}')">+ Görüşme sonucu</button>
++  const offers = S.offers.filter(o=>o.clinicId===cid);
++  const pays = S.payments.filter(p=>p.clinicId===cid);
++  const files = S.files.filter(f=>f.clinicId===cid);
++  const editOk = canEditKlinik();
++  const tab = sekme || 'detay';
++  window._kkTab = tab;
++  const nav = (k, label)=> `<button class="kk-nav ${tab===k?'on':''}" onclick="klinikAc('${cid}','${k}')">${label}</button>`;
++  const val = (x)=> esc(x==null||x===''?'—':x);
++  const row = (lbl, v)=> `<tr><td class="lbl">${lbl}</td><td>${v}</td></tr>`;
++  const empty = (msg)=> `<div class="kk-empty">${msg}</div>`;
++
++  let body = '';
++  if(tab==='detay'){
++    body = `
++      <div class="kk-grid">
++        <div class="kk-panel"><h4>Kurum bilgileri</h4><div class="body"><table>
++          ${row('Klinik adı', `<b>${val(c.ad)}</b>`)}
++          ${row('Kurum tipi', val(c.brans))}
++          ${row('Yetkili', val(c.yetkili))}
++          ${row('Ünvan', val(c.unvan))}
++          ${row('Telefon', `<span class="mono"><b>${val(c.tel)}</b></span>`)}
++          ${row('E-posta', val(c.email))}
++          ${row('Web', val(c.web))}
++          ${row('Hekim / koltuk', val(c.hekimSayisi||c.olcek))}
++          ${row('Ölçek', val(c.olcek))}
++          ${row('Uluslararası', val(c.uluslararasi))}
++          ${row('Skor', `<span class="stars">${'★'.repeat(Math.round(c.skor||0))}${'☆'.repeat(5-Math.round(c.skor||0))}</span>`)}
++        </table></div></div>
++        <div class="kk-panel"><h4>Adres bilgileri</h4><div class="body"><table>
++          ${row('Şehir', val(c.sehir||'İstanbul'))}
++          ${row('İlçe', val(ilceOf(c)))}
++          ${row('Semt', val(c.semt))}
++          ${row('Bölge / yaka', val(c.bolge || yakaOf(c)))}
++          ${row('Adres', val(c.adres))}
++          ${row('Vergi no', val(c.vergi))}
++        </table></div></div>
++        <div class="kk-panel"><h4>CRM bilgileri</h4><div class="body"><table>
++          ${row('Aşama / sekme', segChip(c.segment))}
++          ${row('Referans kaynağı', val(c.kaynak))}
++          ${row('Satış temsilcisi', val(c.sorumlu))}
++          ${row('Dalga', val(c.dalga))}
++          ${row('Arama sayısı', val(c.aramaSayisi||0))}
++          ${row('Son arama', c.sonArama?`<span class="mono">${tarihTR(c.sonArama)}</span>`:'—')}
++          ${row('Dönüş (hatırlatma)', c.hatirlatma?`<span class="mono"><b>${tarihTR(c.hatirlatma)}</b></span>`:'Planlı dönüş yok')}
++          ${row('Klinik ID', `<span class="mono sml">${esc(c.id)}</span>`)}
++        </table></div></div>
++        <div class="kk-panel"><h4>Hızlı özet</h4><div class="body">
++          <div class="row" style="gap:10px;margin:0">
++            <div class="kpi" style="flex:1;padding:10px"><div class="n" style="font-size:18px">${N.length}</div><div class="l">Görüşme</div></div>
++            <div class="kpi" style="flex:1;padding:10px"><div class="n" style="font-size:18px">${offers.length}</div><div class="l">Teklif</div></div>
++            <div class="kpi" style="flex:1;padding:10px"><div class="n" style="font-size:18px">${R.length}</div><div class="l">Randevu</div></div>
++          </div>
++          <div class="row" style="gap:8px;margin-top:12px">
++            <a class="btn p" style="flex:none" href="tel:${esc((c.tel||'').replace(/\s/g,''))}">☏ Ara</a>
++            <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
++            <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Harita</a>
++            <button class="btn" style="flex:none" onclick="mKapat();aramaKaydiAc('${cid}')">+ Görüşme sonucu</button>
++          </div>
++        </div></div>
++      </div>
++      <div style="margin-top:14px">
++        <div class="kk-sec-h"><h3>Görüşme geçmişi (${N.length})</h3></div>
++        ${N.length? N.map(n=>notBlokHtml(n)).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
++      </div>`;
++  } else if(tab==='duzenle'){
++    if(!editOk){
++      body = empty('Klinik düzenleme yalnızca <b>Abdülkadir</b> ve <b>Enes</b> profilleri için açıktır.');
++    } else {
++      body = `
++        <div class="kk-sec-h"><h3>Kurum bilgilerini düzenle</h3></div>
++        <div class="warnbox" style="margin:0 0 10px">Aşama / <span class="mono">hatirlatma</span> burada değiştirilmez — Dinamik Arama bozulmasın diye sonuç <b>Görüşmeler</b> veya Arama ekranından girilir.</div>
++        <div class="kk-panel" style="margin-bottom:12px"><h4>Kurum &amp; yetkili</h4><div class="body"><div class="kk-grid">
++          <div>
++            <label class="f">Kurum adı *</label><input id="kk_ad" type="text" value="${esc(c.ad||'')}">
++            <label class="f">Kurum tipi</label><input id="kk_br" type="text" value="${esc(c.brans||'')}">
++            <label class="f">Yetkili kişi</label><input id="kk_yet" type="text" value="${esc(c.yetkili||'')}">
++            <label class="f">Ünvan</label><input id="kk_unv" type="text" value="${esc(c.unvan||'')}">
++            <label class="f">Telefon</label><input id="kk_tel" type="text" value="${esc(c.tel||'')}">
++            <label class="f">E-posta</label><input id="kk_em" type="text" value="${esc(c.email||'')}">
++            <label class="f">Web / Instagram</label><input id="kk_web" type="text" value="${esc(c.web||'')}">
++            <label class="f">Hekim / koltuk sayısı</label><input id="kk_hek" type="text" value="${esc(c.hekimSayisi||'')}">
++          </div>
++          <div>
++            <label class="f">Şehir</label><input id="kk_seh" type="text" value="${esc(c.sehir||'İstanbul')}">
++            <label class="f">İlçe / semt</label><input id="kk_semt" type="text" value="${esc(c.semt||c.ilce||'')}">
++            <label class="f">Bölge</label><input id="kk_bol" type="text" value="${esc(c.bolge||'')}">
++            <label class="f">Açık adres</label><input id="kk_adr" type="text" value="${esc(c.adres||'')}">
++            <label class="f">Vergi dairesi / no</label><input id="kk_verg" type="text" value="${esc(c.vergi||'')}">
++            <label class="f">Referans kaynağı</label><input id="kk_kay" type="text" value="${esc(c.kaynak||'')}">
++            <label class="f">Ölçek</label><input id="kk_olc" type="text" value="${esc(c.olcek||'')}">
++            <label class="f">Uluslararası</label><input id="kk_ul" type="text" value="${esc(c.uluslararasi||'')}">
++            <label class="f">Skor (1-5)</label><input id="kk_sk" type="number" min="1" max="5" value="${Number(c.skor)||3}">
++            <label class="f">Satış temsilcisi</label>
++            <select id="kk_sr"><option value="">—</option>
++              ${['Abdülkadir','Enes','Kader'].map(x=>`<option ${c.sorumlu===x?'selected':''}>${x}</option>`).join('')}
++            </select>
++          </div>
++        </div></div></div>
++        <div class="row" style="justify-content:flex-end">
++          <button class="btn" onclick="klinikAc('${cid}','detay')">Vazgeç</button>
++          <button class="btn p" onclick="klinikGuncelle('${cid}')">Kaydet</button>
++        </div>`;
++    }
++  } else if(tab==='kisiler'){
++    const list = c.kisiler||[];
++    body = `<div class="kk-sec-h"><h3>İlgili kişiler</h3>
++      ${editOk?`<button class="btn sm p" onclick="klinikKisiEkleForm('${cid}')">+ Kişi ekle</button>`:''}</div>
++      ${list.length? list.map(k=>`
++        <div class="kk-person" style="margin-bottom:8px">
++          <div class="av" style="background:var(--brand)">${esc(bas(k.ad))}</div>
++          <div style="flex:1">
++            <div style="font-weight:700">${esc(k.ad)}</div>
++            <div class="sml" style="color:var(--brand-d);font-weight:600">${esc(k.unvan||'—')}</div>
++            <div class="sml mut" style="margin-top:4px">${esc(k.tel||'—')} · ${esc(k.email||'—')}</div>
++          </div>
++          ${editOk?`<button class="btn sm d" onclick="klinikKisiSil('${cid}','${k.id}')">Sil</button>`:''}
++        </div>`).join('') : empty('Bu kuruma ait ilgili kişi kaydı yok.')}
++      ${editOk?`<div id="kk_kisi_form" style="display:none;margin-top:12px" class="kk-panel"><h4>Yeni kişi</h4><div class="body">
++        <div class="kk-grid">
++          <div><label class="f">Ad soyad *</label><input id="kk_k_ad" type="text">
++            <label class="f">Ünvan</label><input id="kk_k_un" type="text"></div>
++          <div><label class="f">Telefon</label><input id="kk_k_tel" type="text">
++            <label class="f">E-posta</label><input id="kk_k_em" type="text"></div>
++        </div>
++        <div class="row" style="justify-content:flex-end;margin-top:8px">
++          <button class="btn" onclick="klinikAc('${cid}','kisiler')">Vazgeç</button>
++          <button class="btn p" onclick="klinikKisiKaydet('${cid}')">Kaydet</button>
++        </div>
++      </div></div>`:''}`;
++  } else if(tab==='gorusme'){
++    body = `
++      <div class="kk-sec-h"><h3>Yeni görüşme / ziyaret kaydı</h3></div>
++      <div class="kk-panel" style="margin-bottom:14px"><h4>Görüşme formu</h4><div class="body">
++        <div class="kk-grid">
++          <div>
++            <label class="f">Görüşme tipi</label>
++            <select id="kk_g_tip"><option>Telefon</option><option>Saha ziyareti</option><option>Online</option><option>WhatsApp</option></select>
++            <label class="f">Görüşülen kişi</label>
++            <input id="kk_g_kisi" type="text" value="${esc(c.yetkili||(c.kisiler[0]&&c.kisiler[0].ad)||'')}">
++          </div>
++          <div>
++            <label class="f">Sonuç (sekme)</label>
++            <select id="kk_g_son">${SEGMENTS.map(s=>`<option value="${s.k}" ${s.k===(c.segment||'aranmadi')?'selected':''}>${esc(s.ad)}</option>`).join('')}</select>
++            <label class="f">Sonraki adım tarihi (opsiyonel)</label>
++            <input id="kk_g_next" type="date" title="Boş bırakırsan sekmenin varsayılan gün kuralı uygulanır">
++          </div>
++        </div>
++        <label class="f">Konu / notlar</label>
++        <textarea id="kk_g_not" rows="3" placeholder="Görüşmede konuşulanlar..."></textarea>
++        <div class="row" style="justify-content:flex-end;margin-top:8px">
++          <button class="btn p" onclick="klinikGorusmeKaydet('${cid}')">Görüşmeyi kaydet</button>
++        </div>
++      </div></div>
++      <div class="kk-sec-h"><h3>Görüşme geçmişi (${N.length})</h3></div>
++      ${N.length? N.map(n=>notBlokHtml(n)).join('') : empty('Henüz görüşme kaydı yok. Yukarıdaki formdan ilk görüşmeyi ekleyin.')}`;
++  } else if(tab==='teklif'){
++    const formOpen = (window._kkTeklifForm===cid);
++    body = `<div class="kk-sec-h"><h3>Teklifler</h3>
++      <button class="btn sm p" onclick="window._kkTeklifForm='${cid}';klinikAc('${cid}','teklif')">+ Yeni teklif</button></div>
++      ${formOpen?`
++        <div class="kk-panel" style="margin-bottom:12px"><h4>Teklif bilgileri</h4><div class="body">
++          <label class="f">Hizmet / paket *</label>
++          <select id="kk_t_pak"><option value="">Seçiniz</option>
++            <option>CRM Başlangıç Paketi</option><option>CRM Professional</option><option>Pilot (1 ay ücretsiz)</option><option>Özel paket</option>
++          </select>
++          <div class="row">
++            <div><label class="f">Tutar *</label><input id="kk_t_tut" type="number" value="0"></div>
++            <div style="flex:none;width:110px"><label class="f">Para</label><select id="kk_t_par"><option>TRY</option><option>EUR</option><option>USD</option></select></div>
++          </div>
++          <div class="row">
++            <div><label class="f">Teklif tarihi</label><input id="kk_t_tar" type="date" value="${bugun()}"></div>
++            <div><label class="f">Geçerlilik</label><input id="kk_t_gec" type="date"></div>
++          </div>
++          <label class="f">Açıklama / kalemler</label>
++          <textarea id="kk_t_ac" rows="3" placeholder="Teklif detayları..."></textarea>
++          <div class="row" style="justify-content:flex-end;margin-top:8px">
++            <button class="btn" onclick="window._kkTeklifForm=null;klinikAc('${cid}','teklif')">Vazgeç</button>
++            <button class="btn p" onclick="klinikTeklifKaydet('${cid}')">Teklif oluştur</button>
++          </div>
++        </div></div>`:''}
++      ${offers.length? `<div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Paket</th><th>Tutar</th><th>Durum</th><th>Oluşturan</th></tr></thead><tbody>
++        ${offers.map(o=>`<tr>
++          <td class="mono sml">${tarihTR(o.tarih)}</td>
++          <td><b>${esc(o.paket)}</b><div class="sml mut">${esc((o.aciklama||'').slice(0,60))}</div></td>
++          <td class="mono">${esc(o.tutar)} ${esc(o.para||'TRY')}</td>
++          <td><span class="tag">${esc(o.durum||'Beklemede')}</span></td>
++          <td class="sml">${esc(usr(o.userId).ad)}</td>
++        </tr>`).join('')}
++      </tbody></table></div>` : empty('Bu kuruma ait teklif kaydı yok.')}`;
++  } else if(tab==='sozlesme'){
++    const sz = c.sozlesme;
++    body = `<div class="kk-sec-h"><h3>Sözleşme / abonelik</h3>
++      ${editOk?`<button class="btn sm p" onclick="klinikSozlesmeForm('${cid}')">${sz?'Düzenle':'+ Sözleşme ekle'}</button>`:''}</div>
++      ${sz? `<div class="kk-panel"><h4>Aktif sözleşme</h4><div class="body"><table>
++        ${row('Durum', val(sz.durum))}
++        ${row('Paket', val(sz.paket))}
++        ${row('Başlangıç', sz.baslangic?tarihTR(sz.baslangic):'—')}
++        ${row('Bitiş', sz.bitis?tarihTR(sz.bitis):'—')}
++        ${row('Not', val(sz.notu))}
++      </table></div></div>` : empty('Bu kurumla henüz aktif sözleşme/abonelik yok. Sözleşme aşamasına geldiğinde burada görünecek.')}
++      <div id="kk_sz_form" style="display:none;margin-top:12px" class="kk-panel"><h4>Sözleşme kaydı</h4><div class="body">
++        <div class="kk-grid">
++          <div>
++            <label class="f">Durum</label><select id="kk_sz_dr"><option>Aktif</option><option>Taslak</option><option>Askıda</option><option>Bitti</option></select>
++            <label class="f">Paket</label><input id="kk_sz_pk" type="text" value="${esc((sz&&sz.paket)||'')}">
++          </div>
++          <div>
++            <label class="f">Başlangıç</label><input id="kk_sz_b" type="date" value="${esc((sz&&sz.baslangic)||bugun())}">
++            <label class="f">Bitiş</label><input id="kk_sz_t" type="date" value="${esc((sz&&sz.bitis)||'')}">
++          </div>
++        </div>
++        <label class="f">Not</label><textarea id="kk_sz_n" rows="2">${esc((sz&&sz.notu)||'')}</textarea>
++        <div class="row" style="justify-content:flex-end;margin-top:8px">
++          <button class="btn" onclick="klinikAc('${cid}','sozlesme')">Vazgeç</button>
++          <button class="btn p" onclick="klinikSozlesmeKaydet('${cid}')">Kaydet</button>
++        </div>
++      </div></div>`;
++  } else if(tab==='notlar'){
++    const gec = c.notGecmisi||[];
++    body = `
++      <div class="kk-sec-h"><h3>Notlar</h3></div>
++      <label class="f">Notunuz</label>
++      <textarea id="kk_hn" rows="4" placeholder="Notunuzu giriniz">${esc(c.hizliNot||'')}</textarea>
++      <div class="row" style="justify-content:flex-end;margin-top:8px">
++        <button class="btn p" onclick="klinikHizliNotKaydet('${cid}')">Notu kaydet</button>
++      </div>
++      <div style="margin-top:14px">
++        ${gec.length? gec.map(n=>`
++          <div class="note" style="border-color:var(--warn)">
++            <div class="mt"><span>${esc(n.tarihTR||'')}</span><span>· ${esc(n.kim||'')}</span>
++              ${n.id?`<button class="btn sm" style="margin-left:auto" onclick="klinikHizliNotDuzenle('${cid}','${n.id}')">Notu düzenle</button>`:''}</div>
++            <div class="tx" id="hn_${n.id||''}">${esc(n.metin||'')}</div>
++          </div>`).join('') : (c.hizliNot? '': empty('Henüz not yok.'))}
++      </div>`;
++  } else if(tab==='dosya'){
++    body = `<div class="kk-sec-h"><h3>Dosyalar &amp; belgeler</h3>
++      ${editOk?`<label class="btn sm p" style="cursor:pointer">+ Belge ekle<input type="file" id="kk_file" style="display:none" onchange="klinikDosyaEkle('${cid}',this)"></label>`:''}</div>
++      <div class="kk-drop" style="margin-bottom:12px">📁 Sözleşme, teklif PDF'i veya belge ekleyin<br><span class="sml">(Dosya adı ve boyutu kaydedilir; içerik sunucuya yüklenmez.)</span></div>
++      ${files.length? `<table><thead><tr><th>Dosya</th><th>Boyut</th><th>Tarih</th><th>Ekleyen</th><th></th></tr></thead><tbody>
++        ${files.map(f=>`<tr>
++          <td><b>${esc(f.ad)}</b></td>
++          <td class="sml mono">${esc(f.boyut||'—')}</td>
++          <td class="sml mono">${tarihTR(f.tarih)}</td>
++          <td class="sml">${esc(usr(f.userId).ad)}</td>
++          <td>${editOk?`<button class="btn sm d" onclick="klinikDosyaSil('${cid}','${f.id}')">Sil</button>`:''}</td>
++        </tr>`).join('')}
++      </tbody></table>` : empty('Bu kuruma ait henüz belge yüklenmedi.')}`;
++  } else if(tab==='aktivite'){
++    const acts = [];
++    N.forEach(n=>{
++      const d=new Date(n.tarih);
++      acts.push({ts:d.getTime(), bas:`Görüşme — ${SEG[n.segment]?.ad||n.segment}`, acik:(n.metin||'').slice(0,80), tarihTR:`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`, ic:'💬'});
++    });
++    R.forEach(a=>{
++      acts.push({ts:new Date(a.tarih+'T'+(a.saat||'12:00')).getTime(), bas:`Randevu — ${a.durum==='yapildi'?'Yapıldı':'Planlandı'}`, acik:`${a.saat} · ${(a.katilimcilar||[]).map(i=>usr(i).ad.split(' ')[0]).join(', ')}`, tarihTR:tarihTR(a.tarih), ic:'▦'});
++    });
++    offers.forEach(o=>{
++      acts.push({ts:new Date(o.tarih+'T12:00:00').getTime(), bas:`Teklif — ${o.durum||'Beklemede'}`, acik:`${o.paket} · ${o.tutar} ${o.para||'TRY'}`, tarihTR:tarihTR(o.tarih), ic:'📝'});
++    });
++    pays.forEach(p=>{
++      acts.push({ts:new Date(p.tarih+'T12:00:00').getTime(), bas:'Tahsilat', acik:`${p.tutar} ${p.para||'TRY'} · ${p.aciklama||''}`, tarihTR:tarihTR(p.tarih), ic:'💳'});
++    });
++    acts.sort((a,b)=>b.ts-a.ts);
++    body = `<div class="kk-sec-h"><h3>Aktivite geçmişi</h3></div>
++      ${acts.length? `<div class="kk-act">${acts.map(a=>`
++        <div class="it"><div class="ic">${a.ic}</div>
++          <div><div style="font-weight:700;font-size:13px">${esc(a.bas)}</div>
++          <div class="sml mut">${esc(a.acik)}</div></div>
++          <div class="sml mono mut">${esc(a.tarihTR)}</div>
++        </div>`).join('')}</div>` : empty('Henüz aktivite yok.')}`;
++  } else if(tab==='tahsilat'){
++    const toplam = pays.reduce((s,p)=>s+Number(p.tutar||0),0);
++    const teklifToplam = offers.reduce((s,o)=>s+Number(o.tutar||0),0);
++    const acik = Math.max(0, teklifToplam-toplam);
++    body = `<div class="kk-sec-h"><h3>Tahsilat / ödemeler</h3>
++      ${editOk?`<button class="btn sm p" onclick="klinikOdemeForm('${cid}')">+ Ödeme ekle</button>`:''}</div>
++      <div class="kk-pay">
++        <div class="box" style="background:#EAF2FF"><div class="n">${toplam.toLocaleString('tr-TR')} TRY</div><div class="l">Toplam tahsilat</div></div>
++        <div class="box" style="background:#FFF0E8"><div class="n">${acik.toLocaleString('tr-TR')} TRY</div><div class="l">Açık bakiye (teklif − tahsilat)</div></div>
++      </div>
++      <div class="kk-sec-h"><h3>Ödeme hareketleri</h3></div>
++      <div id="kk_od_form" style="display:none;margin-bottom:12px" class="kk-panel"><h4>Yeni ödeme</h4><div class="body">
++        <div class="row">
++          <div><label class="f">Tutar</label><input id="kk_o_tut" type="number" value="0"></div>
++          <div style="flex:none;width:100px"><label class="f">Para</label><select id="kk_o_par"><option>TRY</option><option>EUR</option></select></div>
++          <div><label class="f">Tarih</label><input id="kk_o_tar" type="date" value="${bugun()}"></div>
++        </div>
++        <label class="f">Açıklama</label><input id="kk_o_ac" type="text" placeholder="Havale / EFT / nakit…">
++        <div class="row" style="justify-content:flex-end;margin-top:8px">
++          <button class="btn" onclick="klinikAc('${cid}','tahsilat')">Vazgeç</button>
++          <button class="btn p" onclick="klinikOdemeKaydet('${cid}')">Kaydet</button>
++        </div>
++      </div></div>
++      ${pays.length? `<table><thead><tr><th>Tarih</th><th>Tutar</th><th>Açıklama</th><th>Kaydeden</th></tr></thead><tbody>
++        ${pays.map(p=>`<tr>
++          <td class="mono sml">${tarihTR(p.tarih)}</td>
++          <td class="mono"><b>${esc(p.tutar)} ${esc(p.para||'TRY')}</b></td>
++          <td class="sml">${esc(p.aciklama||'—')}</td>
++          <td class="sml">${esc(usr(p.userId).ad)}</td>
++        </tr>`).join('')}
++      </tbody></table>` : empty('Bu kuruma ait ödeme kaydı yok.')}`;
++  } else if(tab==='randevu'){
++    body = `<div class="kk-sec-h"><h3>Randevular</h3>
++      <button class="btn sm" onclick="mKapat();git('takvim')">Takvime git</button></div>
++      ${R.length? R.map(a=>`<div class="note" style="border-color:var(--brand)">
++        <div class="mt"><b class="mono">${tarihTR(a.tarih)} ${a.saat}</b> · ${(a.katilimcilar||[]).map(i=>usr(i).ad.split(' ')[0]).join(', ')} · ${a.durum==='yapildi'?'Yapıldı':'Planlandı'}
++          <button class="btn sm" style="margin-left:8px" onclick="randevuAc('${a.id}')">Detay</button></div>
++        ${a.notu?`<div class="tx sml">${esc(a.notu)}</div>`:''}
++      </div>`).join('') : empty('Bu klinik için randevu yok. Takvimden oluşturabilirsiniz.')}`;
++  }
++
++  mAc(`<div class="m-h"><h3>Klinik kartı</h3><button class="x" onclick="mKapat()">×</button></div>
++  <div class="m-b" style="padding:0;max-height:none;display:block">
++    <div style="padding:16px 18px 12px;border-bottom:1px solid var(--line)">
++      <div class="kk-head">
++        <div class="kk-ico">⌂</div>
++        <div style="flex:1;min-width:200px">
++          <div style="font-size:18px;font-weight:700;color:var(--brand-d)">${esc(c.ad)}</div>
++          <div style="margin-top:4px"><span class="tag">${esc(c.brans||'')}</span> ${segChip(c.segment)}</div>
++          <div class="kk-meta">
++            <span>[ <b class="mono">${esc(c.id)}</b> ]</span>
++            <span>☎ <b class="mono">${esc(c.tel||'—')}</b></span>
++            <span>👤 <b>${esc(c.yetkili||c.sorumlu||'—')}</b></span>
++            <span>📍 <b>${esc(c.sehir||ilceOf(c)||c.semt||'—')}</b></span>
++          </div>
++        </div>
++        <div class="r" style="flex:none">
++          <a class="btn sm" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
++          <button class="btn sm p" onclick="klinikAc('${cid}','gorusme')">Sonuç gir</button>
++        </div>
++      </div>
+     </div>
+-    ${R.length? `<div><label class="f">Randevular</label>${R.map(a=>`<div class="note" style="border-color:var(--brand)"><div class="mt"><b class="mono">${tarihTR(a.tarih)} ${a.saat}</b> · ${a.katilimcilar.map(i=>usr(i).ad.split(' ')[0]).join(', ')} · ${a.durum==='yapildi'?'Yapıldı':'Planlandı'}</div>${a.notu?`<div class="tx sml">${esc(a.notu)}</div>`:''}</div>`).join('')}</div>`:''}
+-    <div><label class="f">Görüşme geçmişi (${N.length})</label>
+-      ${N.length? N.map(n=>{const d=new Date(n.tarih);const s=SEG[n.segment]||SEG.aranmadi;return `
+-        <div class="note" style="border-color:${s.renk}">
+-          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span></div>
+-          ${n.metin? `<div class="tx">${esc(n.metin)}</div>`:'<div class="tx mut sml">— not girilmemiş —</div>'}
+-        </div>`}).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
++    <div class="kk-wrap">
++      <div class="kk-side">
++        ${nav('detay','Detaylar')}
++        ${nav('duzenle','Düzenle')}
++        ${nav('kisiler','İlgili kişiler')}
++        ${nav('gorusme','Görüşmeler / Ziyaretler')}
++        ${nav('teklif','Teklifler')}
++        ${nav('sozlesme','Sözleşme / Abonelik')}
++        ${nav('notlar','Notlar')}
++        ${nav('dosya','Dosyalar & Belgeler')}
++        ${nav('aktivite','Aktivite geçmişi')}
++        ${nav('tahsilat','Tahsilat / Ödemeler')}
++        ${nav('randevu','Randevular')}
++      </div>
++      <div class="kk-main">${body}</div>
+     </div>
+   </div>
+-  <div class="m-f"><button class="btn" onclick="mKapat()">Kapat</button></div>`, true);
++  <div class="m-f"><button class="btn" onclick="mKapat()">Kapat</button></div>`, 'xl');
++}
++function klinikGuncelle(cid){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const ad = (document.getElementById('kk_ad')?.value||'').trim();
++  if(!ad){ toast('Klinik adı zorunlu.'); return; }
++  const semt = (document.getElementById('kk_semt')?.value||'').trim();
++  c.ad = ad;
++  c.brans = (document.getElementById('kk_br')?.value||'').trim();
++  c.yetkili = (document.getElementById('kk_yet')?.value||'').trim();
++  c.unvan = (document.getElementById('kk_unv')?.value||'').trim();
++  c.tel = (document.getElementById('kk_tel')?.value||'').trim();
++  c.email = (document.getElementById('kk_em')?.value||'').trim();
++  c.web = (document.getElementById('kk_web')?.value||'').trim();
++  c.hekimSayisi = (document.getElementById('kk_hek')?.value||'').trim();
++  c.sehir = (document.getElementById('kk_seh')?.value||'').trim();
++  c.semt = semt; c.ilce = semt;
++  c.bolge = (document.getElementById('kk_bol')?.value||'').trim();
++  c.adres = (document.getElementById('kk_adr')?.value||'').trim();
++  c.vergi = (document.getElementById('kk_verg')?.value||'').trim();
++  c.kaynak = (document.getElementById('kk_kay')?.value||'').trim();
++  c.olcek = (document.getElementById('kk_olc')?.value||'').trim();
++  c.uluslararasi = (document.getElementById('kk_ul')?.value||'').trim();
++  c.skor = Number(document.getElementById('kk_sk')?.value)||c.skor||3;
++  c.sorumlu = document.getElementById('kk_sr')?.value||'';
++  // hatirlatma / segment dokunulmaz
++  kaydet(); toast('Klinik kartı güncellendi.'); klinikAc(cid,'detay'); ciz();
++}
++function klinikHizliNotKaydet(cid){
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const metin = (document.getElementById('kk_hn')?.value||'').trim();
++  if(!metin){ toast('Not boş olamaz.'); return; }
++  c.hizliNot = metin;
++  c.notGecmisi = c.notGecmisi || [];
++  const d = new Date();
++  c.notGecmisi.unshift({
++    id:uid(), metin,
++    kim: ME.ad,
++    tarihTR: `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
++  });
++  kaydet(); toast('Not kaydedildi.'); klinikAc(cid,'notlar');
++}
++function klinikHizliNotDuzenle(cid, nid){
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const n = (c.notGecmisi||[]).find(x=>x.id===nid); if(!n) return;
++  mAc(`<div class="m-h"><h3>Notu düzenle</h3><button class="x" onclick="mKapat()">×</button></div>
++  <div class="m-b">
++    <div class="sml mut">${esc(n.tarihTR||'')} · ${esc(n.kim||'')}</div>
++    <textarea id="hn_edit" rows="5">${esc(n.metin||'')}</textarea>
++  </div>
++  <div class="m-f">
++    <button class="btn" onclick="mKapat();klinikAc('${cid}','notlar')">Vazgeç</button>
++    <button class="btn p" onclick="klinikHizliNotDuzenleKaydet('${cid}','${nid}')">Notu kaydet</button>
++  </div>`);
++}
++function klinikHizliNotDuzenleKaydet(cid, nid){
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const n = (c.notGecmisi||[]).find(x=>x.id===nid); if(!n) return;
++  n.metin = (document.getElementById('hn_edit')?.value||'').trim();
++  c.hizliNot = n.metin;
++  kaydet(); toast('Not güncellendi.'); klinikAc(cid,'notlar');
++}
++
++function klinikKisiEkleForm(cid){
++  klinikAc(cid,'kisiler');
++  setTimeout(()=>{ const el=document.getElementById('kk_kisi_form'); if(el) el.style.display='block'; }, 30);
++}
++function klinikKisiKaydet(cid){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  const ad = (document.getElementById('kk_k_ad')?.value||'').trim();
++  if(!ad){ toast('Ad zorunlu.'); return; }
++  c.kisiler = c.kisiler || [];
++  c.kisiler.push({
++    id:uid(), ad,
++    unvan:(document.getElementById('kk_k_un')?.value||'').trim(),
++    tel:(document.getElementById('kk_k_tel')?.value||'').trim(),
++    email:(document.getElementById('kk_k_em')?.value||'').trim()
++  });
++  if(!c.yetkili) c.yetkili = ad;
++  kaydet(); toast('Kişi eklendi.'); klinikAc(cid,'kisiler');
++}
++function klinikKisiSil(cid, kid){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  c.kisiler = (c.kisiler||[]).filter(k=>k.id!==kid);
++  kaydet(); klinikAc(cid,'kisiler');
++}
++function klinikGorusmeKaydet(cid){
++  const tip = document.getElementById('kk_g_tip')?.value||'Telefon';
++  const kisi = (document.getElementById('kk_g_kisi')?.value||'').trim();
++  const sk = document.getElementById('kk_g_son')?.value||'gorusuldu';
++  const notu = (document.getElementById('kk_g_not')?.value||'').trim();
++  const next = document.getElementById('kk_g_next')?.value||'';
++  const metin = [tip, kisi?('Kişi: '+kisi):'', notu].filter(Boolean).join(' · ');
++  segmentAta(cid, sk, metin);
++  // Opsiyonel sonraki adım: yalnızca kullanıcı tarih girdiyse ve randevu değilse override
++  const c = S.clinics.find(x=>x.id===cid);
++  if(c && next && sk!=='randevu'){
++    c.hatirlatma = next;
++  }
++  kaydet(); toast('Görüşme kaydedildi.'); klinikAc(cid,'gorusme'); ciz();
++}
++function klinikTeklifKaydet(cid){
++  ensureExtras();
++  const paket = (document.getElementById('kk_t_pak')?.value||'').trim();
++  const tutar = Number(document.getElementById('kk_t_tut')?.value||0);
++  if(!paket){ toast('Paket seçin.'); return; }
++  S.offers.unshift({
++    id:uid(), clinicId:cid, paket, tutar,
++    para: document.getElementById('kk_t_par')?.value||'TRY',
++    tarih: document.getElementById('kk_t_tar')?.value||bugun(),
++    gecerlilik: document.getElementById('kk_t_gec')?.value||'',
++    aciklama: (document.getElementById('kk_t_ac')?.value||'').trim(),
++    durum:'Beklemede', userId:ME.id
++  });
++  window._kkTeklifForm = null;
++  kaydet(); toast('Teklif oluşturuldu.'); klinikAc(cid,'teklif');
++}
++function klinikSozlesmeForm(cid){
++  klinikAc(cid,'sozlesme');
++  setTimeout(()=>{ const el=document.getElementById('kk_sz_form'); if(el) el.style.display='block'; }, 30);
++}
++function klinikSozlesmeKaydet(cid){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
++  c.sozlesme = {
++    durum: document.getElementById('kk_sz_dr')?.value||'Aktif',
++    paket: (document.getElementById('kk_sz_pk')?.value||'').trim(),
++    baslangic: document.getElementById('kk_sz_b')?.value||bugun(),
++    bitis: document.getElementById('kk_sz_t')?.value||'',
++    notu: (document.getElementById('kk_sz_n')?.value||'').trim()
++  };
++  kaydet(); toast('Sözleşme kaydedildi.'); klinikAc(cid,'sozlesme');
++}
++function klinikDosyaEkle(cid, input){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  ensureExtras();
++  const f = input.files && input.files[0]; if(!f) return;
++  const kb = Math.max(1, Math.round(f.size/1024));
++  S.files.unshift({
++    id:uid(), clinicId:cid, ad:f.name, tip:f.type||'',
++    boyut: kb>1024? ((kb/1024).toFixed(1)+' MB') : (kb+' KB'),
++    tarih: bugun(), userId:ME.id
++  });
++  input.value='';
++  kaydet(); toast('Belge eklendi.'); klinikAc(cid,'dosya');
++}
++function klinikDosyaSil(cid, fid){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  S.files = (S.files||[]).filter(f=>f.id!==fid);
++  kaydet(); klinikAc(cid,'dosya');
++}
++function klinikOdemeForm(cid){
++  klinikAc(cid,'tahsilat');
++  setTimeout(()=>{ const el=document.getElementById('kk_od_form'); if(el) el.style.display='block'; }, 30);
++}
++function klinikOdemeKaydet(cid){
++  if(!canEditKlinik()){ toast('Düzenleme yetkiniz yok.'); return; }
++  ensureExtras();
++  const tutar = Number(document.getElementById('kk_o_tut')?.value||0);
++  if(!tutar){ toast('Tutar girin.'); return; }
++  S.payments.unshift({
++    id:uid(), clinicId:cid, tutar,
++    para: document.getElementById('kk_o_par')?.value||'TRY',
++    tarih: document.getElementById('kk_o_tar')?.value||bugun(),
++    aciklama: (document.getElementById('kk_o_ac')?.value||'').trim(),
++    userId:ME.id
++  });
++  kaydet(); toast('Ödeme kaydedildi.'); klinikAc(cid,'tahsilat');
+ }
+ 
+ /* --- Randevu oluştur --- */
+ function randevuYeni(t,s){
+   const st = slotDurum(t,s);
+-  const secilebilir = S.clinics.filter(c=>['randevu','sicak','teklif','gorusuldu','mesaj','kisa','orta','uzun','gun2','ulasilamadi','karar','aranmadi','pilot'].includes(c.segment))
++  const secilebilir = S.clinics.filter(c=>['randevu','sicak','teklif','gorusuldu','mesaj','kisa','orta','uzun','gun1','gun2','ulasilamadi','karar','aranmadi','pilot'].includes(c.segment))
+     .sort((a,b)=>{const p=x=>x.segment==='randevu'?0:(SEG[x.segment]?.kat==='sicak'?1:2); return p(a)-p(b) || (b.skor||0)-(a.skor||0);});
+   mAc(`<div class="m-h"><h3>Randevu oluştur — ${tarihTR(t)} · ${s}</h3><button class="x" onclick="mKapat()">×</button></div>
+   <div class="m-b">
+@@ -1408,19 +2029,34 @@
+ function randevuAc(aid){
+   const a = S.appts.find(x=>x.id===aid); if(!a) return;
+   const c = S.clinics.find(x=>x.id===a.clinicId)||{};
+-  mAc(`<div class="m-h"><h3>Randevu — ${esc(c.ad||'')}</h3><button class="x" onclick="mKapat()">×</button></div>
++  const kim = (a.katilimcilar||[]).map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${esc(usr(i).ad)}</span>`).join(' ') || '—';
++  const durumChip = a.durum==='yapildi'
++    ? '<span class="chip" style="background:var(--brand-soft);color:var(--brand-d)"><span class="b"></span>Yapıldı</span>'
++    : a.durum==='iptal'
++    ? '<span class="chip" style="background:#FEECEC;color:#D64545"><span class="b"></span>İptal</span>'
++    : '<span class="chip" style="background:#FEF6E7;color:#B27A00"><span class="b"></span>Beklemede / Planlandı</span>';
++  mAc(`<div class="m-h"><h3>Randevu detayı</h3><button class="x" onclick="mKapat()">×</button></div>
+   <div class="m-b">
++    <div class="row" style="align-items:center;margin-bottom:4px">
++      <div style="flex:1">${durumChip}</div>
++      <button class="btn sm" onclick="klinikAc('${a.clinicId}')">Klinik kartı</button>
++    </div>
++    <div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC;margin-bottom:8px">
++      <div style="font-size:16px;font-weight:700">${klinikLink(a.clinicId, c.ad||a.baslik||'—')}</div>
++      <div class="sml mut" style="margin-top:4px">${esc(c.brans||'')} · ${esc(c.semt||c.sehir||'')}</div>
++      <div class="sml" style="margin-top:6px">☎ <span class="mono">${esc(c.tel||'—')}</span> · 📍 ${esc(c.adres||'—')}</div>
++    </div>
+     <table>
+-      <tr><td class="mut sml" style="width:100px">Tarih</td><td class="mono"><b>${tarihTR(a.tarih)} · ${a.saat}</b></td></tr>
+-      <tr><td class="mut sml">Adres</td><td class="sml">${esc(c.adres||'—')}</td></tr>
+-      <tr><td class="mut sml">Telefon</td><td class="mono sml">${esc(c.tel||'—')}</td></tr>
+-      <tr><td class="mut sml">Katılımcı</td><td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad}</span>`).join(' ')}</td></tr>
++      <tr><td class="mut sml" style="width:120px">Saat</td><td class="mono"><b>${tarihTR(a.tarih)} · ${a.saat}</b></td></tr>
++      <tr><td class="mut sml">Hizmet / konu</td><td class="sml">${esc(a.notu||c.brans||'Saha görüşmesi')}</td></tr>
++      <tr><td class="mut sml">Personel</td><td>${kim}</td></tr>
++      <tr><td class="mut sml">Randevu tipi</td><td class="sml">Klinik saha randevusu</td></tr>
+       <tr><td class="mut sml">Oluşturan</td><td class="sml">${esc(usr(a.olusturan).ad)}</td></tr>
+-      <tr><td class="mut sml">Not</td><td class="sml">${esc(a.notu||'—')}</td></tr>
++      <tr><td class="mut sml">Yetkili</td><td class="sml">${esc(c.yetkili||'—')}</td></tr>
+     </table>
+     <div class="row">
+       <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Haritada aç</a>
+-      <button class="btn" style="flex:none" onclick="mKapat();klinikAc('${a.clinicId}')">Klinik kartı</button>
++      <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
+     </div>
+   </div>
+   <div class="m-f">
+@@ -1607,7 +2243,7 @@
+   rd.onload=e=>{ try{ const j=JSON.parse(e.target.result); if(!j.clinics) throw 0; j.clinics=j.clinics.filter(c=>!isHeaderClinic(c.ad,c.brans,c.tel)); S=j; kaydet(); toast('Yedek yüklendi.'); ciz(); }catch(err){ toast('Dosya okunamadı.'); } inp.value=''; };
+   rd.readAsText(f);
+ }
+-function sifirla(){ if(confirm('Tüm veriler silinip başlangıç klinik listesi geri yüklenecek. Emin misiniz?')){ S=bosDurum(); kaydet(); toast('Sıfırlandı.'); ciz(); } }
++function sifirla(){ if(confirm('Tüm veriler silinip başlangıç klinik listesi geri yüklenecek. Emin misiniz?')){ S=bosDurum(); ensureExtras(); kaydet(); toast('Sıfırlandı.'); ciz(); } }
+ 
+ /* ============ ANA EKRAN (giriş öncesi genel durum) ============ */
+ function anaCiz(){
+@@ -1693,7 +2329,7 @@
+       <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Semt</th><th>Kim gidiyor</th></tr></thead><tbody>
+       ${rnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,6).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+         return `<tr><td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
+-        <td><b>${esc(c.ad||'—')}</b></td><td class="sml mut">${esc(c.semt||'')}</td>
++        <td>${klinikLink(a.clinicId, c.ad||'—')}</td><td class="sml mut">${esc(c.semt||'')}</td>
+         <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td></tr>`}).join('')}
+       </tbody></table></div></div>` : `
+       <div class="card"><div class="empty"><div class="e">▦</div>Henüz planlanmış randevu yok.<br><span class="sml">Kader Hanım takvimden ilk randevuyu oluşturduğunda burada görünecek.</span></div></div>`}
+@@ -1723,7 +2359,8 @@
+ async function crmYukle(){
+   const kayit = await Depo.oku();
+   S = (kayit && kayit.clinics && kayit.clinics.length) ? kayit : bosDurum();
+-  ['notes','busy','appts','notifs'].forEach(k=>{ if(!S[k]) S[k]=[]; });
++  ensureExtras();
++  ['notes','busy','appts','notifs','offers','payments','files'].forEach(k=>{ if(!S[k]) S[k]=[]; }); ensureExtras();
+   if(!(kayit && kayit.clinics && kayit.clinics.length)) await Depo.yaz(S);
+ }
+ async function girisYap(){
+@@ -1773,7 +2410,8 @@
+ 
+ (async function init(){
+   S = bosDurum();
+-  ['notes','busy','appts','notifs'].forEach(k=>{ if(!S[k]) S[k]=[]; });
++  ensureExtras();
++  ['notes','busy','appts','notifs','offers','payments','files'].forEach(k=>{ if(!S[k]) S[k]=[]; }); ensureExtras();
+   anaCiz();
+   let m=null; try{ m=sessionStorage.getItem('nfx_me'); }catch(e){}
+   if(m && USERS.some(u=>u.id===m)){
+@@ -1782,7 +2420,7 @@
+       const kayit = await Depo.oku();
+       if(kayit && kayit.clinics){
+         S = kayit;
+-        ['notes','busy','appts','notifs'].forEach(k=>{ if(!S[k]) S[k]=[]; });
++        ['notes','busy','appts','notifs','offers','payments','files'].forEach(k=>{ if(!S[k]) S[k]=[]; }); ensureExtras();
+         await giris(m);
+       } else {
+         try{ sessionStorage.removeItem('nfx_me'); }catch(e){}
