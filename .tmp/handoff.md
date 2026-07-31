@@ -2,21 +2,20 @@
 
 **Tarih:** 2026-07-31
 
-## ACİL — site yine 404
+## ACİL — site 404
 
-`main`’e merge Vercel’in **eksik** `n8n-repo/nefalix-landing` kit’ini production’a basmış olabilir.
+Kök neden: Vercel ← GitHub `n8n-repo` auto-deploy eksik kit’i basıyor.
 
 **Mac şimdi:**
 ```bash
 cd ~/nefalix-landing && npx vercel --prod --yes
-# sonra:
-cd ~/n8n-repo && git pull
+cd ~/n8n-repo && git checkout main && git pull
 bash execution/deploy-kartvizit-cards.sh
 ```
 
-Kalıcı: `vercel.json` → `git.deploymentEnabled: false` + Vercel Dashboard’da n8n-repo Production Git deploy kapat.
+**Kalıcı (bir kez):** Vercel Dashboard → nefalix-landing → Settings → Git → Disconnect / Ignored Build Step `exit 0`
 
-## Sonraki
-1. Mac CLI redeploy
-2. Smoke: `bash execution/smoke-nefalix-public.sh`
-3. Guard branch’i main’e al
+## Repo koruması
+- `nefalix-landing/` → `landing-kit/` (yanlış Root Directory artık fail eder)
+- Kit’te deployable `vercel.json` yok
+- SOP: `directives/vercel_prod_safety.md`

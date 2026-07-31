@@ -59,11 +59,11 @@ fi
 if [[ ! -f k/enes.html || ! -f k/abdulkadir.html ]]; then
   echo "  ! /k kartları eksik — n8n-repo sync"
   mkdir -p k public
-  if [[ -d "$ROOT/nefalix-landing/k" ]]; then
-    cp -R "$ROOT/nefalix-landing/k/." k/
-    [[ -f "$ROOT/nefalix-landing/public/nefalix-logo-512.png" ]] \
-      && cp "$ROOT/nefalix-landing/public/nefalix-logo-512.png" public/ \
-      && cp "$ROOT/nefalix-landing/public/nefalix-logo-512.png" ./nefalix-logo-512.png
+  if [[ -d "$ROOT/landing-kit/k" ]]; then
+    cp -R "$ROOT/landing-kit/k/." k/
+    [[ -f "$ROOT/landing-kit/public/nefalix-logo-512.png" ]] \
+      && cp "$ROOT/landing-kit/public/nefalix-logo-512.png" public/ \
+      && cp "$ROOT/landing-kit/public/nefalix-logo-512.png" ./nefalix-logo-512.png
   fi
 fi
 

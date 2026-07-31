@@ -62,6 +62,7 @@ Yeni Cursor hesabı veya sohbet taşıması yoksa: önce **`.tmp/handoff.md`** o
 | YouTube + GEO (kanal) | `directives/youtube_geo.md` |
 | Kartvizit QR (`/k/enes`) | `directives/kartvizit_qr.md` |
 | Site CSS/asset kırığı | `directives/site_assets.md` |
+| Vercel prod güvenliği (site silinmesin) | `directives/vercel_prod_safety.md` |
 
 ## Self-Annealing Döngüsü
 

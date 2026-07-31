@@ -20,6 +20,7 @@ curl -sL https://nefalix.com/ | grep stylesheet
 | Bu repodan Vercel deploy | Hayır — private **`~/nefalix-landing`** → `vercel --prod` |
 
 Canlı kaynak: `/Users/enesceylan/nefalix-landing` (`shared.css`, `shared.js`, `index.html`).
+Patch kit (deploy etme): `landing-kit/` — `directives/vercel_prod_safety.md`.
 
 ## Acil düzeltme (Mac)
 
