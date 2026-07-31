@@ -2,20 +2,16 @@
 
 **Tarih:** 2026-07-31
 
-## ACİL — site 404
+## MediDent kartvizit
+- Eski QR `https://qrco.de/bcOVp0` → hesap kapalı (kurtarılamaz)
+- Yeni: `https://nefalix.com/k/medident?utm_source=kartvizit&utm_medium=qr`
+- Baskı PNG: `assets/brand/qr-kartvizit-medident.png` (+ `-plain`)
 
-Kök neden: Vercel ← GitHub `n8n-repo` auto-deploy eksik kit’i basıyor.
-
-**Mac şimdi:**
+## ACİL — nefalix.com hâlâ 404 olabilir
 ```bash
 cd ~/nefalix-landing && npx vercel --prod --yes
 cd ~/n8n-repo && git checkout main && git pull
 bash execution/deploy-kartvizit-cards.sh
 ```
 
-**Kalıcı (bir kez):** Vercel Dashboard → nefalix-landing → Settings → Git → Disconnect / Ignored Build Step `exit 0`
-
-## Repo koruması
-- `nefalix-landing/` → `landing-kit/` (yanlış Root Directory artık fail eder)
-- Kit’te deployable `vercel.json` yok
-- SOP: `directives/vercel_prod_safety.md`
+Vercel Git: n8n-repo Production disconnect (`directives/vercel_prod_safety.md`)
