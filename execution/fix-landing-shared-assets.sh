@@ -56,8 +56,8 @@ if ! grep -q 'home-refresh\|refresh-hero\|liquid-sapphire\|logo-lockup\|\-\-purp
 fi
 
 # Kartvizit silinmesin — CSS hotfix bile /k/* korur
-if [[ ! -f k/enes.html || ! -f k/abdulkadir.html ]]; then
-  echo "  ! /k kartları eksik — n8n-repo sync"
+if [[ ! -f k/enes.html || ! -f k/abdulkadir.html || ! -f k/medident.html ]]; then
+  echo "  ! /k kartları eksik — landing-kit sync"
   mkdir -p k public
   if [[ -d "$ROOT/landing-kit/k" ]]; then
     cp -R "$ROOT/landing-kit/k/." k/

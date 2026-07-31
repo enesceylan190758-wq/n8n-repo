@@ -10,8 +10,10 @@ import urllib.request
 CHECKS = [
     ("https://nefalix.com/k/enes", 200, ["Enes Ceylan", "Nefalix", "enes@nefalix.com"]),
     ("https://nefalix.com/k/abdulkadir", 200, ["Abdülkadir", "Nefalix"]),
+    ("https://nefalix.com/k/medident", 200, ["MediDent", "medidentistanbul.com", "+90 549"]),
     ("https://nefalix.com/k/card.css", 200, [":root", "--navy"]),
     ("https://nefalix.com/k/enes.vcf", 200, ["BEGIN:VCARD", "Enes Ceylan"]),
+    ("https://nefalix.com/k/medident.vcf", 200, ["BEGIN:VCARD", "MediDent"]),
     ("https://nefalix.com/nefalix-logo-512.png", 200, None),
 ]
 

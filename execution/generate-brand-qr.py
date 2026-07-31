@@ -17,6 +17,7 @@ PRESETS = {
     "site": "https://nefalix.com?utm_source=kartvizit&utm_medium=qr",
     "enes": "https://nefalix.com/k/enes?utm_source=kartvizit&utm_medium=qr",
     "abdulkadir": "https://nefalix.com/k/abdulkadir?utm_source=kartvizit&utm_medium=qr",
+    "medident": "https://nefalix.com/k/medident?utm_source=kartvizit&utm_medium=qr",
     "whatsapp": "https://wa.me/905491190819?text=Merhaba%2C%20Nefalix%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.",
     "demo": "https://cal.com/enes-ceylan/15min?utm_source=kartvizit",
 }

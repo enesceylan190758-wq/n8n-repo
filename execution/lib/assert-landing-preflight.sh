@@ -18,9 +18,11 @@ assert_landing_preflight() {
     index.html \
     k/enes.html \
     k/abdulkadir.html \
+    k/medident.html \
     k/card.css \
     k/enes.vcf \
-    k/abdulkadir.vcf
+    k/abdulkadir.vcf \
+    k/medident.vcf
   do
     if [[ ! -f "$landing/$f" ]]; then
       echo "  ✗ eksik: $f" >&2
@@ -32,8 +34,8 @@ assert_landing_preflight() {
 
   # vercel.json içinde /k rewrite + GitHub auto-deploy kapalı
   if [[ -f "$landing/vercel.json" ]]; then
-    if ! grep -q '"/k/enes"' "$landing/vercel.json"; then
-      echo "  ✗ vercel.json içinde /k/enes rewrite yok" >&2
+    if ! grep -q '"/k/enes"' "$landing/vercel.json" || ! grep -q '"/k/medident"' "$landing/vercel.json"; then
+      echo "  ✗ vercel.json içinde /k/enes veya /k/medident rewrite yok" >&2
       missing=1
     else
       echo "  ✓ vercel.json /k rewrite"

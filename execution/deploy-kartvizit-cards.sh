@@ -34,7 +34,7 @@ if [[ "$(cd "$LANDING" && pwd)" == "$SRC" ]] || [[ "$LANDING" == *"/landing-kit"
   exit 1
 fi
 
-if [[ ! -f "$SRC/k/enes.html" || ! -f "$SRC/k/abdulkadir.html" ]]; then
+if [[ ! -f "$SRC/k/enes.html" || ! -f "$SRC/k/abdulkadir.html" || ! -f "$SRC/k/medident.html" ]]; then
   echo "HATA: kaynak kartlar yok: $SRC/k/" >&2
   exit 1
 fi
@@ -52,9 +52,11 @@ copy_file() {
 
 copy_file "$SRC/k/enes.html" "$LANDING/k/enes.html"
 copy_file "$SRC/k/abdulkadir.html" "$LANDING/k/abdulkadir.html"
+copy_file "$SRC/k/medident.html" "$LANDING/k/medident.html"
 copy_file "$SRC/k/card.css" "$LANDING/k/card.css"
 copy_file "$SRC/k/enes.vcf" "$LANDING/k/enes.vcf"
 copy_file "$SRC/k/abdulkadir.vcf" "$LANDING/k/abdulkadir.vcf"
+copy_file "$SRC/k/medident.vcf" "$LANDING/k/medident.vcf"
 
 if [[ -f "$SRC/public/nefalix-logo-512.png" ]]; then
   copy_file "$SRC/public/nefalix-logo-512.png" "$LANDING/public/nefalix-logo-512.png"

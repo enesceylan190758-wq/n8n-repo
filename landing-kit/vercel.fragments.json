@@ -5,6 +5,7 @@
   "rewrites": [
     { "source": "/k/enes", "destination": "/k/enes.html" },
     { "source": "/k/abdulkadir", "destination": "/k/abdulkadir.html" },
+    { "source": "/k/medident", "destination": "/k/medident.html" },
     { "source": "/geo-sitemap.xml", "destination": "/api/geo-sitemap" }
   ],
   "headers": [
