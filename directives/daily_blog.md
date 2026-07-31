@@ -98,6 +98,7 @@ python3 execution/schedule-blog-batch.py --count 3 --interval-hours 2
 | Cron boş log | `PYTHONUNBUFFERED=1` + hata JSON loglanır |
 | `Vertex 401 ACCESS_TOKEN_EXPIRED` | `vertex_gemini` SA JWT ile mint eder (bayat `GCP_ACCESS_TOKEN` kullanmaz). Blog cron **09:05** (saatlik refresh `0 * * * *` sonrası). Gerekirse: `WRITE_GCP_TOKEN_TO_ENV=1 python3 execution/refresh-gcp-access-token.py` |
 | Görsel 404 | `execution/blog-images.json` URL'lerini güncelle |
+| Site düz HTML / stil yok | `shared.css` 404 — `directives/site_assets.md` |
 | AI açık değil | Normal — VPS cron bağımsız |
 
 ## İlgili dosyalar

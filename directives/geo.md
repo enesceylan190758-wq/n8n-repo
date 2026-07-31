@@ -123,6 +123,8 @@ curl -sL -o /dev/null -w '%{http_code}\n' https://nefalix.com/geo/$(date +%F)
 curl -sL https://nefalix.com/api/geo/list?limit=3
 curl -sL https://nefalix.com/geo-sitemap.xml | head
 curl -sL https://nefalix.com/llms.txt | head
+# Stil kırığı (shared.css 404) — directives/site_assets.md
+python3 execution/smoke-site-assets.py
 ```
 
 ## Mevcut paketleri yeniden yaz (blog dili temizliği)
@@ -169,6 +171,7 @@ Her satır: motor · mention · URL · rakip. İlk sürüm manuel; Pazar maili h
 | Aynı gün çift GEO | `geo_daily_runs` run_date unique → skip |
 | Mail yok | `BLOG_SMTP_*` / `GEO_NOTIFY_TO` |
 | Paket DB’de var ama site 404 | Landing deploy / proxy; migration VPS’te mi? |
+| Site düz HTML / stil yok | `shared.css` 404 — `directives/site_assets.md` + Mac hotfix |
 | İçerik blog gibi | Kalite kapısı + prompt; `--force` ile yeniden üret (unique: önce eski satırı sil) |
 | Landing şema | FAQPage (görünür SSS = schema), SoftwareApplication, BlogPosting, llms.txt |
 
