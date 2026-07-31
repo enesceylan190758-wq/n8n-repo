@@ -18,7 +18,16 @@ Bkz. **`directives/vercel_prod_safety.md`** — GitHub `n8n-repo` push’u eksik
 | `~/nefalix-landing` | Canlı tam site — sadece Mac CLI `vercel --prod` |
 | `n8n-repo/landing-kit/` | Patch kit (kartlar) — **asla doğrudan deploy etme** |
 
-## Acil düzeltme (Mac)
+## Acil düzeltme
+
+### Ofis dışı / cloud
+
+```bash
+npx vercel login
+bash execution/restore-nefalix-prod-from-vercel.sh
+```
+
+### Mac
 
 ```bash
 cd ~/nefalix-landing && npx vercel --prod --yes
@@ -62,6 +71,7 @@ Eski `qrco.de/...` (üçüncü parti) baskılar **kurtarılamaz** — yeni QR ba
 |-------|-----|
 | `landing-kit/k/*.html` | Dijital kart sayfaları |
 | `landing-kit/vercel.fragments.json` | Rewrite fragment (kit’te deployable vercel.json yok) |
-| `execution/deploy-kartvizit-cards.sh` | Sync + Vercel CLI prod |
+| `execution/deploy-kartvizit-cards.sh` | Sync + Vercel CLI prod (Mac) |
+| `execution/restore-nefalix-prod-from-vercel.sh` | Ofis dışı: eski deploy promote + MediDent + CLI prod |
 | `execution/smoke-nefalix-public.sh` | Canlı smoke |
 | `directives/vercel_prod_safety.md` | Site silinmesin SOP |

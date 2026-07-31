@@ -43,7 +43,20 @@ grep deploymentEnabled vercel.json || echo 'EKLE: "git":{"deploymentEnabled":fal
 - Preflight: `/k` + `shared.css` yoksa deploy iptal
 - Smoke: `bash execution/smoke-nefalix-public.sh`
 
-## Site düştüyse (acil Mac)
+## Site düştüyse
+
+### Ofis dışı / cloud (Mac yok)
+
+```bash
+npx vercel login   # telefonda OAuth onay
+bash execution/restore-nefalix-prod-from-vercel.sh
+bash execution/smoke-nefalix-public.sh
+```
+
+Script: son sağlam production deploy’u promote eder → dosyaları çeker → `landing-kit` MediDent kartını ekler → CLI prod → smoke.  
+Ayrıca Vercel **Ignored Build Step = `exit 0`** yazar (GitHub `n8n-repo` push’u prod’u ezmesin).
+
+### Acil Mac
 
 ```bash
 cd ~/nefalix-landing && npx vercel --prod --yes
@@ -52,7 +65,7 @@ bash execution/deploy-kartvizit-cards.sh
 bash execution/smoke-nefalix-public.sh
 ```
 
-Beklenen: home + `/k/enes` + `shared.css` → 200.
+Beklenen: home + `/k/enes` + `/k/medident` + `shared.css` → 200.
 
 ## Deploy kuralı
 
@@ -67,7 +80,8 @@ Beklenen: home + `/k/enes` + `shared.css` → 200.
 | Dosya | Rol |
 |-------|-----|
 | `landing-kit/` | Patch kaynağı |
-| `execution/deploy-kartvizit-cards.sh` | Sync + CLI prod |
+| `execution/deploy-kartvizit-cards.sh` | Sync + CLI prod (Mac) |
+| `execution/restore-nefalix-prod-from-vercel.sh` | Ofis dışı kurtarma (promote + patch) |
 | `execution/lib/assert-landing-preflight.sh` | Deploy kilidi |
 | `execution/smoke-nefalix-public.sh` | Canlı smoke |
 | `directives/kartvizit_qr.md` | QR /k |
