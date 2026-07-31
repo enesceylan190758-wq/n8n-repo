@@ -9,22 +9,25 @@ Basılı kartvizit QR’ı açılmıyor:
 
 QR içeriği (decode): aynı URL’ler; baskıyı yeniden basmaya gerek yok — **sayfayı geri getir**.
 
-## Kök neden
+## Kök neden (tekrarlayan — kritik)
 
-1. Canlı site private **`~/nefalix-landing`** → `vercel --prod`.
-2. `/k/enes` + `/k/abdulkadir` o projede yoksa veya son deploy boş/kırık ise Vercel `NOT_FOUND`.
-3. Cloud agent’ta landing + Vercel token yok; prod deploy **Mac’te**.
-
-Tüm `nefalix.com` 404 ise (homepage dahil) önce tam landing deploy, sonra kartlar — veya tek seferde `deploy-kartvizit-cards.sh` (landing doluysa).
+1. Canlı site private **`~/nefalix-landing`** → sadece Mac’te `vercel --prod` (CLI).
+2. **`n8n-repo` içindeki `nefalix-landing/` bir patch kit’tir** — tam site değil.
+3. Vercel projesi GitHub `n8n-repo`’ya bağlıysa `main` push **eksik kit’i production’a basar** → tüm domain `NOT_FOUND` (QR dahil).
+4. Koruma: `vercel.json` → `"git": { "deploymentEnabled": false }` + Dashboard’da Production Git bağlantısını kapat / Ignored Build Step.
 
 ## Acil düzeltme (Mac)
 
+Site yine 404 ise (GitHub merge sonrası sık olur):
+
 ```bash
+cd ~/nefalix-landing && npx vercel --prod --yes
+# veya tam sync:
 cd ~/n8n-repo && git pull
 bash execution/deploy-kartvizit-cards.sh
 ```
 
-Script: `nefalix-landing/k/*` → `~/nefalix-landing/k/` kopyalar, `vercel.json` rewrite merge, `vercel --prod`, smoke.
+Normal kart sync:
 
 Elle:
 

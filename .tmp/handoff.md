@@ -2,16 +2,21 @@
 
 **Tarih:** 2026-07-31
 
-## Tamam
-- Kartvizit QR canlı (`/k/enes`, `/k/abdulkadir`)
-- Merge `main`: kartvizit restore + deploy preflight guard
-- Smoke: `bash execution/smoke-nefalix-public.sh`
+## ACİL — site yine 404
 
-## Mac
+`main`’e merge Vercel’in **eksik** `n8n-repo/nefalix-landing` kit’ini production’a basmış olabilir.
+
+**Mac şimdi:**
 ```bash
-cd ~/n8n-repo && git checkout main && git pull
-# stash varsa: git stash pop
+cd ~/nefalix-landing && npx vercel --prod --yes
+# sonra:
+cd ~/n8n-repo && git pull
+bash execution/deploy-kartvizit-cards.sh
 ```
 
+Kalıcı: `vercel.json` → `git.deploymentEnabled: false` + Vercel Dashboard’da n8n-repo Production Git deploy kapat.
+
 ## Sonraki
-- Private `~/nefalix-landing` için GitHub remote yedek (isteğe bağlı)
+1. Mac CLI redeploy
+2. Smoke: `bash execution/smoke-nefalix-public.sh`
+3. Guard branch’i main’e al

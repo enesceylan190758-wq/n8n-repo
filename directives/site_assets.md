@@ -47,10 +47,10 @@ Telefon/browser: hard refresh.
 
 ## Deploy kuralı (tekrar kırılmasın)
 
-1. `vercel --prod` **önce** preflight: `shared.css` + `shared.js` + `k/enes.html` (`assert-landing-preflight.sh`).
-2. Landing'den dosya silme / “temizlik” deploy'u yasak; CRM-only değişiklik bile tüm projeyi publish eder.
-3. `nefalix-site-v2/` → landing'e **kör kopyalama** yapma (refresh CSS ezilir).
-4. Guardian / smoke: `bash execution/smoke-nefalix-public.sh` (CSS + kartvizit).
+1. Production deploy **sadece** Mac CLI: `cd ~/nefalix-landing && npx vercel --prod` — GitHub `n8n-repo` push asla prod basmamalı.
+2. `vercel.json` → `"git": { "deploymentEnabled": false }` (kit + private landing).
+3. `vercel --prod` **önce** preflight: `shared.css` + `k/enes.html`.
+4. Guardian / smoke: `bash execution/smoke-nefalix-public.sh`.
 
 ## Edge case
 
