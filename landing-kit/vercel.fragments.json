@@ -1,0 +1,19 @@
+{
+  "git": {
+    "deploymentEnabled": false
+  },
+  "rewrites": [
+    { "source": "/k/enes", "destination": "/k/enes.html" },
+    { "source": "/k/abdulkadir", "destination": "/k/abdulkadir.html" },
+    { "source": "/geo-sitemap.xml", "destination": "/api/geo-sitemap" }
+  ],
+  "headers": [
+    {
+      "source": "/k/(.*).vcf",
+      "headers": [
+        { "key": "Content-Type", "value": "text/vcard; charset=utf-8" },
+        { "key": "Content-Disposition", "value": "attachment" }
+      ]
+    }
+  ]
+}
