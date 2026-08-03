@@ -298,7 +298,7 @@ tr:hover td{background:#FAFCFD}
     <button class="nav" data-p="whatsapp"><span class="ic">✆</span><span class="lb">WhatsApp</span></button>
     <div class="navgrp">Veri</div>
     <button class="nav" data-p="havuz"><span class="ic">▤</span><span class="lb">Klinik Havuzu</span><span class="cnt" id="c-hav">0</span></button>
-    <button class="nav" data-p="gorusme"><span class="ic">✎</span><span class="lb">Görüşme Notları</span></button>
+    <button class="nav" data-p="gorusme"><span class="ic">✎</span><span class="lb">Saha Görüşme</span></button>
     <div class="navgrp">Destek</div>
     <button class="nav" data-p="yardim"><span class="ic">?</span><span class="lb">Yardım</span></button>
     <button class="nav" data-p="ayar"><span class="ic">⚙</span><span class="lb">Ayarlar</span></button>
@@ -696,7 +696,7 @@ const SAYFALAR = {
   randevu:{t:'Randevular', f:pRandevu},
   whatsapp:{t:'WhatsApp — Evolution', f:pWhatsapp},
   havuz:{t:'Klinik Havuzu', f:pHavuz},
-  gorusme:{t:'Görüşme Notları', f:pGorusme},
+  gorusme:{t:'Saha Görüşme — Firma & Not', f:pGorusme},
   yardim:{t:'Yardım', f:pYardim},
   ayar:{t:'Ayarlar', f:pAyar}
 };
@@ -747,9 +747,16 @@ function pKokpit(){
       ${benimRnd.length? `<div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Bölge</th><th></th></tr></thead><tbody>
         ${benimRnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,8).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
         return `<tr><td class="mono">${tarihTR(a.tarih)}</td><td class="mono"><b>${a.saat}</b></td><td>${klinikLink(a.clinicId, c.ad||a.baslik||'—')}</td><td class="sml mut">${esc(c.semt||'')}</td>
-        <td><button class="btn sm" onclick="klinikAc('${a.clinicId}')">Kart</button></td></tr>`}).join('')}
+        <td style="white-space:nowrap">
+          <button class="btn sm" onclick="klinikAc('${a.clinicId}')">Kart</button>
+          <button class="btn sm p" onclick="sahaGorusmeAc({cid:'${a.clinicId}',aid:'${a.id}'})">Not gir</button>
+        </td></tr>`}).join('')}
       </tbody></table></div>`
       : `<div class="empty"><div class="e">▦</div>Planlanmış görüşmen yok.<br><span class="sml">Kader Hanım randevu oluşturduğunda burada görünecek.</span></div>`}
+      <div style="padding:12px 16px;border-top:1px solid var(--line)">
+        <button class="btn p" onclick="sahaGorusmeAc()">+ Saha görüşmesi kaydet</button>
+        <span class="sml mut" style="margin-left:8px">Firma adı + görüşme notu</span>
+      </div>
       </div>`;
 
   return `
@@ -998,18 +1005,24 @@ function pRandevu(){
   const gelecek = list.filter(a=>a.tarih>=bugun()), gecmis = list.filter(a=>a.tarih<bugun());
   const tablo = (arr,gec)=> !arr.length? `<div class="empty"><div class="e">▦</div>Kayıt yok.</div>` : `
     <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Adres</th><th>Katılımcı</th><th>Durum</th><th></th></tr></thead><tbody>
-    ${arr.map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};return `<tr>
+    ${arr.map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+      const notOk = a.durum!=='yapildi' && a.tarih<=bugun();
+      return `<tr>
       <td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
       <td>${klinikLink(a.clinicId, c.ad||a.baslik||'—')}<div class="sml mut">${esc(c.brans||'')}</div></td>
       <td class="sml mut">${esc((c.adres||'').slice(0,42))}</td>
       <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td>
       <td>${a.durum==='yapildi'?'<span class="chip" style="background:var(--brand-soft);color:var(--brand-d)"><span class="b"></span>Yapıldı</span>':'<span class="chip" style="background:#FEF6E7;color:#B27A00"><span class="b"></span>Planlandı</span>'}</td>
-      <td style="white-space:nowrap">${gec&&a.durum!=='yapildi'?`<button class="btn sm p" onclick="gorusmeNotAc('${a.clinicId}','${a.id}')">Notu gir</button>`:''}
+      <td style="white-space:nowrap">${notOk?`<button class="btn sm p" onclick="sahaGorusmeAc({cid:'${a.clinicId}',aid:'${a.id}'})">Not gir</button>`:''}
+        ${a.durum==='yapildi'?`<button class="btn sm" onclick="sahaGorusmeAc({cid:'${a.clinicId}',aid:'${a.id}'})">Not ekle</button>`:''}
         <button class="btn sm" onclick="randevuAc('${a.id}')">Detay</button></td></tr>`}).join('')}
     </tbody></table></div>`;
   return `
   <div class="card" style="margin-bottom:14px"><div class="card-h"><h3>Yaklaşan randevular</h3>
-    <div class="r"><span class="mut sml">${gelecek.length} kayıt</span>${ME.id==='kd'?'<button class="btn sm p" onclick="git(\'takvim\')">+ Takvimden ekle</button>':''}</div></div>${tablo(gelecek,false)}</div>
+    <div class="r"><span class="mut sml">${gelecek.length} kayıt</span>
+      <button class="btn sm p" onclick="sahaGorusmeAc()">+ Saha görüşmesi</button>
+      ${ME.id==='kd'?'<button class="btn sm" onclick="git(\'takvim\')">+ Takvimden ekle</button>':''}
+    </div></div>${tablo(gelecek,false)}</div>
   <div class="card"><div class="card-h"><h3>Geçmiş randevular</h3><div class="r"><span class="mut sml">${gecmis.length} kayıt</span></div></div>${tablo(gecmis.reverse(),true)}</div>`;
 }
 
@@ -1133,12 +1146,35 @@ function pHavuz(){
   </tbody></table></div></div>`;
 }
 
-/* ============ SAYFA: GÖRÜŞME NOTLARI ============ */
+/* ============ SAYFA: SAHA GÖRÜŞME (firma + not) ============ */
 function pGorusme(){
   const N = S.notes.slice(0,200);
   return `
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-h"><h3>Saha görüşmesi kaydet</h3>
+      <div class="r"><button class="btn sm p" onclick="sahaGorusmeAc()">Tam ekran form</button></div>
+    </div>
+    <div class="card-b">
+      <p class="sml mut" style="margin-bottom:12px">Klinik / firma adını yaz, görüşmede konuşulanları kaydet. Kayıt klinik kartına ve Dinamik Arama’ya bağlanır.</p>
+      <div class="row">
+        <div style="flex:1.2"><label class="f">Firma / klinik adı *</label>
+          <input id="sg_page_ad" type="text" list="sg_page_clist" placeholder="Örn. MediDent Kartal" autocomplete="off">
+          <datalist id="sg_page_clist">${S.clinics.slice(0,400).map(c=>`<option value="${esc(c.ad)}"></option>`).join('')}</datalist>
+        </div>
+        <div style="flex:0.8"><label class="f">Sonuç sekmesi</label>
+          <select id="sg_page_seg">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`<option value="${s.k}" ${s.k==='gorusuldu'?'selected':''}>${esc(s.ad)}</option>`).join('')}</select>
+        </div>
+      </div>
+      <label class="f">Görüşme notları *</label>
+      <textarea id="sg_page_not" rows="4" placeholder="Kiminle görüşüldü, ne konuşuldu, sonraki adım…"></textarea>
+      ${hatirlatmaAlanHtml('sg_page_hat', '', {label:'Manuel dönüş tarihi (opsiyonel)', hint:'Boşsa sekme varsayılanı. Doluysa Dinamik Arama bu tarihe düşer.'})}
+      <div class="row" style="justify-content:flex-end;margin-top:10px">
+        <button class="btn p" onclick="sahaGorusmeKaydetSayfa()">Görüşmeyi kaydet</button>
+      </div>
+    </div>
+  </div>
   <div class="card"><div class="card-h"><h3>Tüm görüşme kayıtları</h3><div class="r"><span class="mut sml">${S.notes.length} kayıt</span></div></div>
-  ${N.length? `<div class="tscroll"><table><thead><tr><th>Tarih</th><th>Klinik</th><th>Sekme</th><th>Not</th><th>Kaydeden</th><th></th></tr></thead><tbody>
+  ${N.length? `<div class="tscroll"><table><thead><tr><th>Tarih</th><th>Firma / Klinik</th><th>Sekme</th><th>Not</th><th>Kaydeden</th><th></th></tr></thead><tbody>
     ${N.map(n=>{const c=S.clinics.find(x=>x.id===n.clinicId)||{};const d=new Date(n.tarih);return `<tr>
       <td class="mono sml">${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}<div class="mut" style="font-size:11px">${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</div></td>
       <td>${klinikLink(n.clinicId, c.ad||'—')}<div class="sml mut">${esc(c.semt||'')}</div></td>
@@ -1147,7 +1183,7 @@ function pGorusme(){
       <td class="sml">${esc(usr(n.userId).ad.split(' ')[0])}</td>
       <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${n.clinicId}','gorusme')">Kart</button>
         <button class="btn sm p" onclick="notDuzenleAc('${n.id}')">Notu düzenle</button></td></tr>`}).join('')}
-  </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz görüşme notu yok.<br><span class="sml">Arama Ekranı'ndan bir sonuç işaretlediğinde buraya düşer.</span></div>`}
+  </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz saha görüşme notu yok.<br><span class="sml">Yukarıdaki formdan firma adı + not girerek başla.</span></div>`}
   </div>`;
 }
 
@@ -2207,7 +2243,7 @@ function randevuAc(aid){
     <button class="btn d" onclick="randevuIptal('${aid}')">Randevuyu iptal et</button>
     <div style="flex:1"></div>
     <button class="btn" onclick="mKapat()">Kapat</button>
-    <button class="btn p" onclick="mKapat();gorusmeNotAc('${a.clinicId}','${aid}')">Görüşme notunu gir</button>
+    <button class="btn p" onclick="mKapat();sahaGorusmeAc({cid:'${a.clinicId}',aid:'${aid}'})">Görüşme notunu gir</button>
   </div>`);
 }
 function randevuIptal(aid){
@@ -2222,11 +2258,111 @@ function randevuIptal(aid){
   });
   kaydet(); mKapat(); toast('Randevu iptal edildi — panel + mail.'); ciz();
 }
+
+/* --- Saha görüşmesi: firma adı + not --- */
+function klinikBulVeyaOlustur(ad){
+  const norm = (ad||'').trim().toLowerCase();
+  if(!norm) return null;
+  let c = S.clinics.find(x=>(x.ad||'').trim().toLowerCase()===norm);
+  if(c) return {c, yeni:false};
+  c = {
+    id:uid(), ad:ad.trim(), brans:'', tel:'', email:'', web:'',
+    sehir:'İstanbul', semt:'', ilce:'', bolge:'', adres:'',
+    yetkili:'', unvan:'', hekimSayisi:'', olcek:'', uluslararasi:'',
+    vergi:'', kaynak:'Saha görüşmesi', skor:3, sorumlu:ME.ad.split(' ')[0],
+    dalga:'', kisiler:[],
+    segment:'gorusuldu', sonArama:null, hatirlatma:null, aramaSayisi:0
+  };
+  S.clinics.unshift(c);
+  return {c, yeni:true};
+}
+function sahaGorusmeAc(opts){
+  const o = opts||{};
+  const a = o.aid ? S.appts.find(x=>x.id===o.aid) : null;
+  const cid = o.cid || (a && a.clinicId) || '';
+  const c = cid ? (S.clinics.find(x=>x.id===cid)||{}) : {};
+  const firma = c.ad || a?.baslik || '';
+  mAc(`<div class="m-h"><h3>Saha görüşmesi kaydı</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <div class="sml mut" style="margin-bottom:8px">${a?`Randevu: <b class="mono">${tarihTR(a.tarih)} · ${a.saat}</b>`:'Randevu dışı / serbest kayıt'}</div>
+    <div><label class="f">Firma / klinik adı *</label>
+      <input id="sg_ad" type="text" list="sg_clist" value="${esc(firma)}" placeholder="Görüşülen firma adı" autocomplete="off">
+      <datalist id="sg_clist">${S.clinics.slice(0,400).map(x=>`<option value="${esc(x.ad)}"></option>`).join('')}</datalist>
+    </div>
+    <input type="hidden" id="sg_cid" value="${esc(cid)}">
+    <input type="hidden" id="sg_aid" value="${esc(o.aid||'')}">
+    <div><label class="f">Görüşme notları *</label>
+      <textarea id="sg_not" rows="5" placeholder="Kiminle görüşüldü, ne konuşuldu, sonraki adım ne?">${esc(a?.gorusmeNot||'')}</textarea></div>
+    <div><label class="f">Sonuç sekmesi</label>
+      <select id="sg_seg">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`<option value="${s.k}" ${s.k===(c.segment&&c.segment!=='randevu'?c.segment:'gorusuldu')?'selected':''}>${esc(s.ad)}</option>`).join('')}</select>
+    </div>
+    ${hatirlatmaAlanHtml('sg_hat', '', {label:'Manuel dönüş tarihi (opsiyonel)', hint:'Boşsa sekme varsayılanı. Örn. +4 / +5 gün → Dinamik Arama.'})}
+  </div>
+  <div class="m-f">
+    <button class="btn" onclick="mKapat()">Vazgeç</button>
+    <button class="btn p" onclick="sahaGorusmeKaydet()">Kaydet</button>
+  </div>`);
+}
+function sahaGorusmeKaydetCore(ad, not, sk, hatId, cidHint, aid){
+  const firma = (ad||'').trim();
+  const metin = (not||'').trim();
+  if(!firma){ toast('Firma / klinik adı zorunlu.'); return null; }
+  if(!metin){ toast('Görüşme notu zorunlu.'); return null; }
+  const seg = SEG[sk] ? sk : 'gorusuldu';
+  let c = cidHint ? S.clinics.find(x=>x.id===cidHint) : null;
+  let yeni = false;
+  if(c){
+    // İsim farklı yazıldıysa notta firma satırı kalsın; klinik adını sadece boşsa doldur
+    if(!(c.ad||'').trim()) c.ad = firma;
+  } else {
+    const r = klinikBulVeyaOlustur(firma);
+    c = r.c; yeni = r.yeni;
+  }
+  const notMetin = (c.ad && c.ad.trim().toLowerCase()!==firma.toLowerCase())
+    ? (`Firma: ${firma} · `+metin)
+    : metin;
+  segmentAta(c.id, seg, notMetin);
+  const manuel = hatId ? hatirlatmaOku(hatId) : '';
+  if(manuel && seg!=='randevu'){
+    c.hatirlatma = manuel;
+  }
+  if(aid){
+    const a = S.appts.find(x=>x.id===aid);
+    if(a){
+      a.durum = 'yapildi';
+      a.gorusmeNot = metin;
+      a.gorusmeTarih = new Date().toISOString();
+      a.gorusmeUser = ME.id;
+    }
+  }
+  kaydet();
+  return {c, yeni, seg, manuel};
+}
+function sahaGorusmeKaydet(){
+  const ad = document.getElementById('sg_ad')?.value||'';
+  const not = document.getElementById('sg_not')?.value||'';
+  const sk = document.getElementById('sg_seg')?.value||'gorusuldu';
+  const cid = document.getElementById('sg_cid')?.value||'';
+  const aid = document.getElementById('sg_aid')?.value||'';
+  const r = sahaGorusmeKaydetCore(ad, not, sk, 'sg_hat', cid, aid);
+  if(!r) return;
+  mKapat();
+  toast((r.yeni?'Yeni firma eklendi · ':'')+'Görüşme kaydedildi'+(r.manuel?' · dönüş '+tarihTR(r.manuel):''));
+  ciz();
+  klinikAc(r.c.id, 'gorusme');
+}
+function sahaGorusmeKaydetSayfa(){
+  const ad = document.getElementById('sg_page_ad')?.value||'';
+  const not = document.getElementById('sg_page_not')?.value||'';
+  const sk = document.getElementById('sg_page_seg')?.value||'gorusuldu';
+  const r = sahaGorusmeKaydetCore(ad, not, sk, 'sg_page_hat', '', '');
+  if(!r) return;
+  toast((r.yeni?'Yeni firma eklendi · ':'')+'Görüşme kaydedildi'+(r.manuel?' · dönüş '+tarihTR(r.manuel):''));
+  ciz();
+  klinikAc(r.c.id, 'gorusme');
+}
 function gorusmeNotAc(cid, aid){
-  const a = S.appts.find(x=>x.id===aid);
-  if(a) a.durum='yapildi';
-  kaydet(true);
-  aramaKaydiAc(cid, 'gorusuldu');
+  sahaGorusmeAc({cid, aid});
 }
 
 /* --- Klinik ekle --- */
