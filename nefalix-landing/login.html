@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<!-- nefalix-seo-start -->
+<meta name="robots" content="noindex, nofollow">
+<!-- nefalix-seo-end -->
+  <title>Giriş | Nefalix Klinik Paneli</title>
+  <link rel="icon" href="/assets/brand/favicon-192.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/nefalix-dashboard.css" />
+</head>
+<body class="login-page">
+  <div class="login-shell">
+    <div class="login-brand">
+      <img src="/assets/brand/nefalix-logo.png" alt="Nefalix" class="login-logo" />
+      <h1>Nefalix Klinik Paneli</h1>
+      <p>MediDent İstanbul Kartal · Hasta deneyimi ve itibar yönetimi</p>
+      <ul class="login-features">
+        <li>Inbox ve WhatsApp mesajları</li>
+        <li>NPS ve Google yorum takibi</li>
+        <li>Recall ve itibar modülleri</li>
+      </ul>
+    </div>
+    <div class="login-card">
+      <h2>Oturum aç</h2>
+      <p class="login-sub">Yetkili kullanıcı hesabınızla giriş yapın</p>
+      <form id="login-form" class="login-form">
+        <label>
+          <span>E-posta</span>
+          <input type="email" id="email" name="email" autocomplete="username" required placeholder="ornek@klinik.com" />
+        </label>
+        <label>
+          <span>Şifre</span>
+          <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••••" />
+        </label>
+        <p id="login-error" class="login-error hidden"></p>
+        <button type="submit" id="login-btn" class="btn-primary btn-block">Giriş yap</button>
+      </form>
+      <p class="login-foot"><a href="/">← Ana siteye dön</a></p>
+    </div>
+  </div>
+  <script type="module" src="/nefalix-login.js"></script>
+</body>
+</html>

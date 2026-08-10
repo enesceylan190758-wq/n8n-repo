@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-tab:hover { color:#4338ca !important; }
+  .nf-row:hover { background:#f3f1fb !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="rapor" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 40px;">
+    <div style="background:#fff; border-radius:14px 14px 0 0; border:1px solid #ece9f7; border-bottom:none; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px 24px 0;">
+      <div style="font-size:18px; font-weight:700; color:#241854; margin-bottom:16px;">CRM Raporu</div>
+      <div style="display:flex; gap:6px; overflow-x:auto;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><div class="nf-tab" onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.label }}</div></sc-for>
+      </div>
+    </div>
+    <div style="background:#fff; border-radius:0 0 14px 14px; border:1px solid #ece9f7; border-top:none; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:24px;">
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:50px; text-align:center; color:#8b87a8;">Rapor hesaplanıyor...</div></sc-if>
+
+      <sc-if value="{{ isTrend }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:18px;">👤 Lead - Temsilci dağılımı (Aylık)</div>
+        <div style="display:flex; align-items:flex-end; gap:20px; height:280px; padding:0 10px 30px; border-bottom:1px solid #eee; position:relative;">
+          <sc-for list="{{ trendBars }}" as="b" hint-placeholder-count="6">
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end;">
+              <div style="display:flex; flex-direction:column; justify-content:flex-end; width:64px; height:100%;">
+                <sc-for list="{{ b.segs }}" as="s" hint-placeholder-count="2"><div style="{{ s.style }}">{{ s.label }}</div></sc-for>
+              </div>
+              <span style="font-size:11px; color:#8b87a8; white-space:nowrap;">{{ b.month }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:16px; margin-top:16px; justify-content:center;">
+          <sc-for list="{{ trendLegend }}" as="l" hint-placeholder-count="2"><span style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:#4b4770;"><span style="width:12px; height:12px; border-radius:3px; background:{{ l.color }}; display:inline-block;"></span>{{ l.label }}</span></sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSegment }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:16px;">🗂 Güncel Temsilci - Segment dağılımı</div>
+        <div style="overflow-x:auto;">
+          <div style="{{ segHeadStyle }}">
+            <span style="font-weight:700; color:#241854; font-size:12.5px;">Segment</span>
+            <sc-for list="{{ reps }}" as="r" hint-placeholder-count="3"><span style="font-weight:700; color:#241854; font-size:12.5px; text-align:right;">{{ r }}</span></sc-for>
+            <span style="font-weight:700; color:#241854; font-size:12.5px; text-align:right;">Toplam</span>
+          </div>
+          <sc-for list="{{ segRows }}" as="row" hint-placeholder-count="8">
+            <div class="nf-row" style="{{ row.style }}">
+              <span style="display:flex; align-items:center; gap:7px; font-size:12.5px; color:#4b4770;"><span style="{{ row.dot }}"></span>{{ row.segment }}</span>
+              <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="3"><span style="text-align:right; font-size:12.5px; color:#241854;">{{ c }}</span></sc-for>
+              <span style="text-align:right; font-size:12.5px; font-weight:700; color:#241854;">{{ row.total }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReferans }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:12.5px; border-radius:9px; padding:10px 14px; margin-bottom:18px;">✎ Aşağıdaki tablolar, her temsilcinin referans kaynağına göre performansını gösterir.</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <sc-for list="{{ repCards }}" as="rc" hint-placeholder-count="2">
+            <div style="border:1px solid #eee7fb; border-radius:12px; overflow:hidden;">
+              <div style="background:#241854; color:#fff; padding:12px 16px; font-size:13.5px; font-weight:700;">{{ rc.name }}</div>
+              <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; padding:10px 16px; background:#fbfaff; font-size:11.5px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+                <span>Referans</span><span style="text-align:right;">Kurum</span><span style="text-align:right;">Randevu</span><span style="text-align:right;">Satış</span>
+              </div>
+              <sc-for list="{{ rc.rows }}" as="r" hint-placeholder-count="5">
+                <div style="{{ r.style }}">
+                  <span style="font-size:12px; color:#4b4770;">{{ r.ref }}</span>
+                  <span style="text-align:right; font-size:12px; color:#241854;">{{ r.danisan }}</span>
+                  <span style="text-align:right; font-size:12px; color:#241854;">{{ r.randevu }}</span>
+                  <span style="text-align:right; font-size:12px; color:#241854;">{{ r.satis }}</span>
+                </div>
+              </sc-for>
+              <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; padding:11px 16px; background:#f4f2fb; font-size:12px; font-weight:700; color:#241854;">
+                <span>Toplam</span><span style="text-align:right;">{{ rc.totDanisan }}</span><span style="text-align:right;">{{ rc.totRandevu }}</span><span style="text-align:right;">{{ rc.totSatis }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFinans }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:24px;">
+          <div style="background:linear-gradient(135deg,#16a34a,#22c55e); border-radius:14px; padding:20px; color:#fff;"><div style="font-size:13px; opacity:0.9;">Toplam Gelir (TRY)</div><div style="font-size:22px; font-weight:800; margin-top:6px;">{{ finGirisTRY }}</div></div>
+          <div style="background:linear-gradient(135deg,#ef4444,#dc2626); border-radius:14px; padding:20px; color:#fff;"><div style="font-size:13px; opacity:0.9;">Toplam Gider (TRY)</div><div style="font-size:22px; font-weight:800; margin-top:6px;">{{ finCikisTRY }}</div></div>
+          <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:14px; padding:20px; color:#fff;"><div style="font-size:13px; opacity:0.9;">Net (TRY)</div><div style="font-size:22px; font-weight:800; margin-top:6px;">{{ finNetTRY }}</div></div>
+          <div style="background:linear-gradient(135deg,#2563eb,#22d3ee); border-radius:14px; padding:20px; color:#fff;"><div style="font-size:13px; opacity:0.9;">Açık Bakiye</div><div style="font-size:22px; font-weight:800; margin-top:6px;">{{ finBakiye }}</div></div>
+        </div>
+        <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:14px;">İşlem tipine göre kasa dağılımı</div>
+        <sc-for list="{{ finRows }}" as="r" hint-placeholder-count="6">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <span style="width:200px; font-size:12.5px; color:#4b4770; flex-shrink:0;">{{ r.label }}</span>
+            <div style="flex:1; height:12px; background:#f0eef8; border-radius:6px; overflow:hidden;"><div style="{{ r.barStyle }}"></div></div>
+            <span style="width:130px; text-align:right; font-size:12.5px; font-weight:700; color:#241854;">{{ r.value }}</span>
+          </div>
+        </sc-for>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900}}">
+const TABS = [
+  { key: 'trend', label: '📈 CRM-Trend' },
+  { key: 'segment', label: '🗂 Temsilci-Segment dağılımı' },
+  { key: 'referans', label: '👥 Temsilci-Referans değerlendirmesi' },
+  { key: 'finans', label: '💰 Finansal Özet' }
+];
+const MONTHS_SHORT = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+const REP_COLORS = ['#22c55e', '#2563eb', '#f59e0b', '#ec4899', '#7c3aed'];
+function money(v, kur) { return Math.round(Math.abs(v)).toLocaleString('tr-TR') + ' ' + (kur || 'TRY'); }
+function segColor(s) { s = (s || '').toLowerCase(); if (s.includes('ulaşılamadı')) return '#f59e0b'; if (s.includes('sıcak')) return '#ef4444'; if (s.includes('sonra aranacak')) return '#2563eb'; if (s.includes('uzun vade') || s.includes('potansiyel')) return '#7c3aed'; if (s.includes('olumsuz') || s.includes('başka')) return '#9ca3af'; if (s.includes('teklif')) return '#0891b2'; return '#a78bfa'; }
+
+class Component extends DCLogic {
+  state = { ready: false, tab: 'trend' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  topReps(list, n) {
+    const m = {}; list.forEach(d => { const t = (d['Satış temsilcisi'] || '').trim(); if (t) m[t] = (m[t] || 0) + 1; });
+    return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, n).map(x => x[0]);
+  }
+  renderVals() {
+    const tabs = TABS.map(t => ({
+      label: t.label, pick: () => this.setState({ tab: t.key }),
+      style: { padding: '12px 18px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', color: this.state.tab === t.key ? '#4338ca' : '#8b87a8', borderBottom: this.state.tab === t.key ? '3px solid #7c3aed' : '3px solid transparent' }
+    }));
+    if (!this.state.ready) return { loading: true, tabs, isTrend: false, isSegment: false, isReferans: false, isFinans: false };
+    const N = window.Nefalix;
+    const list = N.getDanisan({ size: 100000 }).rows;
+    const reps = this.topReps(list, 2);
+    const base = { loading: false, tabs, isTrend: false, isSegment: false, isReferans: false, isFinans: false };
+
+    if (this.state.tab === 'trend') {
+      const byMonth = {};
+      list.forEach(d => { const dt = N.parseDate(d['Kayıt tarihi']); if (!dt) return; const key = dt.getFullYear() + '-' + dt.getMonth(); const t = (d['Satış temsilcisi'] || '').trim(); if (!reps.includes(t)) return; (byMonth[key] = byMonth[key] || {})[t] = (byMonth[key][t] || 0) + 1; });
+      const keys = Object.keys(byMonth).sort((a, b) => { const [ay, am] = a.split('-').map(Number), [by, bm] = b.split('-').map(Number); return ay !== by ? ay - by : am - bm; }).slice(-6);
+      let max = 1; keys.forEach(k => { let s = 0; reps.forEach(r => s += byMonth[k][r] || 0); if (s > max) max = s; });
+      const trendBars = keys.map(k => {
+        const [y, mo] = k.split('-').map(Number);
+        return { month: MONTHS_SHORT[mo] + ' ' + y, segs: reps.map((r, ri) => { const v = byMonth[k][r] || 0; return { label: v || '', style: { background: REP_COLORS[ri], height: (v / max * 240) + 'px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '11px', fontWeight: 700 } }; }) };
+      });
+      return Object.assign(base, { isTrend: true, trendBars, trendLegend: reps.map((r, i) => ({ label: r, color: REP_COLORS[i] })) });
+    }
+
+    if (this.state.tab === 'segment') {
+      const segs = {}; const repSet = this.topReps(list, 4);
+      list.forEach(d => { const s = (d['Segment'] || '(Boş)').trim() || '(Boş)'; const t = (d['Satış temsilcisi'] || '').trim(); const row = segs[s] = segs[s] || { total: 0, reps: {} }; row.total++; if (repSet.includes(t)) row.reps[t] = (row.reps[t] || 0) + 1; });
+      const segRows = Object.entries(segs).sort((a, b) => b[1].total - a[1].total).slice(0, 12).map(([seg, o], i) => ({
+        segment: seg, dot: { width: '9px', height: '9px', borderRadius: '50%', background: segColor(seg), display: 'inline-block', flexShrink: 0 },
+        cells: repSet.map(r => o.reps[r] || 0), total: o.total,
+        style: { display: 'grid', gridTemplateColumns: '2fr repeat(' + (repSet.length + 1) + ', 1fr)', alignItems: 'center', gap: '8px', padding: '11px 14px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      }));
+      return Object.assign(base, { isSegment: true, reps: repSet, segRows, segHeadStyle: { display: 'grid', gridTemplateColumns: '2fr repeat(' + (repSet.length + 1) + ', 1fr)', gap: '8px', padding: '11px 14px', background: '#f4f2fb', borderRadius: '8px', marginBottom: '2px' } });
+    }
+
+    if (this.state.tab === 'referans') {
+      const repCards = reps.map(rep => {
+        const rows0 = {};
+        list.filter(d => (d['Satış temsilcisi'] || '').trim() === rep).forEach(d => {
+          const ref = (d['Referans kaynağı'] || 'Boş').trim() || 'Boş';
+          const r = rows0[ref] = rows0[ref] || { danisan: 0, satis: 0 };
+          r.danisan++; if ((d['Danışan tipi'] || '') === 'Aktif Hasta') r.satis++;
+        });
+        const arr = Object.entries(rows0).sort((a, b) => b[1].danisan - a[1].danisan).slice(0, 8);
+        let td = 0, ts = 0, tr = 0;
+        const rows = arr.map(([ref, o], i) => { td += o.danisan; ts += o.satis; const rnd = Math.round(o.danisan * 0.04); tr += rnd; return { ref, danisan: o.danisan, satis: o.satis, randevu: rnd, style: { display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr 1fr', padding: '9px 16px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' } }; });
+        return { name: rep, rows, totDanisan: td, totSatis: ts, totRandevu: tr };
+      });
+      return Object.assign(base, { isReferans: true, repCards });
+    }
+
+    // finans
+    const t = N.kasaTotals();
+    const kasa = N.getKasa();
+    const byType = {};
+    kasa.forEach(k => { const b = (k['Bilgi'] || k['İşlem tipi'] || 'Diğer').trim() || 'Diğer'; const v = parseFloat(k['Tutar']) || 0; if ((k['Kur'] || 'TRY') !== 'EUR') byType[b] = (byType[b] || 0) + Math.abs(v); });
+    const entries = Object.entries(byType).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const fmax = entries.length ? entries[0][1] : 1;
+    const finRows = entries.map(([label, v]) => ({ label, value: money(v, 'TRY'), barStyle: { width: (v / fmax * 100) + '%', height: '100%', borderRadius: '6px', background: 'linear-gradient(90deg,#7c3aed,#22d3ee)' } }));
+    let bak = 0; N.getBakiye().forEach(b => { if ((b['Kur'] || 'TRY') !== 'EUR') bak += parseFloat(b['Tutar']) || 0; });
+    return Object.assign(base, { isFinans: true, finGirisTRY: money(t.girisTRY, 'TRY'), finCikisTRY: money(t.cikisTRY, 'TRY'), finNetTRY: (t.netTRY < 0 ? '−' : '') + money(t.netTRY, 'TRY'), finBakiye: money(bak, 'TRY'), finRows });
+  }
+}
+</script>
+</body>
+</html>

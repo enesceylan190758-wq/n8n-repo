@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+  .nf-danger:hover { background:#fee2e2 !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="sistem" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px; max-width:1100px; margin:0 auto; width:100%; box-sizing:border-box;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start;">
+      <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; padding:14px 20px; font-size:14px; font-weight:700;">🏥 Klinik Bilgileri</div>
+        <div style="padding:20px;">
+          <label style="{{ lbl }}">Klinik Adı</label><input class="nf-f" value="Nefalix Ağız ve Diş Sağlığı" style="{{ inp }} margin-bottom:14px;" />
+          <label style="{{ lbl }}">Telefon</label><input class="nf-f" value="+90 212 555 00 00" style="{{ inp }} margin-bottom:14px;" />
+          <label style="{{ lbl }}">E-Posta</label><input class="nf-f" value="info@nefalix.com" style="{{ inp }} margin-bottom:14px;" />
+          <label style="{{ lbl }}">Adres</label><textarea class="nf-f" style="{{ inp }} min-height:64px; resize:vertical; font-family:inherit;">Ataşehir, İstanbul</textarea>
+          <div class="nf-btn" style="margin-top:16px; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:11px; text-align:center; font-size:13px; font-weight:700; color:#fff; cursor:pointer;">Değişiklikleri Kaydet</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:22px;">
+        <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#2563eb,#22d3ee); color:#fff; padding:14px 20px; font-size:14px; font-weight:700;">⚙️ Genel Tercihler</div>
+          <div style="padding:8px 20px;">
+            <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid #f6f5fb;">
+                <div><div style="font-size:13.5px; font-weight:600; color:#241854;">{{ t.label }}</div><div style="font-size:11.5px; color:#8b87a8; margin-top:2px;">{{ t.desc }}</div></div>
+                <div onClick="{{ t.toggle }}" style="{{ t.trackStyle }}"><div style="{{ t.knobStyle }}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+          <div style="background:#241854; color:#fff; padding:14px 20px; font-size:14px; font-weight:700;">🗄️ Veri Yönetimi</div>
+          <div style="padding:20px;">
+            <div style="font-size:13px; color:#4b4770; margin-bottom:14px; line-height:1.6;">Sistemdeki tüm eklediğiniz kayıtlar (yeni danışan, not, randevu, satış vb.) bu tarayıcıda saklanır. Sıfırlarsanız orijinal veri setine (7.500 danışan) dönülür.</div>
+            <div class="nf-btn nf-danger" onClick="{{ reset }}" style="border:1px solid #fecaca; border-radius:9px; padding:11px; text-align:center; font-size:13px; font-weight:600; color:#dc2626; cursor:pointer;">Eklenen kayıtları sıfırla</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:640}}">
+const TOGGLES = [
+  { key: 'sms', label: 'SMS Hatırlatmaları', desc: 'Randevu öncesi otomatik SMS gönder', on: true },
+  { key: 'wa', label: 'WhatsApp Bildirimleri', desc: 'Yeni lead düştüğünde bildir', on: true },
+  { key: 'dark', label: 'Otomatik Yedekleme', desc: 'Günlük veri yedeği al', on: true },
+  { key: 'kur', label: 'Döviz kurunu otomatik güncelle', desc: 'TCMB kurlarını her gün çek', on: false }
+];
+class Component extends DCLogic {
+  state = { on: {} };
+  renderVals() {
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; outline:none; background:#fff;';
+    const toggles = TOGGLES.map(t => {
+      const on = this.state.on[t.key] !== undefined ? this.state.on[t.key] : t.on;
+      return {
+        label: t.label, desc: t.desc, toggle: () => this.setState(s => ({ on: Object.assign({}, s.on, { [t.key]: !on }) })),
+        trackStyle: { width: '44px', height: '24px', borderRadius: '12px', background: on ? '#16a34a' : '#d1d5db', position: 'relative', cursor: 'pointer', transition: 'background .2s', flexShrink: 0 },
+        knobStyle: { width: '18px', height: '18px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: on ? '23px' : '3px', transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }
+      };
+    });
+    return {
+      lbl, inp, toggles,
+      reset: () => { if (confirm('Eklediğiniz tüm kayıtlar silinip orijinal veriye dönülecek. Emin misiniz?')) { window.Nefalix.resetAll(); window.Nefalix.nav('Login.dc.html'); } }
+    };
+  }
+}
+</script>
+</body>
+</html>

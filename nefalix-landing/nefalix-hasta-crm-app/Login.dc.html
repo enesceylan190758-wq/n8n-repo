@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#1a1140">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#1a1140"/>
+    <circle cx="600" cy="330" r="120" fill="none" stroke="#22d3ee" stroke-width="26"/>
+    <path d="M545 390 L600 270 L655 390" fill="none" stroke="#a78bfa" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="600" y="560" font-family="Segoe UI, Arial, sans-serif" font-size="90" font-weight="800" fill="#ffffff" text-anchor="middle">Nefalix</text>
+    <text x="600" y="620" font-family="Segoe UI, Arial, sans-serif" font-size="34" fill="#c7c3f0" text-anchor="middle">CRM Giriş</text>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<style>
+  body { margin:0; }
+  a { color:#22d3ee; text-decoration:none; }
+  a:hover { color:#67e8f9; }
+  .nf-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.15) !important; }
+  .nf-loginbtn:hover { filter:brightness(1.07); }
+</style>
+<script src="store.js"></script>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; display:flex; background:#140d2e;">
+  <div style="flex:1.15; background:linear-gradient(135deg,#1a1140 0%,#2a1a6e 55%,#123a8f 100%); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:40px;">
+    <img src="assets/nefalix-banner.png" alt="Nefalix" style="max-width:88%; max-height:70%; object-fit:contain;" />
+    <div style="position:absolute; bottom:26px; left:40px; color:rgba(255,255,255,0.5); font-size:12px;">© 2026 Nefalix — Yapay zekâ destekli hasta deneyimi yönetim platformu</div>
+  </div>
+
+  <div style="width:460px; max-width:100%; background:#fff; display:flex; flex-direction:column; justify-content:center; padding:56px 52px;">
+    <div style="display:flex; align-items:center; gap:11px; margin-bottom:36px;">
+      <img src="assets/nefalix-icon.png" alt="Nefalix" style="height:40px; width:40px; object-fit:contain;" />
+      <span style="font-size:24px; font-weight:800; color:#140d2e; letter-spacing:0.2px;">Nefalix</span>
+    </div>
+
+    <div style="font-size:22px; font-weight:700; color:#140d2e;">Giriş Yap</div>
+    <div style="font-size:13.5px; color:#8b87a8; margin-top:6px; margin-bottom:26px;">Devam etmek için kullanıcı bilgilerinizi girin.</div>
+
+    <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fef2f2; border:1px solid #fecaca; color:#dc2626; font-size:13px; border-radius:9px; padding:11px 14px; margin-bottom:16px;">{{ err }}</div>
+    </sc-if>
+
+    <label style="font-size:12.5px; font-weight:600; color:#4b4770; display:block; margin-bottom:7px;">Kullanıcı ID</label>
+    <input class="nf-input" placeholder="Kullanıcı ID" onInput="{{ onId }}" onKeyDown="{{ onKey }}" style="width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #d9d5ee; border-radius:9px; font-size:14px; color:#140d2e; outline:none; margin-bottom:18px; transition:box-shadow .15s,border-color .15s;" />
+
+    <label style="font-size:12.5px; font-weight:600; color:#4b4770; display:block; margin-bottom:7px;">Şifre</label>
+    <input class="nf-input" type="password" placeholder="••••••••" onInput="{{ onPw }}" onKeyDown="{{ onKey }}" style="width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #d9d5ee; border-radius:9px; font-size:14px; color:#140d2e; outline:none; margin-bottom:18px; transition:box-shadow .15s,border-color .15s;" />
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#4b4770; cursor:pointer;"><input type="checkbox" style="accent-color:#7c3aed; width:15px; height:15px;" /> Beni hatırla</label>
+      <a href="#" style="font-size:13px; color:#7c3aed;">Şifremi unuttum</a>
+    </div>
+
+    <div class="nf-loginbtn" onClick="{{ submit }}" style="background:linear-gradient(135deg,#7c3aed,#2563eb 55%,#22d3ee); border-radius:10px; padding:14px; text-align:center; color:#fff; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(124,58,237,0.28);">Giriş Yap</div>
+
+    <div style="margin-top:26px; background:#f6f5fb; border-radius:9px; padding:12px 14px; font-size:12px; color:#8b87a8; line-height:1.7;">
+      <strong style="color:#4b4770;">Giriş:</strong> enes &nbsp;•&nbsp; abdulkadir &nbsp;•&nbsp; kader &nbsp;(şifre opsiyonel)
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:760}}">
+class Component extends DCLogic {
+  state = { err: '' };
+  _id = ''; _pw = '';
+  renderVals() {
+    return {
+      err: this.state.err,
+      onId: (e) => { this._id = e.target.value; },
+      onPw: (e) => { this._pw = e.target.value; },
+      onKey: (e) => { if (e.key === 'Enter') this.doLogin(); },
+      submit: () => this.doLogin()
+    };
+  }
+  doLogin() {
+    const N = window.Nefalix;
+    if (!N) { this.setState({ err: 'Sistem yükleniyor, tekrar deneyin.' }); return; }
+    N.loginAsync(this._id, this._pw).then((u) => {
+      if (!u) { this.setState({ err: 'Kullanıcı ID veya şifre hatalı.' }); return; }
+      window.Nefalix.nav('Dashboard.dc.html');
+    });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nefalix · Kurumsal Mail Önizlemesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0C2A31; --teal:#17727E; --teal-deep:#0E4A52; --mint:#E4F0F0;
+    --coral:#E8734A; --paper:#FFFFFF; --bg:#E9F0F0; --muted:#5E7075; --line:#DDE7E7;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Inter',Arial,sans-serif; background:var(--bg); color:var(--ink);
+    line-height:1.6; padding:40px 20px; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px; margin:0 auto;}
+  .kicker{
+    text-align:center; font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--muted); font-weight:600; margin-bottom:6px;
+  }
+  .page-title{
+    text-align:center; font-family:'Sora',sans-serif; font-weight:700; font-size:22px;
+    color:var(--ink); margin-bottom:28px;
+  }
+
+  /* mail window */
+  .mail{
+    background:var(--paper); border-radius:16px; overflow:hidden;
+    box-shadow:0 24px 60px -24px rgba(12,42,49,.35); border:1px solid var(--line);
+  }
+  .toolbar{
+    display:flex; align-items:center; gap:7px; padding:14px 18px;
+    background:#F4F8F8; border-bottom:1px solid var(--line);
+  }
+  .dot{width:11px; height:11px; border-radius:50%;}
+  .dot.r{background:#F0695B;} .dot.y{background:#F3C04A;} .dot.g{background:#5BC28A;}
+  .toolbar span{margin-left:8px; font-size:12px; color:var(--muted);}
+
+  /* banner */
+  .banner{
+    position:relative; padding:34px 32px;
+    background:linear-gradient(135deg,#0E4A52 0%,#17727E 60%,#1C8593 100%);
+    color:#fff; overflow:hidden;
+  }
+  .banner::after{
+    content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px;
+    border-radius:50%; background:radial-gradient(circle at center, rgba(255,255,255,.10), transparent 70%);
+  }
+  .wordmark{
+    font-family:'Sora',sans-serif; font-weight:700; font-size:26px; letter-spacing:.14em;
+    display:flex; align-items:center; gap:12px;
+  }
+  .wordmark .mark{
+    width:26px; height:26px; border-radius:7px; background:#fff; position:relative; flex:0 0 auto;
+  }
+  .wordmark .mark::before{
+    content:""; position:absolute; inset:6px 6px auto 6px; height:5px; border-radius:3px; background:var(--teal);
+  }
+  .wordmark .mark::after{
+    content:""; position:absolute; inset:auto 6px 6px 6px; height:5px; border-radius:3px; background:var(--coral);
+  }
+  .banner .lead{
+    font-family:'Sora',sans-serif; font-weight:600; font-size:16px; margin-top:14px; max-width:80%;
+  }
+  .banner .tags{
+    margin-top:12px; font-size:12px; letter-spacing:.04em; color:#CDE6E8; font-weight:500;
+  }
+
+  /* meta */
+  .meta{padding:20px 32px 6px;}
+  .meta-row{display:flex; gap:10px; font-size:13.5px; padding:5px 0; border-bottom:1px solid #F0F4F4;}
+  .meta-row:last-child{border-bottom:none;}
+  .meta-row b{color:var(--muted); font-weight:600; min-width:64px;}
+  .meta-row span{color:var(--ink);}
+
+  /* body */
+  .body{padding:14px 32px 4px; font-size:14.5px; color:#26383D;}
+  .body p{margin-bottom:13px;}
+  .cta{
+    display:inline-block; background:var(--coral); color:#fff; text-decoration:none;
+    font-weight:600; font-size:14px; padding:11px 22px; border-radius:9px; margin:4px 0 10px;
+  }
+
+  /* signature */
+  .sig{
+    margin:8px 32px 32px; padding:20px 22px; background:#F7FAFA;
+    border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:10px;
+    display:flex; gap:22px; align-items:center; flex-wrap:wrap;
+  }
+  .sig-brand{display:flex; flex-direction:column; gap:2px; min-width:150px;}
+  .sig-brand .sw{
+    font-family:'Sora',sans-serif; font-weight:700; font-size:20px; letter-spacing:.12em; color:var(--teal);
+    display:flex; align-items:center; gap:9px;
+  }
+  .sig-brand .sw .m{
+    width:20px;height:20px;border-radius:6px;background:var(--teal);position:relative;flex:0 0 auto;
+  }
+  .sig-brand .sw .m::before{content:"";position:absolute;inset:5px 5px auto 5px;height:3.5px;border-radius:2px;background:#fff;}
+  .sig-brand .sw .m::after{content:"";position:absolute;inset:auto 5px 5px 5px;height:3.5px;border-radius:2px;background:var(--coral);}
+  .sig-brand .sub{font-size:11px; color:var(--muted); letter-spacing:.02em; margin-left:1px;}
+  .sig-div{width:1px; align-self:stretch; background:var(--line);}
+  .sig-person .nm{font-family:'Sora',sans-serif; font-weight:600; font-size:15px; color:var(--ink);}
+  .sig-person .ttl{font-size:12.5px; color:var(--teal); font-weight:600; margin-bottom:8px;}
+  .sig-person .row{font-size:12.5px; color:#33474C; margin:2px 0;}
+  .sig-person .row b{color:var(--teal); font-weight:600; display:inline-block; width:20px;}
+  .sig-social{margin-top:9px; font-size:12px; font-weight:600; color:var(--teal); letter-spacing:.02em;}
+  .sig-social a{color:var(--teal); text-decoration:none;}
+
+  .note{
+    text-align:center; font-size:12.5px; color:var(--muted); margin-top:18px; line-height:1.7;
+  }
+  .note code{background:#DCE8E8; padding:1px 6px; border-radius:5px; font-size:11.5px; color:var(--teal-deep);}
+
+  @media(max-width:520px){
+    .banner .lead{max-width:100%;}
+    .sig{flex-direction:column; align-items:flex-start;}
+    .sig-div{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Kurumsal Mail Sistemi</div>
+  <div class="page-title">Nefalix · gönderilen mailin görünümü</div>
+
+  <div class="mail">
+    <div class="toolbar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span>Gelen Kutusu · Nefalix</span>
+    </div>
+
+    <!-- BANNER -->
+    <div class="banner">
+      <div class="wordmark"><span class="mark"></span>NEFALIX</div>
+      <div class="lead">Müşteri deneyimini veriye, veriyi doğru aksiyona dönüştürün.</div>
+      <div class="tags">Müşteri Deneyimi &nbsp;•&nbsp; Dijital İtibar &nbsp;•&nbsp; Yapay Zekâ &nbsp;•&nbsp; Operasyonel İçgörü</div>
+    </div>
+
+    <!-- META -->
+    <div class="meta">
+      <div class="meta-row"><b>Gönderen</b><span>Abdülkadir Yaşar &lt;abdulkadir@nefalix.com&gt;</span></div>
+      <div class="meta-row"><b>Kime</b><span>[İsim Soyisim] &lt;[e-posta]&gt;</span></div>
+      <div class="meta-row"><b>Konu</b><span>Nefalix tanışma görüşmesi</span></div>
+    </div>
+
+    <!-- BODY -->
+    <div class="body">
+      <p>Merhaba [İsim] Bey/Hanım,</p>
+      <p>Ben Abdülkadir Yaşar, Nefalix'in kurucusuyum. Nefalix; sağlık kuruluşları, oteller ve otomotiv servisleri için müşteri deneyimi, dijital itibar ve geri bildirim süreçlerini yapay zekâ desteğiyle tek merkezden yönetmeyi amaçlayan yeni nesil bir platformdur.</p>
+      <p>Müşteri yorumlarının analizi, memnuniyet ve şikâyet eğilimlerinin tespiti, yapay zekâ destekli yanıt önerileri ve yönetim raporlaması gibi süreçleri daha ölçülebilir ve yönetilebilir hâle getiriyoruz.</p>
+      <p>Hem sizi ve çalışmalarınızı daha yakından tanımak hem de Nefalix'in kurumunuza sağlayabileceği katkıları değerlendirmek üzere 20–30 dakikalık kısa bir görüşme gerçekleştirmek isteriz.</p>
+      <a href="https://cal.com/enes-ceylan/15min" class="cta">Görüşme için uygun zamanı paylaşın →</a>
+      <p>Saygılarımla,</p>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="sig">
+      <div class="sig-brand">
+        <div class="sw"><span class="m"></span>NEFALIX</div>
+        <div class="sub">Experience Intelligence Platform</div>
+      </div>
+      <div class="sig-div"></div>
+      <div class="sig-person">
+        <div class="nm">Abdülkadir Yaşar</div>
+        <div class="ttl">Kurucu &amp; CEO</div>
+        <div class="row"><b>M</b> +90 507 821 06 96</div>
+        <div class="row"><b>E</b> abdulkadir@nefalix.com</div>
+        <div class="row"><b>W</b> www.nefalix.com</div>
+        <div class="row"><b>A</b> Kartal, İstanbul</div>
+        <div class="sig-social"><a href="https://www.linkedin.com/company/nefalixai/">LinkedIn</a> &nbsp;·&nbsp; <a href="https://www.instagram.com/nefalixai/">Instagram</a> &nbsp;·&nbsp; <a href="https://www.youtube.com/@Nefalixai">YouTube</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    Bu bir görsel referanstır — markanın maildeki duruşunu gösterir.<br>
+    <code>[İsim]</code>, telefon ve sosyal medya bağlantıları yer tutucudur; göndermeden önce doldurun.
+  </div>
+</div>
+</body>
+</html>

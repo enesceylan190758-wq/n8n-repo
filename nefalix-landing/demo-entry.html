@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- nefalix-seo-start -->
+<meta name="robots" content="noindex, nofollow">
+<!-- nefalix-seo-end -->
+  <title>Demo giriş | Nefalix</title>
+  <link rel="icon" href="/assets/brand/favicon-192.png" type="image/png" />
+  <style>
+    body { font-family: system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; background: #0b1f1c; color: #cde8e4; }
+    p { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <p>Panele yönlendiriliyorsunuz…</p>
+  <script>
+    const token = new URLSearchParams(location.search).get('token');
+    if (!token) {
+      location.replace('/dashboard/login');
+    } else {
+      location.replace(`/api/auth?action=demo&token=${encodeURIComponent(token)}`);
+    }
+  </script>
+</body>
+</html>

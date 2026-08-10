@@ -1,0 +1,27 @@
+# Nefalix
+
+> Klinikler, oteller ve auto servisler için WhatsApp, NPS, Google yorumları ve hasta/misafir geri bildirimi otomasyonu. Türkiye'de barınan, KVKK uyumlu platform.
+
+Nefalix (marka: Nefalix / NefalixAI) randevu sonrası memnuniyet ölçümü, yorum daveti, mesaj inbox, itibar erken uyarı (Sentinel) ve kayıp hasta recall akışlarını tek panelde birleştirir. HBYS/Estesoft entegrasyonu desteklenir.
+
+## Önemli sayfalar
+
+- [Ana sayfa](https://nefalix.com/): Ürün özeti ve demo
+- [Ürünler](https://nefalix.com/urunler): Geri bildirim, mesaj, yorum asistanı, eNPS, Sentinel, Recall
+- [Fiyatlar](https://nefalix.com/fiyatlar): Paket hesaplayıcı
+- [Sektörler](https://nefalix.com/sektorler): Sağlık, otel, auto
+- [Platformlar](https://nefalix.com/platformlar): Google, Booking, vb.
+- [Blog](https://nefalix.com/blog): Operasyon ve itibar rehberleri
+- [GEO](https://nefalix.com/geo): Günlük AI alıntı soru-cevap paketleri (her paket: https://nefalix.com/geo/YYYY-MM-DD)
+- [YouTube @Nefalixai](https://www.youtube.com/@Nefalixai): Ürün tanıtımı, klinik hikâyeleri, itibar ve sağlık turizmi videoları (açıklamalarda answer-first + site linkleri)
+- [HBYS entegrasyon](https://nefalix.com/hbys-entegrasyon)
+- [Veri güvenliği](https://nefalix.com/veri-guvenligi)
+- [İYS izin](https://nefalix.com/iys-izin)
+- [Kaynaklar](https://nefalix.com/kaynaklar)
+
+## İletişim
+
+- Email: info@nefalix.com
+- Demo: https://cal.com/enes-ceylan/15min
+- LinkedIn: https://www.linkedin.com/company/nefalixai/
+- YouTube: https://www.youtube.com/@Nefalixai

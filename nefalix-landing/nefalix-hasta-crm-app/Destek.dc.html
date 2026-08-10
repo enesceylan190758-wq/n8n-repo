@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="destek" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px; display:grid; grid-template-columns:1fr 380px; gap:22px; align-items:start;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; font-size:17px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Destek Kayıtlarım</div>
+      <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+        <span>Konu</span><span>Kategori</span><span>Öncelik</span><span>Durum</span>
+      </div>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+          <div class="nf-row" style="{{ r.style }}">
+            <div><div style="font-size:13px; font-weight:600; color:#241854;">{{ r.konu }}</div><div style="font-size:11px; color:#9c98b8; margin-top:2px;">{{ r.tarih }}</div></div>
+            <span style="font-size:12.5px; color:#4b4770;">{{ r.kategori }}</span>
+            <span style="{{ r.oncelikStyle }}">{{ r.oncelik }}</span>
+            <span style="{{ r.durumStyle }}">{{ r.durum }}</span>
+          </div>
+        </sc-for>
+      </sc-if>
+    </div>
+
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; padding:14px 20px; font-size:14px; font-weight:700;">＋ Yeni Destek Kaydı</div>
+      <div style="padding:20px;">
+        <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><div style="background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:12.5px; border-radius:8px; padding:10px 12px; margin-bottom:14px;">✓ Destek kaydınız oluşturuldu.</div></sc-if>
+        <label style="{{ lbl }}">Konu *</label><input class="nf-f" data-k="konu" value="{{ konu }}" onInput="{{ onIn }}" style="{{ inp }} margin-bottom:14px;" />
+        <label style="{{ lbl }}">Kategori</label><select class="nf-f" data-k="kategori" onChange="{{ onIn }}" style="{{ inp }} margin-bottom:14px;"><option>Teknik</option><option>Entegrasyon</option><option>Hesap</option><option>Eğitim</option><option>Diğer</option></select>
+        <label style="{{ lbl }}">Öncelik</label><select class="nf-f" data-k="oncelik" onChange="{{ onIn }}" style="{{ inp }} margin-bottom:14px;"><option>Düşük</option><option>Orta</option><option>Yüksek</option></select>
+        <label style="{{ lbl }}">Açıklama</label><textarea class="nf-f" data-k="aciklama" onInput="{{ onIn }}" style="{{ inp }} min-height:90px; resize:vertical; font-family:inherit; margin-bottom:16px;"></textarea>
+        <div class="nf-btn" onClick="{{ save }}" style="background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:12px; text-align:center; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Kaydı Oluştur</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:600}}">
+const DURUM_C = { 'Açık': ['#dc2626', '#fee2e2'], 'İşlemde': ['#f59e0b', '#fef3c7'], 'Çözüldü': ['#16a34a', '#dcfce7'] };
+const ONCELIK_C = { 'Düşük': ['#16a34a', '#dcfce7'], 'Orta': ['#f59e0b', '#fef3c7'], 'Yüksek': ['#dc2626', '#fee2e2'] };
+class Component extends DCLogic {
+  state = { ready: false, saved: false, ver: 0, konuKey: 0 };
+  form = { kategori: 'Teknik', oncelik: 'Orta' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; outline:none; background:#fff;';
+    const base = {
+      lbl, inp, saved: this.state.saved, konu: '',
+      onIn: (e) => { this.form[e.target.getAttribute('data-k')] = e.target.value; },
+      save: () => { if (!this.form.konu) return; window.Nefalix.addDestek(Object.assign({}, this.form)); this.form = { kategori: 'Teknik', oncelik: 'Orta' }; this.setState(s => ({ saved: true, ver: s.ver + 1 })); }
+    };
+    if (!this.state.ready) return Object.assign(base, { ready: false, rows: [] });
+    const rows = window.Nefalix.getDestek().map((d, i) => {
+      const dc = DURUM_C[d.durum] || ['#4b4770', '#eee']; const oc = ONCELIK_C[d.oncelik] || ['#4b4770', '#eee'];
+      return {
+        konu: d.konu, kategori: d.kategori, tarih: d.tarih, oncelik: d.oncelik, durum: d.durum,
+        durumStyle: { fontSize: '11.5px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', justifySelf: 'start', color: dc[0], background: dc[1] },
+        oncelikStyle: { fontSize: '11.5px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', justifySelf: 'start', color: oc[0], background: oc[1] },
+        style: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', alignItems: 'center', padding: '13px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      };
+    });
+    return Object.assign(base, { ready: true, rows });
+  }
+}
+</script>
+</body>
+</html>

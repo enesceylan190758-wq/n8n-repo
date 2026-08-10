@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" role="img" aria-label="Bosch Car Service">
+  <rect width="200" height="60" rx="4" fill="#ea0016"/>
+  <circle cx="30" cy="30" r="18" fill="#fff"/>
+  <text x="30" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#ea0016">B</text>
+  <text x="115" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#fff">BOSCH CAR SERVICE</text>
+</svg>

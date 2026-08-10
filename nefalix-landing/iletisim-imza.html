@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nefalix E-posta İmzası</title>
+<style>
+  body{background:#E9F0F0; font-family:Arial,Helvetica,sans-serif; margin:0; padding:36px 16px; color:#0C2A31;}
+  .sheet{max-width:640px; margin:0 auto;}
+  .kicker{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#5E7075; font-weight:bold; text-align:center; margin-bottom:6px;}
+  .h{font-size:20px; font-weight:bold; text-align:center; margin-bottom:6px;}
+  .desc{font-size:13px; color:#5E7075; text-align:center; margin-bottom:16px; line-height:1.6;}
+  .switch{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+  .switch a{display:inline-block;padding:8px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:bold;border:1px solid #DDE7E7;color:#0E4A52;background:#fff}
+  .switch a.on{background:#17727E;color:#fff;border-color:#17727E}
+  .card{background:#fff; border-radius:14px; padding:26px; box-shadow:0 16px 40px -22px rgba(12,42,49,.4);}
+  .steps{background:#F7FAFA; border:1px solid #DDE7E7; border-radius:10px; padding:16px 20px; margin-top:20px; font-size:13px; color:#33474C; line-height:1.7;}
+  .steps b{color:#17727E;}
+  .steps code{background:#DCE8E8; padding:1px 6px; border-radius:5px; color:#0E4A52; font-size:12px;}
+  .links{text-align:center;margin-top:18px;font-size:13px}
+  .links a{color:#17727E;font-weight:bold;text-decoration:none;margin:0 8px}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="kicker">Kullanıma Hazır</div>
+  <div class="h">Nefalix E-posta İmzası</div>
+  <div class="desc">Profil seçin, imzayı fareyle seçip kopyalayın; Gmail/Outlook imza ayarına yapıştırın.<br>Toplu Mail gönderiminde de aynı imza (HTML imza açıkken) kullanılır.</div>
+
+  <div class="switch" id="switch"></div>
+  <div class="card" id="sigMount"></div>
+
+  <div class="steps">
+    <b>Nasıl kullanılır?</b><br>
+    <b>Gmail:</b> Ayarlar → Tümünü gör → “İmza” bölümüne yukarıdaki imzayı seçip yapıştırın.<br>
+    <b>Outlook:</b> Dosya → Seçenekler → Posta → İmzalar → yeni imza oluşturup yapıştırın.<br>
+    <b>Toplu Mail:</b> <code>/toplu-mail</code> → “HTML imza ekle” açıkken Hostinger üzerinden aynı tablo gider.
+  </div>
+  <div class="links">
+    <a href="/toplu-mail">Toplu Mail</a>
+    <a href="/mail#ayarlar">Ayarlar</a>
+    <a href="/mail">İletişim</a>
+  </div>
+</div>
+<script>
+const SENDERS = {
+  kadir: {
+    key: 'kadir',
+    name: 'Abdülkadir Yaşar',
+    title: 'Kurucu & CEO',
+    email: 'abdulkadir@nefalix.com',
+    phone: '+90 507 821 06 96',
+    web: 'www.nefalix.com',
+    address: 'Kartal, İstanbul',
+    linkedin: 'https://www.linkedin.com/company/nefalixai/',
+    instagram: 'https://www.instagram.com/nefalixai/',
+    youtube: 'https://www.youtube.com/@Nefalixai',
+    slogan: 'Müşterinizi anlayın. Deneyimi yönetin. İtibarınızı büyütün.'
+  },
+  enes: {
+    key: 'enes',
+    name: 'Enes Ceylan',
+    title: 'Kurucu Ortak & CTO',
+    email: 'enes@nefalix.com',
+    phone: '+90 535 928 82 50',
+    web: 'www.nefalix.com',
+    address: 'Kartal, İstanbul',
+    linkedin: 'https://www.linkedin.com/company/nefalixai/',
+    instagram: 'https://www.instagram.com/nefalixai/',
+    youtube: 'https://www.youtube.com/@Nefalixai',
+    slogan: 'Müşterinizi anlayın. Deneyimi yönetin. İtibarınızı büyütün.'
+  },
+  kader: {
+    key: 'kader',
+    name: 'Kader Hanım',
+    title: 'Kurumsal İletişim',
+    email: 'info@nefalix.com',
+    phone: '+90 535 928 82 50',
+    web: 'www.nefalix.com',
+    address: 'Kartal, İstanbul',
+    linkedin: 'https://www.linkedin.com/company/nefalixai/',
+    instagram: 'https://www.instagram.com/nefalixai/',
+    youtube: 'https://www.youtube.com/@Nefalixai',
+    slogan: 'Müşterinizi anlayın. Deneyimi yönetin. İtibarınızı büyütün.'
+  }
+};
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function webHref(web) {
+  const w = String(web || 'www.nefalix.com').trim();
+  if (/^https?:\/\//i.test(w)) return w;
+  return 'https://' + w.replace(/^\/+/, '');
+}
+function buildSignatureHtml(p) {
+  const web = String(p.web || 'www.nefalix.com').replace(/^https?:\/\//i, '');
+  return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="font-family:Arial,Helvetica,sans-serif; border-collapse:collapse;">
+  <tr>
+    <td valign="middle" style="padding:2px 18px 2px 0;">
+      <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+        <tr>
+          <td valign="middle" style="padding-right:10px;">
+            <table cellpadding="0" cellspacing="0" border="0" role="presentation" width="34" style="width:34px;">
+              <tr><td height="7" bgcolor="#17727E" style="line-height:7px; font-size:0; border-radius:3px;">&nbsp;</td></tr>
+              <tr><td height="4" style="line-height:4px; font-size:0;">&nbsp;</td></tr>
+              <tr><td height="7" bgcolor="#0C2A31" style="line-height:7px; font-size:0; border-radius:3px;">&nbsp;</td></tr>
+              <tr><td height="4" style="line-height:4px; font-size:0;">&nbsp;</td></tr>
+              <tr><td height="7" bgcolor="#E8734A" style="line-height:7px; font-size:0; border-radius:3px;">&nbsp;</td></tr>
+            </table>
+          </td>
+          <td valign="middle">
+            <div style="font-size:20px; font-weight:bold; letter-spacing:2.5px; color:#17727E;">NEFALIX</div>
+            <div style="font-size:10px; color:#5E7075; letter-spacing:.4px; margin-top:2px;">Experience Intelligence Platform</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td width="1" bgcolor="#DDE7E7" style="width:1px; line-height:1px; font-size:0;">&nbsp;</td>
+    <td valign="middle" style="padding:2px 0 2px 18px; color:#33474C;">
+      <div style="font-size:15px; font-weight:bold; color:#0C2A31;">${esc(p.name)}</div>
+      <div style="font-size:12.5px; font-weight:bold; color:#17727E; padding-bottom:6px;">${esc(p.title)}</div>
+      <div style="font-size:12.5px; padding:1px 0;"><span style="color:#17727E; font-weight:bold;">M</span>&nbsp;&nbsp;${esc(p.phone)}</div>
+      <div style="font-size:12.5px; padding:1px 0;"><span style="color:#17727E; font-weight:bold;">E</span>&nbsp;&nbsp;<a href="mailto:${esc(p.email)}" style="color:#33474C; text-decoration:none;">${esc(p.email)}</a></div>
+      <div style="font-size:12.5px; padding:1px 0;"><span style="color:#17727E; font-weight:bold;">W</span>&nbsp;&nbsp;<a href="${esc(webHref(p.web))}" style="color:#33474C; text-decoration:none;">${esc(web)}</a></div>
+      <div style="font-size:12.5px; padding:1px 0;"><span style="color:#17727E; font-weight:bold;">A</span>&nbsp;&nbsp;${esc(p.address)}</div>
+      <div style="font-size:12px; font-weight:bold; padding-top:7px;">
+        <a href="${esc(p.linkedin)}" style="color:#17727E; text-decoration:none;">LinkedIn</a>&nbsp;&nbsp;·&nbsp;&nbsp;
+        <a href="${esc(p.instagram)}" style="color:#17727E; text-decoration:none;">Instagram</a>&nbsp;&nbsp;·&nbsp;&nbsp;
+        <a href="${esc(p.youtube)}" style="color:#17727E; text-decoration:none;">YouTube</a>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="3" style="padding-top:12px;">
+      <div style="border-top:1px solid #DDE7E7; padding-top:8px; font-size:11px; color:#5E7075;">${esc(p.slogan)}</div>
+    </td>
+  </tr>
+</table>`;
+}
+
+function activeKey() {
+  const q = new URLSearchParams(location.search).get('kart') || '';
+  const h = (location.hash || '').replace(/^#/, '');
+  let k = (q || h || 'kadir').toLowerCase();
+  if (['abdulkadir', 'ak', 'ay'].includes(k)) k = 'kadir';
+  if (['kader', 'kh', 'kd'].includes(k)) k = 'kader';
+  if (['enes', 'ec'].includes(k)) k = 'enes';
+  if (!SENDERS[k]) k = 'kadir';
+  return k;
+}
+
+function render() {
+  const key = activeKey();
+  const p = SENDERS[key];
+  document.getElementById('switch').innerHTML = Object.keys(SENDERS).map((k) =>
+    `<a class="${k===key?'on':''}" href="?kart=${k}">${SENDERS[k].name.split(' ')[0]}</a>`
+  ).join('');
+  document.getElementById('sigMount').innerHTML =
+    '<!-- KOPYALANACAK İMZA -->' + buildSignatureHtml(p);
+}
+
+render();
+window.addEventListener('popstate', render);
+</script>
+</body>
+</html>

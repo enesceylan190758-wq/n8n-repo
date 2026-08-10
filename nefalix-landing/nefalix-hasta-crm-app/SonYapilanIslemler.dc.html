@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="home" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:20px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8;">
+        <div>
+          <div style="font-size:17px; font-weight:700; color:#241854;">Son Yapılan İşlemler</div>
+          <div style="font-size:12px; color:#8b87a8; margin-top:4px;">Kasa, randevu, teklif ve yeni kayıtlar — canlı veri</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div class="nf-btn" onClick="{{ doExcel }}" style="background:#16a34a; border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+          <div class="nf-btn" onClick="{{ doPdf }}" style="background:#dc2626; border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1.2fr 1.2fr 1.1fr 1fr 1.6fr; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+        <span>İşlem tarihi</span><span>İşlemi yapan</span><span>İşlem tipi</span><span>Modül</span><span>Kayıt</span>
+      </div>
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:50px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="16">
+          <div class="nf-row" style="{{ r.style }}">
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.date }}</span>
+            <span style="color:#241854; font-weight:600; font-size:13px;">{{ r.user }}</span>
+            <span style="{{ r.tipStyle }}">{{ r.type }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.module }}</span>
+            <span style="color:#8b87a8; font-size:12px;">{{ r.ref }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 24px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900}}">
+const TIP_C = { 'Giriş': ['#2563eb', '#dbeafe'], 'Ekleme': ['#16a34a', '#dcfce7'], 'Güncelleme': ['#f59e0b', '#fef3c7'], 'Görüntüleme': ['#7c3aed', '#f1eefc'], 'Silme': ['#dc2626', '#fee2e2'] };
+class Component extends DCLogic {
+  state = { ready: false };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    if (!this.state.ready) return { loading: true, ready: false, rows: [], countLabel: 'Yükleniyor...', doExcel: () => {}, doPdf: () => {} };
+    const acts = window.Nefalix.getRecentActivity(100);
+    const rows = acts.map((a, i) => {
+      const c = TIP_C[a.type] || ['#4b4770', '#eee'];
+      return {
+        date: a.date || '—', user: a.user || 'Sistem', type: a.type, module: a.module, ref: a.ref || '—',
+        tipStyle: { fontSize: '11.5px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', justifySelf: 'start', color: c[0], background: c[1] },
+        style: { display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1.1fr 1fr 1.6fr', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      };
+    });
+    return {
+      ready: true, loading: false, rows,
+      countLabel: acts.length + ' işlem (kasa / randevu / teklif / kayıt).',
+      doExcel: () => window.Nefalix.exportExcel('son-islemler', ['İşlem tarihi', 'İşlemi yapan', 'İşlem tipi', 'Modül', 'Kayıt'], acts.map(a => [a.date, a.user, a.type, a.module, a.ref || ''])),
+      doPdf: () => window.Nefalix.exportPDF('Son Yapılan İşlemler', ['İşlem tarihi', 'İşlemi yapan', 'İşlem tipi', 'Modül', 'Kayıt'], acts.map(a => [a.date, a.user, a.type, a.module, a.ref || '']))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+  .nf-chip:hover { filter:brightness(0.96); }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="kurum" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:22px;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4"><div style="{{ s.style }}"><div style="font-size:13px; opacity:0.92;">{{ s.label }}</div><div style="font-size:26px; font-weight:800; margin-top:6px;">{{ s.value }}</div></div></sc-for>
+      </div>
+      <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+        <div style="padding:18px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8;">
+          <div style="font-size:17px; font-weight:700; color:#241854;">Teklifler</div>
+          <div style="display:flex; gap:8px;">
+          <div class="nf-btn" onClick="{{ doExcel }}" style="background:#16a34a; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+          <div class="nf-btn" onClick="{{ doPdf }}" style="background:#dc2626; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+          <a href="YeniTeklif.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:10px 16px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Teklif</a>
+          </div>
+        </div>
+        <div style="padding:14px 24px; display:flex; gap:12px; align-items:center; border-bottom:1px solid #f0eef8;">
+          <div style="display:flex; align-items:center; gap:8px; border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; flex:1; max-width:360px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b87a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input class="nf-input" placeholder="Teklif ara (danışan, ref)..." onInput="{{ onQ }}" style="border:none; outline:none; font-size:13.5px; color:#241854; width:100%; background:transparent;" />
+          </div>
+          <select onChange="{{ onStatus }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; font-size:13px; color:#4b4770; background:#fff; cursor:pointer;">
+            <option value="">Tüm durumlar</option>
+            <sc-for list="{{ statusOpts }}" as="s" hint-placeholder-count="4"><option value="{{ s.key }}">{{ s.label }}</option></sc-for>
+          </select>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1.4fr 1.4fr 0.9fr 1fr 1.3fr; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+          <span>Ref / Tarih</span><span>Kurum</span><span>Hizmet</span><span style="text-align:right;">Tutar</span><span>Temsilci</span><span style="text-align:center;">Durum</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+          <div class="nf-row" style="{{ r.style }}">
+            <div><div style="font-size:12.5px; color:#4338ca; font-weight:600;">{{ r.ref }}</div><div style="font-size:11px; color:#9c98b8;">{{ r.tarih }}</div></div>
+            <a href="{{ r.href }}" style="font-weight:600; color:#241854; font-size:13px;">{{ r.ad }}</a>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.hizmet }}</span>
+            <span style="text-align:right; font-weight:700; font-size:13px; color:#241854;">{{ r.tutar }}</span>
+            <span style="color:#4b4770; font-size:12px;">{{ r.temsilci }}</span>
+            <div style="display:flex; justify-content:center;">
+              <select value="{{ r.durum }}" onChange="{{ r.change }}" style="{{ r.badge }}">
+                <sc-for list="{{ statusOpts }}" as="s" hint-placeholder-count="4"><option value="{{ s.key }}">{{ s.label }}</option></sc-for>
+              </select>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 24px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900}}">
+function money(v, kur) { return Math.round(parseFloat(v) || 0).toLocaleString('tr-TR') + ' ' + (kur || 'TRY'); }
+class Component extends DCLogic {
+  state = { ready: false, q: '', status: '', ver: 0 };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const S = window.Nefalix ? window.Nefalix.teklifStatusMeta() : [];
+    const statusOpts = S.map(s => ({ key: s.key, label: s.label }));
+    if (!this.state.ready) return { loading: true, ready: false, statusOpts };
+    const stColor = {}, stLabel = {}; S.forEach(s => { stColor[s.key] = s.color; stLabel[s.key] = s.label; });
+    let list = window.Nefalix.getTeklif();
+    const all = list.slice();
+    if (this.state.status) list = list.filter(t => t.durum === this.state.status);
+    const q = this.state.q.toLowerCase().trim();
+    if (q) list = list.filter(t => (t.ad + ' ' + t.ref).toLowerCase().includes(q));
+    let toplam = 0, kabul = 0, kabulTut = 0;
+    all.forEach(t => { toplam += t.tutar || 0; if (t.durum === 'kabul') { kabul++; kabulTut += t.tutar || 0; } });
+    const stats = [
+      { label: 'Toplam Teklif', value: all.length, style: card('#7c3aed', '#4338ca') },
+      { label: 'Toplam Tutar', value: money(toplam, 'TRY'), style: card('#2563eb', '#22d3ee') },
+      { label: 'Kabul Edilen', value: kabul, style: card('#16a34a', '#22c55e') },
+      { label: 'Kazanılan Tutar', value: money(kabulTut, 'TRY'), style: card('#f59e0b', '#d97706') }
+    ];
+    const rows = list.map((t, i) => ({
+      ref: t.ref, tarih: t.tarih, ad: t.ad, hizmet: t.hizmet, tutar: money(t.tutar, t.kur), temsilci: t.temsilci, durum: t.durum,
+      href: 'KurumKarti.dc.html?id=' + encodeURIComponent(t.danisanId || ''),
+      change: (e) => { window.Nefalix.setTeklifStatus(t._id, e.target.value); this.setState(s => ({ ver: s.ver + 1 })); },
+      badge: { border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer', color: '#fff', background: stColor[t.durum] || '#999', appearance: 'none', textAlign: 'center' },
+      style: { display: 'grid', gridTemplateColumns: '1fr 1.4fr 1.4fr 0.9fr 1fr 1.3fr', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+    }));
+    return { ready: true, loading: false, rows, stats, statusOpts, countLabel: list.length + ' teklif gösteriliyor.',
+      onQ: (e) => this.setState({ q: e.target.value }), onStatus: (e) => this.setState({ status: e.target.value }),
+      doExcel: () => this.exp('excel', list, stLabel), doPdf: () => this.exp('pdf', list, stLabel) };
+  }
+  exp(kind, list, stLabel) {
+    const headers = ['Ref', 'Tarih', 'Danışan', 'Hizmet', 'Tutar', 'Kur', 'Temsilci', 'Durum'];
+    const rows = list.map(t => [t.ref, t.tarih, t.ad, t.hizmet, t.tutar, t.kur, t.temsilci, stLabel[t.durum] || t.durum]);
+    if (kind === 'excel') window.Nefalix.exportExcel('teklifler', headers, rows);
+    else window.Nefalix.exportPDF('Teklifler', headers, rows);
+  }
+}
+function card(a, b) { return { background: 'linear-gradient(135deg,' + a + ',' + b + ')', borderRadius: '14px', padding: '20px 22px', color: '#fff' }; }
+</script>
+</body>
+</html>

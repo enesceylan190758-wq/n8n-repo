@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nefalix CRM</title>
+
+<script src="94ff931e-93e7-48c4-b3e8-848075949f01"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="c95dd00f-0bdf-4cfb-9820-eb0deaa74b0c"></script>
+<script src="a90a0ed2-5e97-4f96-9a33-f09210399e03"></script>
+<style>
+  html, body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  @keyframes nfxspin { to { transform: rotate(360deg); } }
+</style>
+</helmet>
+<div style="min-height:100vh; background:#f2f2f9;">
+  <sc-if value="{{ booting }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:linear-gradient(135deg,#1c1240,#241854); color:#fff; font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif;">
+      <div style="width:56px; height:56px; border-radius:50%; border:5px solid rgba(255,255,255,0.18); border-top-color:#22d3ee; animation:nfxspin 0.9s linear infinite;"></div>
+      <div style="font-size:19px; font-weight:800; letter-spacing:0.3px;">Nefalix CRM</div>
+      <div style="font-size:13px; color:#c7c3f0;">Sistem yükleniyor…</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ p_Login }}" hint-placeholder-val="{{ false }}"><dc-import name="Login" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Dashboard }}" hint-placeholder-val="{{ false }}"><dc-import name="Dashboard" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_HastaKarti }}" hint-placeholder-val="{{ false }}"><dc-import name="HastaKarti" key="{{ hkKey }}" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_DanisanListesi }}" hint-placeholder-val="{{ false }}"><dc-import name="DanisanListesi" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_YeniDanisan }}" hint-placeholder-val="{{ false }}"><dc-import name="YeniDanisan" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_YeniLead }}" hint-placeholder-val="{{ false }}"><dc-import name="YeniLead" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_LeadListesi }}" hint-placeholder-val="{{ false }}"><dc-import name="LeadListesi" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_DinamikArama }}" hint-placeholder-val="{{ false }}"><dc-import name="DinamikArama" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_DinamikAramaHavuz }}" hint-placeholder-val="{{ false }}"><dc-import name="DinamikAramaHavuz" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Salesline }}" hint-placeholder-val="{{ false }}"><dc-import name="Salesline" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_SonYapilanIslemler }}" hint-placeholder-val="{{ false }}"><dc-import name="SonYapilanIslemler" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_YeniRandevu }}" hint-placeholder-val="{{ false }}"><dc-import name="YeniRandevu" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_RandevuTakvim }}" hint-placeholder-val="{{ false }}"><dc-import name="RandevuTakvim" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_TransferTakvim }}" hint-placeholder-val="{{ false }}"><dc-import name="TransferTakvim" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_RandevuListe }}" hint-placeholder-val="{{ false }}"><dc-import name="RandevuListe" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_YeniSatis }}" hint-placeholder-val="{{ false }}"><dc-import name="YeniSatis" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Kasa }}" hint-placeholder-val="{{ false }}"><dc-import name="Kasa" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_SatisListesi }}" hint-placeholder-val="{{ false }}"><dc-import name="SatisListesi" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_BakiyeListesi }}" hint-placeholder-val="{{ false }}"><dc-import name="BakiyeListesi" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_BankaOzet }}" hint-placeholder-val="{{ false }}"><dc-import name="BankaOzet" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_GelirlerListe }}" hint-placeholder-val="{{ false }}"><dc-import name="GelirlerListe" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_GiderKaydet }}" hint-placeholder-val="{{ false }}"><dc-import name="GiderKaydet" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Giderler }}" hint-placeholder-val="{{ false }}"><dc-import name="Giderler" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Raporlar }}" hint-placeholder-val="{{ false }}"><dc-import name="Raporlar" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_YeniTeklif }}" hint-placeholder-val="{{ false }}"><dc-import name="YeniTeklif" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Teklifler }}" hint-placeholder-val="{{ false }}"><dc-import name="Teklifler" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_NotlarGorevler }}" hint-placeholder-val="{{ false }}"><dc-import name="NotlarGorevler" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Faturalar }}" hint-placeholder-val="{{ false }}"><dc-import name="Faturalar" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_FirmaListesi }}" hint-placeholder-val="{{ false }}"><dc-import name="FirmaListesi" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_WhatsappPanel }}" hint-placeholder-val="{{ false }}"><dc-import name="WhatsappPanel" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Yetki }}" hint-placeholder-val="{{ false }}"><dc-import name="Yetki" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Ayarlar }}" hint-placeholder-val="{{ false }}"><dc-import name="Ayarlar" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Personel }}" hint-placeholder-val="{{ false }}"><dc-import name="Personel" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Hizmet }}" hint-placeholder-val="{{ false }}"><dc-import name="Hizmet" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Paket }}" hint-placeholder-val="{{ false }}"><dc-import name="Paket" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Urun }}" hint-placeholder-val="{{ false }}"><dc-import name="Urun" hint-size="100%,100%"></dc-import></sc-if>
+  <sc-if value="{{ p_Destek }}" hint-placeholder-val="{{ false }}"><dc-import name="Destek" hint-size="100%,100%"></dc-import></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">const PAGES = ['Login','Dashboard','HastaKarti','DanisanListesi','YeniDanisan','YeniLead','LeadListesi','DinamikArama','DinamikAramaHavuz','Salesline','SonYapilanIslemler','YeniRandevu','RandevuTakvim','TransferTakvim','RandevuListe','YeniSatis','Kasa','SatisListesi','BakiyeListesi','BankaOzet','GelirlerListe','GiderKaydet','Giderler','Raporlar','YeniTeklif','Teklifler','NotlarGorevler','Faturalar','FirmaListesi','WhatsappPanel','Yetki','Ayarlar','Personel','Hizmet','Paket','Urun','Destek'];
+class Component extends DCLogic {
+  state = { route: '', booted: false };
+  componentDidMount() {
+    this._onHash = () => this._sync(false);
+    window.addEventListener('hashchange', this._onHash);
+    this._boot();
+  }
+  componentWillUnmount() { if (this._onHash) window.removeEventListener('hashchange', this._onHash); }
+  _boot() {
+    const run = () => {
+      const N = window.Nefalix;
+      if (!N) { setTimeout(run, 20); return; }
+      if (N.readyLocal) N.readyLocal();
+      if (N.currentUser && N.currentUser()) {
+        this._applyRoute(true);
+        if (N.syncInBackground) N.syncInBackground();
+        else if (N.ready) Promise.resolve(N.ready()).catch(() => {});
+        return;
+      }
+      const after = () => {
+        this._applyRoute(true);
+        if (N.syncInBackground) N.syncInBackground();
+      };
+      if (N.restoreServerSession) {
+        Promise.race([N.restoreServerSession(), new Promise((res) => setTimeout(res, 1200))]).then(after).catch(after);
+      } else { after(); }
+    };
+    run();
+  }
+  _sync(fromBoot) {
+    const N = window.Nefalix;
+    if (!N) return;
+    if (fromBoot && !(N.currentUser && N.currentUser()) && N.restoreServerSession) {
+      N.restoreServerSession().then(() => this._applyRoute(true));
+      return;
+    }
+    this._applyRoute(fromBoot);
+  }
+  _applyRoute(fromBoot) {
+    const N = window.Nefalix;
+    const authed = !!(N && N.currentUser && N.currentUser());
+    let page = (N && N.currentPage) ? N.currentPage('') : '';
+    const hashEmpty = !(location.hash || '').replace(/^#/, '').trim();
+    if (authed) {
+      if (hashEmpty || !page || PAGES.indexOf(page) < 0 || page === 'Login') {
+        const resume = (N.resumeRoute && N.resumeRoute('Dashboard')) || 'Dashboard';
+        const resumePage = String(resume).split('?')[0];
+        if (PAGES.indexOf(resumePage) >= 0 && resumePage !== 'Login') {
+          if (location.hash !== '#' + resume) { location.hash = '#' + resume; return; }
+          page = resumePage;
+        } else {
+          page = 'Dashboard';
+          if (location.hash !== '#Dashboard') { location.hash = '#Dashboard'; return; }
+        }
+      }
+      if (N.saveLastRoute) N.saveLastRoute(location.hash);
+      this.setState({ route: page, booted: true });
+      return;
+    }
+    if (page !== 'Login') { location.hash = '#Login'; return; }
+    this.setState({ route: 'Login', booted: true });
+  }
+  renderVals() {
+    const N = window.Nefalix;
+    const page = this.state.route;
+    const vals = { booting: !this.state.booted, hkKey: (N && N.param && N.param('id')) || 'none' };
+    PAGES.forEach(p => { vals['p_' + p] = (this.state.booted && page === p); });
+    return vals;
+  }
+}
+</script>
+
+
+</body></html>

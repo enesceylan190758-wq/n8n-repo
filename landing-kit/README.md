@@ -2,7 +2,9 @@
 
 `landing-kit/` = patch / sync kaynağı (kartvizit, SEO fragment).
 
-**Canlı site:** Mac’te private `~/nefalix-landing` → sadece:
+**Kaynak (git):** `n8n-repo/nefalix-landing/` — Arif / ekip buradan.
+
+**Canlı deploy:** Mac’te `~/nefalix-landing` → sadece CLI:
 
 ```bash
 cd ~/nefalix-landing && npx vercel --prod --yes

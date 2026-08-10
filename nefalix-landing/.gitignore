@@ -1,0 +1,11 @@
+*.bak*
+.DS_Store
+.env
+.env*
+.env.*
+.env.local.vercel
+.tmp/
+.vercel
+.vercel/
+nefalix-runway-agent.mp4
+node_modules/

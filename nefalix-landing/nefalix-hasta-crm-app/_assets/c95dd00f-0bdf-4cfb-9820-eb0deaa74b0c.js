@@ -1,0 +1,1 @@
+window.__NFX_SEED = {"danisan":[],"dinamik":[],"kasa":[],"bakiye":[]};

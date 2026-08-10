@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firma başvurusu — Nefalix</title>
+<meta name="description" content="Nefalix'e firma kaydı: formu doldurun, ekibimiz kurulumu 24 saat içinde hazırlasın. Standart 9.500 TL · Profesyonel 14.900 TL.">
+<link rel="canonical" href="https://nefalix.com/basvuru">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="/assets/brand/favicon-192.png" type="image/png">
+<link rel="stylesheet" href="/shared.css">
+<style>
+  .ba-wrap{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:48px 20px 72px;background:linear-gradient(180deg,#F4F7FC 0%,#fff 55%)}
+  .ba-card{background:#fff;border:1px solid #D8E0EF;border-radius:18px;padding:32px 28px;max-width:520px;width:100%;box-shadow:0 12px 40px rgba(11,18,32,.06)}
+  .ba-card .eyebrow{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#2F6BFF;margin-bottom:6px}
+  .ba-card h1{font-size:22px;font-weight:800;color:#0B1220;margin:0 0 6px;letter-spacing:-.02em}
+  .ba-card .sub{font-size:14px;color:#6B7A8D;margin:0 0 22px;line-height:1.5}
+  .ba-field{display:block;margin-bottom:14px}
+  .ba-field span{display:block;font-size:12px;font-weight:600;color:#54657A;margin-bottom:6px}
+  .ba-field input,.ba-field select{width:100%;border:1px solid #D8E0EF;border-radius:10px;padding:10px 12px;font-size:14px;color:#151D2E;background:#fff}
+  .ba-field input:focus,.ba-field select:focus{outline:none;border-color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.15)}
+  .ba-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.ba-row{grid-template-columns:1fr}}
+  .ba-plans{display:grid;gap:10px;margin:8px 0 18px}
+  .ba-plan{border:1px solid #D8E0EF;border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:.12s}
+  .ba-plan:hover{border-color:#B8C9F0}
+  .ba-plan.on{border-color:#2F6BFF;background:#F4F7FF;box-shadow:0 0 0 2px rgba(47,107,255,.2)}
+  .ba-plan input{margin-top:3px}
+  .ba-plan b{display:block;font-size:14px;color:#0B1220}
+  .ba-plan em{font-style:normal;font-size:13px;font-weight:700;color:#2F6BFF}
+  .ba-plan p{margin:4px 0 0;font-size:12px;color:#6B7A8D;line-height:1.4}
+  .ba-submit{width:100%;border:0;border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;color:#fff;background:#2F6BFF;cursor:pointer}
+  .ba-submit:hover{background:#1F4FD6}
+  .ba-submit:disabled{opacity:.55;cursor:not-allowed}
+  .ba-err{margin-top:10px;font-size:13px;color:#D64545}
+  .ba-err.hidden{display:none}
+  .ba-done{text-align:center;padding:20px 8px}
+  .ba-done .ico{width:52px;height:52px;border-radius:50%;background:#ECFDF5;color:#059669;display:grid;place-items:center;margin:0 auto 14px;font-size:24px}
+  .ba-done h2{font-size:18px;margin:0 0 8px;color:#0B1220}
+  .ba-done p{font-size:14px;color:#6B7A8D;line-height:1.55;margin:0}
+  .ba-note{margin-top:14px;font-size:12px;color:#94A3B8;text-align:center}
+  .ba-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid #E8EEF5;background:#fff}
+</style>
+</head>
+<body class="site-subpage">
+<header class="ba-top">
+  <a href="/" class="logo logo-lockup" aria-label="Nefalix ana sayfa">
+    <img src="/assets/brand/nefalix-logo.png" alt="" class="logo-icon" width="40" height="40" />
+    <span class="logo-word">Nefalix</span>
+  </a>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a href="/fiyatlar" style="font-size:13px;font-weight:600;color:#54657A">Fiyatlar</a>
+    <a href="/dashboard/login" class="btn-login">Giriş Yap</a>
+  </div>
+</header>
+
+<main class="ba-wrap">
+  <div class="ba-card" id="ba-root">
+    <p class="eyebrow">Nefalix'e başlayın</p>
+    <h1>Firmanızı kaydedin</h1>
+    <p class="sub">Formu doldurun — hesap hemen açılmaz. Ekibimiz kurulumu tamamlayıp size özel paneli 24 saat içinde hazırlar.</p>
+
+    <form id="ba-form">
+      <label class="ba-field"><span>Firma adı *</span>
+        <input name="firmaAdi" required placeholder="Örn. MediDent Kartal" autocomplete="organization">
+      </label>
+      <div class="ba-row">
+        <label class="ba-field"><span>Sektör</span>
+          <select name="sektor">
+            <option>Diş Kliniği</option>
+            <option>Saç Ekimi Kliniği</option>
+            <option>Estetik Klinik</option>
+            <option>Otel</option>
+            <option>Oto Servis</option>
+            <option>Diğer</option>
+          </select>
+        </label>
+        <label class="ba-field"><span>Şehir / ilçe</span>
+          <input name="sehir" placeholder="Kadıköy, İstanbul" autocomplete="address-level2">
+        </label>
+      </div>
+      <label class="ba-field"><span>Yetkili ad soyad</span>
+        <input name="yetkiliAdi" placeholder="Görüşülecek kişi" autocomplete="name">
+      </label>
+      <div class="ba-row">
+        <label class="ba-field"><span>WhatsApp / telefon *</span>
+          <input name="telefon" type="tel" placeholder="+90 5xx xxx xx xx" autocomplete="tel">
+        </label>
+        <label class="ba-field"><span>E-posta</span>
+          <input name="eposta" type="email" placeholder="info@firma.com" autocomplete="email">
+        </label>
+      </div>
+      <label class="ba-field"><span>Web sitesi</span>
+        <input name="website" type="url" placeholder="https://…">
+      </label>
+
+      <p style="font-size:12px;font-weight:600;color:#54657A;margin:4px 0 8px">Paket seçimi</p>
+      <div class="ba-plans">
+        <label class="ba-plan" data-plan="standart">
+          <input type="radio" name="plan" value="standart">
+          <div>
+            <b>Standart <em>9.500 TL/ay</em></b>
+            <p>NPS anketi, Google yorum daveti, temel itibar takibi.</p>
+          </div>
+        </label>
+        <label class="ba-plan on" data-plan="profesyonel">
+          <input type="radio" name="plan" value="profesyonel" checked>
+          <div>
+            <b>Profesyonel <em>14.900 TL/ay</em></b>
+            <p>WhatsApp inbox, AI yanıt, NPS kriz takibi ve otomasyonlar.</p>
+          </div>
+        </label>
+      </div>
+
+      <button type="submit" class="ba-submit" id="ba-submit">Başvuruyu gönder</button>
+      <p class="ba-err hidden" id="ba-err"></p>
+      <p class="ba-note">Gönderince yalnızca başvuru kaydı oluşur. Kurulumu Nefalix ekibi elle tamamlar.</p>
+    </form>
+  </div>
+</main>
+
+<script>
+(function () {
+  const form = document.getElementById('ba-form');
+  const root = document.getElementById('ba-root');
+  const errEl = document.getElementById('ba-err');
+  const btn = document.getElementById('ba-submit');
+
+  document.querySelectorAll('.ba-plan').forEach((el) => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.ba-plan').forEach((x) => x.classList.remove('on'));
+      el.classList.add('on');
+      el.querySelector('input').checked = true;
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errEl.classList.add('hidden');
+    const fd = new FormData(form);
+    const payload = Object.fromEntries(fd.entries());
+    if (!payload.telefon && !payload.eposta) {
+      errEl.textContent = 'Telefon veya e-posta gerekli.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Gönderiliyor…';
+    try {
+      const res = await fetch('/api/firma-basvuru', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Başvuru gönderilemedi');
+      const contact = payload.telefon ? "WhatsApp'tan" : 'e-posta ile';
+      const name = String(payload.firmaAdi || 'firmanız')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      root.innerHTML = `
+        <div class="ba-done">
+          <div class="ico">✓</div>
+          <h2>Başvurunuz alındı</h2>
+          <p>Ekibimiz <b>${name}</b> için kurulumu incelemeye başladı.
+          24 saat içinde ${contact} sizinle iletişime geçeceğiz.</p>
+        </div>`;
+    } catch (err) {
+      errEl.textContent = err.message || 'Bir hata oluştu.';
+      errEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Başvuruyu gönder';
+    }
+  });
+})();
+</script>
+</body>
+</html>

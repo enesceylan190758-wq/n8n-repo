@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="giderler" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8; flex-wrap:wrap; gap:10px;">
+        <div style="font-size:17px; font-weight:700; color:#241854;">Firma Listesi</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div class="nf-btn" onClick="{{ doExcel }}" style="background:#16a34a; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+        <div class="nf-btn" onClick="{{ doPdf }}" style="background:#dc2626; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+        <div class="nf-btn" onClick="{{ openPay }}" style="background:linear-gradient(135deg,#ef4444,#dc2626); border-radius:9px; padding:10px 16px; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">＋ Firma Ödemesi</div>
+        <div class="nf-btn" onClick="{{ openForm }}" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:10px 16px; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">＋ Yeni Firma</div>
+        </div>
+      </div>
+      <sc-if value="{{ showForm }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:18px 24px; background:#faf9fe; border-bottom:1px solid #f0eef8; display:grid; grid-template-columns:1.4fr 1.1fr 1fr 1fr auto; gap:12px; align-items:end;">
+          <div><label style="{{ lbl }}">Firma Adı *</label><input class="nf-f" data-k="ad" onInput="{{ onIn }}" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Kategori</label><input class="nf-f" data-k="kategori" onInput="{{ onIn }}" placeholder="Tedarikçi / Laboratuvar" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Telefon</label><input class="nf-f" data-k="tel" onInput="{{ onIn }}" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Vergi No</label><input class="nf-f" data-k="vergiNo" onInput="{{ onIn }}" style="{{ inp }}" /></div>
+          <div class="nf-btn" onClick="{{ save }}" style="background:#16a34a; border-radius:8px; padding:10px 18px; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">Kaydet</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showPay }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:18px 24px; background:#fff7f7; border-bottom:1px solid #f0eef8; display:grid; grid-template-columns:1.4fr 1fr 0.8fr 1fr auto; gap:12px; align-items:end;">
+          <div><label style="{{ lbl }}">Firma *</label><input class="nf-f" list="firma-opts" data-k="ad" onInput="{{ onPay }}" placeholder="Firma adı" style="{{ inp }}" /><datalist id="firma-opts"><sc-for list="{{ firmaNames }}" as="n" hint-placeholder-count="3"><option value="{{ n }}"></option></sc-for></datalist></div>
+          <div><label style="{{ lbl }}">Tutar *</label><input class="nf-f" data-k="tutar" onInput="{{ onPay }}" placeholder="0,00" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Kur</label><select class="nf-f" data-k="kur" onChange="{{ onPay }}" style="{{ inp }}"><option>TRY</option><option>EUR</option></select></div>
+          <div><label style="{{ lbl }}">Yöntem</label><select class="nf-f" data-k="yontem" onChange="{{ onPay }}" style="{{ inp }}"><option>Banka Hesabı</option><option>Nakit</option><option>Kredi Kartı</option><option>Çek</option></select></div>
+          <div class="nf-btn" onClick="{{ savePay }}" style="background:#dc2626; border-radius:8px; padding:10px 18px; font-size:13px; font-weight:600; color:#fff; cursor:pointer;">Öde</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 24px; background:#fef2f2; color:#dc2626; font-size:13px; border-bottom:1px solid #fecaca;">{{ err }}</div></sc-if>
+      <div style="display:grid; grid-template-columns:1.5fr 1.1fr 1fr 1fr 1fr; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+        <span>Firma</span><span>Kategori</span><span>Telefon</span><span>Vergi No</span><span style="text-align:right;">Ödenen (gider)</span>
+      </div>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
+          <div class="nf-row" style="{{ r.style }}">
+            <span style="font-size:13px; font-weight:600; color:#241854;">{{ r.ad }}</span>
+            <span style="font-size:12.5px; color:#4b4770;">{{ r.kategori }}</span>
+            <span style="font-size:12.5px; color:#4b4770;">{{ r.tel }}</span>
+            <span style="font-size:12.5px; color:#4b4770;">{{ r.vergi }}</span>
+            <span style="{{ r.bakiyeStyle }}">{{ r.bakiye }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 24px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:700}}">
+class Component extends DCLogic {
+  state = { ready: false, showForm: false, showPay: false, err: '', ver: 0 };
+  form = {};
+  pay = { kur: 'TRY', yontem: 'Banka Hesabı' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const lbl = 'display:block; font-size:11.5px; font-weight:600; color:#4b4770; margin-bottom:5px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:9px 11px; border:1px solid #d9d5ee; border-radius:8px; font-size:13px; outline:none; background:#fff;';
+    const base = {
+      lbl, inp, showForm: this.state.showForm, showPay: this.state.showPay, err: this.state.err,
+      openForm: () => { this.form = {}; this.setState({ showForm: true, showPay: false, err: '' }); },
+      openPay: () => { this.pay = { kur: 'TRY', yontem: 'Banka Hesabı' }; this.setState({ showPay: true, showForm: false, err: '' }); },
+      onIn: (e) => { this.form[e.target.getAttribute('data-k')] = e.target.value; },
+      onPay: (e) => { this.pay[e.target.getAttribute('data-k')] = e.target.value; },
+      save: () => {
+        if (!this.form.ad) { this.setState({ err: 'Firma adı gerekli.' }); return; }
+        window.Nefalix.addFirma(Object.assign({}, this.form));
+        this.setState(s => ({ showForm: false, err: '', ver: s.ver + 1 }));
+      },
+      savePay: () => {
+        const t = parseFloat(String(this.pay.tutar || '').replace(',', '.'));
+        if (!this.pay.ad || !t) { this.setState({ err: 'Firma ve tutar gerekli.' }); return; }
+        window.Nefalix.addFirmaOdeme(this.pay).then(() => {
+          this.setState(s => ({ showPay: false, err: '', ver: s.ver + 1 }));
+        }).catch(e => this.setState({ err: (e && e.message) || 'Kayıt başarısız' }));
+      },
+      doExcel: () => this.exp('excel'), doPdf: () => this.exp('pdf')
+    };
+    if (!this.state.ready) return Object.assign(base, { ready: false, rows: [], firmaNames: [] });
+    const data = window.Nefalix.getFirma();
+    const rows = data.map((f, i) => ({
+      ad: f.ad, kategori: f.kategori || '-', tel: f.tel || '-', vergi: f.vergiNo || '—',
+      bakiye: (f.bakiye ? Math.round(f.bakiye).toLocaleString('tr-TR') : '0') + ' ' + (f.kur || 'TRY'),
+      bakiyeStyle: { textAlign: 'right', fontSize: '13px', fontWeight: 700, color: f.bakiye > 0 ? '#dc2626' : '#16a34a' },
+      style: { display: 'grid', gridTemplateColumns: '1.5fr 1.1fr 1fr 1fr 1fr', alignItems: 'center', padding: '13px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+    }));
+    return Object.assign(base, {
+      ready: true, rows,
+      firmaNames: data.map(f => f.ad).filter(Boolean),
+      countLabel: rows.length + ' firma · ödenen tutarlar gider kayıtlarından'
+    });
+  }
+  exp(kind) {
+    const data = window.Nefalix.getFirma();
+    const headers = ['Firma', 'Kategori', 'Telefon', 'Vergi No', 'Ödenen', 'Kur'];
+    const rows = data.map(f => [f.ad, f.kategori || '', f.tel || '', f.vergiNo || '', f.bakiye || 0, f.kur || 'TRY']);
+    if (kind === 'excel') window.Nefalix.exportExcel('firma-listesi', headers, rows);
+    else window.Nefalix.exportPDF('Firma Listesi', headers, rows);
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "nefalix-landing",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NEFALIX AI — Klinik itibar yönetimi landing page",
+  "scripts": {
+    "build": "node -e \"console.log('Static site — no build step')\"",
+    "preview": "npx --yes serve . -p 3000"
+  },
+  "dependencies": {
+    "stripe": "^22.2.3"
+  }
+}

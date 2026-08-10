@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="gelirler" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; font-size:17px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8; display:flex; justify-content:space-between; align-items:center;">
+        <span>Bakiye Listesi</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+        <div class="nf-btn" onClick="{{ doExcel }}" style="background:#16a34a; border-radius:9px; padding:9px 13px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+        <div class="nf-btn" onClick="{{ doPdf }}" style="background:#dc2626; border-radius:9px; padding:9px 13px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+        <span style="font-size:13px; font-weight:600; color:#dc2626; background:#fee2e2; padding:6px 14px; border-radius:20px;">Toplam açık bakiye: {{ totalLabel }}</span>
+        </div>
+      </div>
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:1fr 1.4fr 1.1fr 1.2fr 0.9fr 1fr; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+          <span>Vade tarihi</span><span>Danışan</span><span>Telefon</span><span>Segment</span><span>Geçen süre</span><span style="text-align:right;">Bakiye</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+          <div class="nf-row" style="{{ r.style }}">
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.vade }}</span>
+            <div style="min-width:0;">
+              <sc-if value="{{ r.linked }}" hint-placeholder-val="{{ false }}"><a href="{{ r.href }}" style="color:#241854; font-weight:600; font-size:13px;">{{ r.ad }}</a></sc-if>
+              <sc-if value="{{ r.notLinked }}" hint-placeholder-val="{{ true }}"><span style="color:#241854; font-weight:600; font-size:13px;">{{ r.ad }}</span></sc-if>
+            </div>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.tel }}</span>
+            <span style="color:#4b4770; font-size:12px;">{{ r.segment }}</span>
+            <span style="{{ r.gunStyle }}">{{ r.gun }}</span>
+            <span style="text-align:right; font-weight:700; font-size:13px; color:#dc2626;">{{ r.tutar }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 24px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900}}">
+function money(v, kur) { const n = Math.abs(parseFloat(v) || 0); return n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' ' + (kur || 'TRY'); }
+class Component extends DCLogic {
+  state = { ready: false };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    if (!this.state.ready) return { loading: true, ready: false };
+    const list = window.Nefalix.getBakiye();
+    let totTRY = 0, totEUR = 0;
+    list.forEach(b => {
+      totTRY += parseFloat(b.openTRY) || 0;
+      totEUR += parseFloat(b.openEUR) || 0;
+    });
+    const rows = list.map((b, i) => {
+      const v = parseFloat(b['Tutar']) || 0; const kur = b['Kur'] || 'TRY';
+      const gun = b['Geçen zaman'] || b['Geçen süre'] || '-';
+      const gunNum = parseInt(gun) || 0;
+      const ad = b['Danışan'] || '-';
+      const href = b.danisanId
+        ? ('HastaKarti.dc.html?id=' + encodeURIComponent(b.danisanId))
+        : window.Nefalix.hrefForName(ad);
+      let tutarLabel = money(v, kur);
+      if ((b.openEUR > 0.01) && (b.openTRY > 0.01)) {
+        tutarLabel = money(b.openEUR, 'EUR') + ' + ' + money(b.openTRY, 'TRY');
+      }
+      return {
+        vade: b['Vade tarihi'] || '-', ad, href: href || '#', linked: !!href, notLinked: !href, tel: b['Telefon'] || '-',
+        segment: b['Segment'] || '-', gun: gun + (String(gun).match(/\d/) ? ' gün' : ''),
+        tutar: tutarLabel,
+        gunStyle: { fontSize: '11.5px', fontWeight: 600, padding: '3px 9px', borderRadius: '20px', justifySelf: 'start', color: gunNum > 30 ? '#dc2626' : '#f59e0b', background: gunNum > 30 ? '#fee2e2' : '#fef3c7' },
+        style: { display: 'grid', gridTemplateColumns: '1fr 1.4fr 1.1fr 1.2fr 0.9fr 1fr', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      };
+    });
+    return {
+      ready: true, loading: false, rows,
+      totalLabel: money(totTRY, 'TRY') + (totEUR ? ' + ' + money(totEUR, 'EUR') : ''),
+      countLabel: list.length ? (list.length + ' danışan açık bakiye (kabul teklif − tahsilat).') : 'Açık bakiye yok — kabul edilmiş teklif ve eksik tahsilat gerekir.',
+      doExcel: () => this.exp('excel', list), doPdf: () => this.exp('pdf', list)
+    };
+  }
+  exp(kind, list) {
+    const headers = ['Vade tarihi', 'Danışan', 'Telefon', 'Segment', 'Geçen süre', 'Tutar', 'Kur'];
+    const rows = list.map(b => [b['Vade tarihi'] || '', b['Danışan'] || '', b['Telefon'] || '', b['Segment'] || '', b['Geçen zaman'] || b['Geçen süre'] || '', parseFloat(b['Tutar']) || 0, b['Kur'] || 'TRY']);
+    if (kind === 'excel') window.Nefalix.exportExcel('bakiye-listesi', headers, rows);
+    else window.Nefalix.exportPDF('Bakiye Listesi', headers, rows);
+  }
+}
+</script>
+</body>
+</html>

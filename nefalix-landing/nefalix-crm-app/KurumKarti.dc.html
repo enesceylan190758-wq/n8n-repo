@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-side:hover { background:#f4f2fb !important; }
+  .nf-actbtn:hover { background:#f4f2fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12); outline:none; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9;">
+  <dc-import name="NavHeader" active-page="kurum" hint-size="100%,132px"></dc-import>
+
+  <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8; font-size:14px;">Kurum kartı yükleniyor...</div></sc-if>
+  <sc-if value="{{ notFound }}" hint-placeholder-val="{{ false }}"><div style="padding:60px; text-align:center; color:#8b87a8; font-size:14px;">Kurum bulunamadı. <a href="KurumListesi.dc.html">Kurum listesine dön</a></div></sc-if>
+
+  <sc-if value="{{ found }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1780px; margin:0 auto; padding:20px 28px 50px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:22px 26px; display:flex; align-items:center; gap:20px; margin-bottom:20px;">
+      <div style="width:74px; height:74px; border-radius:16px; background:#eceafb; display:flex; align-items:center; justify-content:center; color:#7c3aed; flex-shrink:0;"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"></path></svg></div>
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><span style="font-size:22px; font-weight:800; color:#241854;">{{ ad }}</span><span style="{{ tipBadge }}">{{ tip }}</span><span style="{{ segBadge }}">{{ segment }}</span></div>
+        <div style="margin-top:8px; color:#8b87a8; font-size:13.5px; display:flex; gap:18px; flex-wrap:wrap; align-items:center;">
+          <span>[ # {{ dosyaNo }} ]</span><span>📞 {{ tel }}</span><span>👤 {{ yetkili }}</span><span>📍 {{ sehir }}</span>
+          <sc-if value="{{ hasBakiye }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px; font-weight:700; color:#dc2626; background:#fee2e2; padding:4px 12px; border-radius:20px;">Açık bakiye: {{ bakiyeLabel }}</span></sc-if>
+        </div>
+      </div>
+      <a href="{{ mailHref }}" target="_blank" rel="noopener" class="nf-btn" style="display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,#6320EE,#2E6BFF); border-radius:10px; padding:11px 18px; color:#fff; font-size:13px; font-weight:600;">✉ Mail kalıbı</a>
+      <a href="{{ waHref }}" class="nf-btn" style="display:flex; align-items:center; gap:7px; background:#16a34a; border-radius:10px; padding:11px 18px; color:#fff; font-size:13px; font-weight:600;"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5.1-1.3A10 10 0 1012 2z"></path></svg>WhatsApp</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:250px 1fr; gap:20px; align-items:start;">
+      <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:8px;">
+        <sc-for list="{{ sideItems }}" as="s" hint-placeholder-count="10">
+          <div class="nf-side" onClick="{{ s.pick }}" style="{{ s.style }}"><span style="width:20px; text-align:center;">{{ s.icon }}</span>{{ s.label }}</div>
+        </sc-for>
+      </div>
+
+      <div>
+        <!-- DETAYLAR -->
+        <sc-if value="{{ isDetay }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:1fr 1.05fr 1.05fr; gap:20px; align-items:start;">
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
+              <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:16px;">✦ Hızlı İşlemler</div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:16px;">
+                <div style="width:84px; height:84px; border-radius:18px; background:#eceafb; display:flex; align-items:center; justify-content:center; color:#7c3aed;"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"></path></svg></div>
+                <span style="{{ segBadge }}">{{ segment }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="{{ mailHref }}" target="_blank" rel="noopener" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#4338ca;">✉ Tanışma maili / mesaj kalıbı</a>
+                <a href="{{ waHref }}" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#16a34a;">💬 WhatsApp sohbeti başlat</a>
+                <div onClick="{{ goGorusme }}" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#4b4770; cursor:pointer;">🗣 Yeni Görüşme Kaydı</div>
+                <a href="YeniTeklif.dc.html" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#4b4770;">📝 Yeni Teklif</a>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:16px;">
+                <div onClick="{{ goGorusme }}" class="nf-actbtn" style="border:1px solid #f0eef8; border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer;"><div style="font-size:18px;">🗣</div><div style="font-size:16px; font-weight:700; color:#241854;">{{ gorusmeCount }}</div><div style="font-size:11px; color:#8b87a8;">Görüşme</div></div>
+                <div onClick="{{ goTeklif }}" class="nf-actbtn" style="border:1px solid #f0eef8; border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer;"><div style="font-size:18px;">📝</div><div style="font-size:16px; font-weight:700; color:#241854;">{{ teklifCount }}</div><div style="font-size:11px; color:#8b87a8;">Teklif</div></div>
+                <div onClick="{{ goDemo }}" class="nf-actbtn" style="border:1px solid #f0eef8; border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer;"><div style="font-size:18px;">📅</div><div style="font-size:16px; font-weight:700; color:#241854;">{{ demoCount }}</div><div style="font-size:11px; color:#8b87a8;">Demo</div></div>
+              </div>
+            </div>
+
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
+              <div style="text-align:center; background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; font-size:13px; font-weight:700; padding:9px; border-radius:9px; margin-bottom:14px;">🏢 Kurum Bilgileri</div>
+              <sc-for list="{{ kurumBilgi }}" as="f" hint-placeholder-count="6"><div style="display:flex; justify-content:space-between; gap:12px; padding:8px 2px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#8b87a8;">{{ f.label }}</span><span style="color:#241854; font-weight:600; text-align:right;">{{ f.value }}</span></div></sc-for>
+              <div style="text-align:center; background:linear-gradient(135deg,#2563eb,#22d3ee); color:#fff; font-size:13px; font-weight:700; padding:9px; border-radius:9px; margin:16px 0 14px;">📍 Adres Bilgileri</div>
+              <sc-for list="{{ adres }}" as="f" hint-placeholder-count="3"><div style="display:flex; justify-content:space-between; gap:12px; padding:8px 2px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#8b87a8;">{{ f.label }}</span><span style="color:#241854; font-weight:600; text-align:right;">{{ f.value }}</span></div></sc-for>
+            </div>
+
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
+              <div style="text-align:center; background:#241854; color:#fff; font-size:13px; font-weight:700; padding:9px; border-radius:9px; margin-bottom:14px;">🗂 CRM Bilgileri</div>
+              <sc-for list="{{ diger }}" as="f" hint-placeholder-count="6"><div style="display:flex; justify-content:space-between; gap:12px; padding:8px 2px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#8b87a8;">{{ f.label }}</span><span style="color:#241854; font-weight:600; text-align:right;">{{ f.value }}</span></div></sc-for>
+              <div style="font-size:13px; font-weight:700; color:#241854; margin:16px 0 10px;">💬 Hızlı Not</div>
+              <textarea key="{{ noteKey }}" class="nf-f" placeholder="Notunuzu giriniz" onInput="{{ onNote }}" style="width:100%; box-sizing:border-box; min-height:60px; border:1px solid #d9d5ee; border-radius:9px; padding:11px; font-size:13px; color:#241854; resize:vertical; font-family:inherit;"></textarea>
+              <div class="nf-btn" onClick="{{ saveNote }}" style="margin-top:10px; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:10px; text-align:center; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Notu Kaydet</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- DÜZENLE -->
+        <sc-if value="{{ isDuzenle }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; padding:13px 22px; font-size:14px; font-weight:700;">✎ Kurum Bilgilerini Düzenle</div>
+            <div style="padding:22px;">
+              <div style="font-size:13px; font-weight:700; color:#4338ca; margin-bottom:12px;">Kurum & Yetkili</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 20px;">
+                <div><label style="{{ lbl }}">Kurum Adı</label><input class="nf-f" data-k="Ad" value="{{ f_ad }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Kurum Tipi</label><select class="nf-f" data-k="Kurum tipi" onChange="{{ onEdit }}" style="{{ inp }}"><option>Diş Kliniği</option><option>Estetik / Güzellik Merkezi</option><option>Saç Ekim Merkezi</option><option>Hastane</option><option>Göz Merkezi</option><option>Poliklinik</option><option>Fizik Tedavi / Rehabilitasyon</option><option>Diğer</option></select></div>
+                <div><label style="{{ lbl }}">Aşama</label><select class="nf-f" data-k="Segment" onChange="{{ onEdit }}" style="{{ inp }}"><option>Yeni Lead</option><option>İlk Görüşme</option><option>Demo</option><option>Teklif</option><option>Sözleşme</option><option>Aktif Müşteri</option></select></div>
+                <div><label style="{{ lbl }}">Yetkili Kişi</label><input class="nf-f" data-k="Yetkili" value="{{ f_yetkili }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Ünvan</label><input class="nf-f" data-k="Ünvan" value="{{ f_unvan }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Telefon</label><input class="nf-f" data-k="Telefon" value="{{ f_tel }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">E-Posta</label><input class="nf-f" data-k="E-Posta" value="{{ f_email }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Web / Instagram</label><input class="nf-f" data-k="Web" value="{{ f_web }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Hekim / Koltuk Sayısı</label><input class="nf-f" data-k="Hekim sayısı" value="{{ f_hekim }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+              </div>
+              <div style="font-size:13px; font-weight:700; color:#4338ca; margin:20px 0 12px;">Adres & Diğer</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 20px;">
+                <div><label style="{{ lbl }}">Şehir</label><input class="nf-f" data-k="Şehir" value="{{ f_sehir }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">İlçe</label><input class="nf-f" data-k="İlçe" value="{{ f_ilce }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Açık Adres</label><input class="nf-f" data-k="Adres" value="{{ f_adres }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Vergi Dairesi / No</label><input class="nf-f" data-k="Vergi no" value="{{ f_vergi }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Referans Kaynağı</label><input class="nf-f" data-k="Referans kaynağı" value="{{ f_referans }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Satış Temsilcisi</label><input class="nf-f" data-k="Satış temsilcisi" value="{{ f_temsilci }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:22px;">
+                <div class="nf-btn" onClick="{{ goDetay }}" style="padding:12px 22px; border-radius:9px; border:1px solid #d9d5ee; font-size:13.5px; color:#4b4770; font-weight:600; cursor:pointer;">Vazgeç</div>
+                <div class="nf-btn" onClick="{{ saveEdit }}" style="background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:12px 28px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Kaydet</div>
+              </div>
+              <sc-if value="{{ editSaved }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px; background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:13px; border-radius:9px; padding:11px 14px;">✓ Değişiklikler kaydedildi.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- İLGİLİ KİŞİLER -->
+        <sc-if value="{{ isKisiler }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">İlgili Kişiler</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:22px;">
+              <sc-for list="{{ kisiler }}" as="k" hint-placeholder-count="2"><div style="display:flex; gap:14px; align-items:center; border:1px solid #f0eef8; border-radius:12px; padding:16px;"><div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,#a78bfa,#22d3ee); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:16px;">{{ k.initial }}</div><div style="flex:1;"><div style="font-size:14px; font-weight:700; color:#241854;">{{ k.ad }}</div><div style="font-size:12.5px; color:#7c3aed; font-weight:600;">{{ k.rol }}</div><div style="font-size:12px; color:#8b87a8; margin-top:3px;">{{ k.tel }} {{ k.mail }}</div></div></div></sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- GÖRÜŞMELER -->
+        <sc-if value="{{ isGorusme }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+              <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; padding:13px 22px; font-size:14px; font-weight:700;">🗣 Yeni Görüşme / Ziyaret Kaydı</div>
+              <div style="padding:20px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 18px;">
+                  <div><label style="{{ lbl }}">Görüşme Tipi</label><select class="nf-f" data-k="tip" onChange="{{ onG }}" style="{{ inp }}"><option>Telefon</option><option>Yüz yüze</option><option>Online demo</option><option>Saha ziyareti</option><option>WhatsApp</option></select></div>
+                  <div><label style="{{ lbl }}">Görüşülen Kişi</label><input key="{{ gKey }}" class="nf-f" data-k="kisi" placeholder="{{ yetkili }}" onInput="{{ onG }}" style="{{ inp }}" /></div>
+                  <div style="grid-column:1 / -1;"><label style="{{ lbl }}">Konu / Notlar</label><textarea key="{{ gKey }}" class="nf-f" data-k="konu" placeholder="Görüşmede konuşulanlar..." onInput="{{ onG }}" style="{{ inp }} min-height:64px; resize:vertical;"></textarea></div>
+                  <div><label style="{{ lbl }}">Sonuç</label><select class="nf-f" data-k="sonuc" onChange="{{ onG }}" style="{{ inp }}"><option>İlgilendi</option><option>Teklif istendi</option><option>Düşünecek</option><option>Demo planlandı</option><option>Sözleşme aşamasına geçti</option><option>Tekrar aranacak</option><option>Ulaşılamadı</option><option>Olumsuz</option></select></div>
+                  <div><label style="{{ lbl }}">Sonraki Adım Tarihi</label><input key="{{ gKey }}" class="nf-f" data-k="sonrakiTarih" placeholder="gg.aa.yyyy" onInput="{{ onG }}" style="{{ inp }}" /></div>
+                </div>
+                <div style="display:flex; justify-content:flex-end; margin-top:16px;"><div class="nf-btn" onClick="{{ saveG }}" style="background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:11px 26px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Görüşmeyi Kaydet</div></div>
+              </div>
+            </div>
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+              <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Görüşme Geçmişi ({{ gorusmeCount }})</div>
+              <sc-if value="{{ noGorusme }}" hint-placeholder-val="{{ false }}"><div style="{{ emptyBox }}">Henüz görüşme kaydı yok. Yukarıdaki formdan ilk görüşmeyi ekleyin.</div></sc-if>
+              <sc-for list="{{ gorusmeler }}" as="g" hint-placeholder-count="3"><div style="display:flex; gap:14px; padding:16px 22px; border-bottom:1px solid #f6f5fb;"><div style="width:40px; height:40px; border-radius:10px; background:#f1eefc; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px;">{{ g.icon }}</div><div style="flex:1;"><div style="display:flex; justify-content:space-between; gap:10px;"><span style="font-size:13.5px; font-weight:700; color:#241854;">{{ g.tip }} • {{ g.kisi }}</span><span style="{{ g.badge }}">{{ g.sonuc }}</span></div><div style="font-size:13px; color:#4b4770; margin-top:4px;">{{ g.konu }}</div><div style="font-size:11.5px; color:#9c98b8; margin-top:5px;">🕒 {{ g.tarih }} • 👤 {{ g.temsilci }} {{ g.sonraki }}</div></div></div></sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- TEKLİF -->
+        <sc-if value="{{ isTeklif }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0eef8;"><span style="font-size:15px; font-weight:700; color:#241854;">Teklifler</span><a href="YeniTeklif.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:9px 15px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Teklif</a></div>
+            <sc-if value="{{ hasTeklif }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Paket / Hizmet</span><span>Tarih</span><span style="text-align:right;">Tutar</span><span style="text-align:center;">Durum</span></div>
+              <sc-for list="{{ teklifler }}" as="t" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#241854; font-weight:600;">{{ t.hizmet }}</span><span style="color:#4b4770;">{{ t.tarih }}</span><span style="text-align:right; font-weight:700; color:#241854;">{{ t.tutar }}</span><span style="display:flex; justify-content:center;"><span style="{{ t.badge }}">{{ t.durum }}</span></span></div></sc-for>
+            </sc-if>
+            <sc-if value="{{ noTeklif }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">🔍 Bu kuruma ait teklif kaydı yok.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- SÖZLEŞME -->
+        <sc-if value="{{ isSozlesme }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Sözleşme / Abonelik</div>
+            <sc-if value="{{ hasSozlesme }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:22px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:14px; padding:22px 24px; color:#fff;"><div style="font-size:13px; opacity:0.85;">📦 Abonelik Planı</div><div style="font-size:24px; font-weight:800; margin-top:8px;">{{ sz_plan }}</div><div style="font-size:13px; opacity:0.9; margin-top:6px;">{{ sz_aylik }} · {{ sz_yenileme }}</div></div>
+                  <div style="border:1px solid #f0eef8; border-radius:14px; padding:22px 24px;"><div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f6f5fb; font-size:13.5px;"><span style="color:#8b87a8;">Durum</span><span style="{{ sz_durumBadge }}">{{ sz_durum }}</span></div><div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f6f5fb; font-size:13.5px;"><span style="color:#8b87a8;">Başlangıç</span><span style="color:#241854; font-weight:600;">{{ sz_baslangic }}</span></div><div style="display:flex; justify-content:space-between; padding:7px 0; font-size:13.5px;"><span style="color:#8b87a8;">Koltuk / Hekim</span><span style="color:#241854; font-weight:600;">{{ sz_koltuk }}</span></div></div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noSozlesme }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">Bu kurumla henüz aktif sözleşme/abonelik yok. Sözleşme aşamasına geldiğinde burada görünecek.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- NOTLAR -->
+        <sc-if value="{{ isNotlar }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:22px;">
+            <div style="font-size:15px; font-weight:700; color:#241854; margin-bottom:16px;">💬 Notlar</div>
+            <textarea key="{{ noteKey }}" class="nf-f" placeholder="Notunuzu giriniz" onInput="{{ onNote }}" style="width:100%; box-sizing:border-box; min-height:80px; border:1px solid #d9d5ee; border-radius:9px; padding:11px; font-size:13.5px; color:#241854; resize:vertical; font-family:inherit;"></textarea>
+            <div class="nf-btn" onClick="{{ saveNote }}" style="margin-top:10px; display:inline-block; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:10px 24px; text-align:center; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Notu Kaydet</div>
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
+              <sc-for list="{{ notes }}" as="n" hint-placeholder-count="5"><div style="display:flex; gap:12px; padding-bottom:14px; border-bottom:1px solid #f6f5fb;"><span style="width:18px; height:18px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13.5px; color:#241854;">{{ n.text }}</div><div style="font-size:11.5px; color:#9c98b8; margin-top:4px;">🕒 {{ n.ts }} • 👤 {{ n.user }}</div></div></div></sc-for>
+              <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px; color:#c5c1dc; text-align:center; padding:20px;">Henüz not girilmemiş.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- DOSYALAR -->
+        <sc-if value="{{ isDosya }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Dosyalar & Belgeler</div>
+            <div style="padding:30px 22px;">
+              <div style="border:2px dashed #d9d5ee; border-radius:14px; padding:40px; text-align:center; color:#9c98b8;"><div style="font-size:34px;">📁</div><div style="font-size:14px; font-weight:600; color:#4b4770; margin-top:10px;">Sözleşme, teklif PDF'i veya belge sürükleyin</div><div style="font-size:12.5px; margin-top:4px;">Bu kuruma ait henüz belge yüklenmedi.</div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- AKTİVİTE -->
+        <sc-if value="{{ isAktivite }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Aktivite Geçmişi</div>
+            <sc-if value="{{ hasAktivite }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:22px 26px;">
+                <sc-for list="{{ aktivite }}" as="a" hint-placeholder-count="5"><div style="display:flex; gap:14px;"><div style="display:flex; flex-direction:column; align-items:center;"><div style="width:34px; height:34px; border-radius:50%; background:{{ a.bg }}; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">{{ a.icon }}</div><div style="width:2px; flex:1; background:#f0eef8; margin:4px 0;"></div></div><div style="flex:1; padding-bottom:20px;"><div style="font-size:13.5px; font-weight:700; color:#241854;">{{ a.title }}</div><div style="font-size:13px; color:#4b4770; margin-top:2px;">{{ a.text }}</div><div style="font-size:11.5px; color:#9c98b8; margin-top:4px;">🕒 {{ a.ts }}</div></div></div></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noAktivite }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">Henüz aktivite yok.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- TAHSİLAT -->
+        <sc-if value="{{ isTahsilat }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+              <div style="background:linear-gradient(135deg,#0891b2,#22d3ee); border-radius:14px; padding:20px 24px; color:#fff;"><div style="font-size:13px; opacity:0.9;">🛒 Toplam Tahsilat</div><div style="font-size:24px; font-weight:800; margin-top:8px; text-align:right;">{{ tahsilatLabel }}</div></div>
+              <div style="background:linear-gradient(135deg,#dc2626,#f97316); border-radius:14px; padding:20px 24px; color:#fff;"><div style="font-size:13px; opacity:0.9;">💳 Açık Bakiye</div><div style="font-size:24px; font-weight:800; margin-top:8px; text-align:right;">{{ bakiyeLabel }}</div></div>
+            </div>
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+              <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Ödeme Hareketleri</div>
+              <sc-if value="{{ hasSatis }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid; grid-template-columns:1fr 1fr 1.4fr 1fr 1fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Ödeme tarihi</span><span>İşlem</span><span>Bilgi</span><span>Yöntem</span><span style="text-align:right;">Tutar</span></div>
+                <sc-for list="{{ satislar }}" as="s" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1fr 1fr 1.4fr 1fr 1fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#4b4770;">{{ s.tarih }}</span><span><span style="font-size:11px; font-weight:600; color:#16a34a; background:#dcfce7; padding:3px 9px; border-radius:20px;">Tahsilat</span></span><span style="color:#241854; font-weight:600;">{{ s.bilgi }}</span><span style="color:#4b4770;">{{ s.yontem }}</span><span style="text-align:right; font-weight:700; color:#16a34a;">{{ s.tutar }}</span></div></sc-for>
+              </sc-if>
+              <sc-if value="{{ noSatis }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">Bu kuruma ait ödeme kaydı yok.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+const SIDE = [
+  { key: 'detaylar', label: 'Detaylar', icon: 'ⓘ' }, { key: 'duzenle', label: 'Düzenle', icon: '✎' },
+  { key: 'kisiler', label: 'İlgili Kişiler', icon: '👥' }, { key: 'gorusme', label: 'Görüşmeler / Ziyaretler', icon: '🗣' },
+  { key: 'teklif', label: 'Teklifler', icon: '📝' }, { key: 'sozlesme', label: 'Sözleşme / Abonelik', icon: '📄' },
+  { key: 'notlar', label: 'Notlar', icon: '🗒' }, { key: 'dosya', label: 'Dosyalar & Belgeler', icon: '📁' },
+  { key: 'aktivite', label: 'Aktivite Geçmişi', icon: '📊' }, { key: 'tahsilat', label: 'Tahsilat / Ödemeler', icon: '💳' }
+];
+function pick(d, pairs) { const out = []; pairs.forEach(([label, key]) => { const v = d[key]; if (v) out.push({ label, value: v }); }); return out; }
+function money(v, k) { return Math.round(Math.abs(parseFloat(v) || 0)).toLocaleString('tr-TR') + ' ' + (k || 'TRY'); }
+function segColorOf(s) { s = (s || '').toLowerCase(); if (s.includes('yeni lead')) return '#9ca3af'; if (s.includes('görüşme')) return '#2563eb'; if (s.includes('demo')) return '#7c3aed'; if (s.includes('teklif')) return '#f59e0b'; if (s.includes('sözleşme')) return '#0891b2'; if (s.includes('aktif')) return '#16a34a'; return '#9ca3af'; }
+const SONUC_COLOR = { 'İlgilendi': '#16a34a', 'Teklif istendi': '#2563eb', 'Demo planlandı': '#7c3aed', 'Sözleşme aşamasına geçti': '#0891b2', 'Tekrar aranacak': '#f59e0b', 'Düşünecek': '#f59e0b', 'Ulaşılamadı': '#9ca3af', 'Olumsuz': '#ef4444' };
+class Component extends DCLogic {
+  state = { ready: false, notFound: false, tab: 'detaylar', ver: 0, noteKey: 0, gKey: 0, editSaved: false };
+  _note = ''; edit = {}; g = {};
+  componentDidMount() {
+    const id = window.Nefalix.param('id');
+    window.Nefalix.ready().then(() => { const d = id ? window.Nefalix.getKurumById(id) : null; this._id = id; this._d = d; this.setState({ ready: true, notFound: !d }); });
+  }
+  renderVals() {
+    if (!this.state.ready) return { loading: true, found: false, notFound: false };
+    if (this.state.notFound) return { loading: false, found: false, notFound: true };
+    const d = this._d, tab = this.state.tab;
+    const seg = d['Segment'] || 'Yeni Lead';
+    const H = window.Nefalix.kurumHistory(this._id, d['Ad']);
+    const TS = window.Nefalix.teklifStatusMeta();
+    const tlabel = {}, tcolor = {}; TS.forEach(s => { tlabel[s.key] = s.label; tcolor[s.key] = s.color; });
+    const badge = (c) => ({ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', color: c, background: c + '22', whiteSpace: 'nowrap' });
+    const sideItems = SIDE.map(s => ({ label: s.label, icon: s.icon, pick: () => this.setState({ tab: s.key, editSaved: false }),
+      style: { display: 'flex', alignItems: 'center', gap: '10px', padding: '11px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontWeight: tab === s.key ? 700 : 500, color: tab === s.key ? '#4338ca' : '#4b4770', background: tab === s.key ? '#f1eefc' : 'transparent' } }));
+    const userNotes = window.Nefalix.getNotes(this._id).map(n => ({ text: n.text, user: n.user, ts: n.ts, color: '#22c55e' }));
+    const seedNote = d['Son müşteri notu'] ? [{ text: d['Son müşteri notu'], user: d['Oluşturan'] || 'Sistem', ts: d['Değişiklik tarihi'] || d['Kayıt tarihi'] || '', color: '#f59e0b' }] : [];
+    const notes = userNotes.concat(seedNote);
+    const teklifler = H.teklifler.slice(0, 20).map(t => ({ hizmet: t.hizmet, tarih: t.tarih, tutar: money(t.tutar, t.kur), durum: tlabel[t.durum] || t.durum, badge: badge(tcolor[t.durum] || '#888') }));
+    const gorusmeler = H.gorusmeler.slice(0, 40).map(g => ({ tip: g.tip, kisi: g.kisi || d['Yetkili'] || '-', konu: g.konu || '-', sonuc: g.sonuc || '-', tarih: g.tarih, temsilci: g.temsilci || '-',
+      icon: g.tip === 'Telefon' ? '📞' : (g.tip === 'Yüz yüze' ? '🤝' : (g.tip === 'Online demo' ? '💻' : (g.tip === 'Saha ziyareti' ? '🚗' : '💬'))),
+      sonraki: g.sonrakiTarih ? ('• ⏭ ' + g.sonrakiTarih) : '', badge: badge(SONUC_COLOR[g.sonuc] || '#888') }));
+    const satislar = H.satislar.slice(0, 20).map(s => ({ tarih: s['Ödeme tarihi'] || '-', bilgi: s['Bilgi'] || 'Tahsilat', yontem: s['Ödeme Yöntemi'] || '-', tutar: money(s['Tutar'], s['Kur']) }));
+    // İlgili kişiler
+    const kseen = {}; const kisiler = [];
+    if (d['Yetkili']) { kisiler.push({ ad: d['Yetkili'], rol: d['Ünvan'] || 'Yetkili', tel: d['Telefon'] || '', mail: d['E-Posta'] ? ('• ' + d['E-Posta']) : '', initial: (d['Yetkili'] || '?').replace(/^(Dr\.|Op\.|Uzm\.|Dyt\.)\s*/i, '').trim().charAt(0).toUpperCase() }); kseen[d['Yetkili']] = 1; }
+    H.gorusmeler.forEach(g => { if (g.kisi && !kseen[g.kisi]) { kseen[g.kisi] = 1; kisiler.push({ ad: g.kisi, rol: 'Görüşülen kişi', tel: '', mail: '', initial: g.kisi.trim().charAt(0).toUpperCase() }); } });
+    // Aktivite timeline
+    let acts = [];
+    H.gorusmeler.forEach(g => acts.push({ icon: '🗣', bg: '#f1eefc', title: 'Görüşme — ' + (g.sonuc || ''), text: g.tip + ' · ' + (g.konu || ''), ts: g.tarih }));
+    H.teklifler.forEach(t => acts.push({ icon: '📝', bg: '#fff7ed', title: 'Teklif — ' + (tlabel[t.durum] || t.durum), text: t.hizmet + ' · ' + money(t.tutar, t.kur), ts: t.tarih }));
+    H.randevular.forEach(r => acts.push({ icon: '📅', bg: '#eff6ff', title: 'Demo / Toplantı', text: r.tip + ' · ' + r.saat, ts: r.tarih }));
+    userNotes.forEach(n => acts.push({ icon: '🗒', bg: '#f0fdf4', title: 'Not eklendi', text: n.text, ts: n.ts }));
+    const pd = (s) => { const dt = window.Nefalix.parseDate(s); return dt ? dt.getTime() : 0; };
+    acts.sort((a, b) => pd(b.ts) - pd(a.ts));
+    const sz = H.sozlesme;
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; background:#fff; font-family:inherit;';
+    const emptyBox = 'margin:20px; background:#fffbeb; border:1px solid #fde68a; color:#92400e; font-size:13.5px; border-radius:10px; padding:18px 20px;';
+    return {
+      loading: false, found: true, notFound: false,
+      ad: d['Ad'] || '(İsimsiz)', dosyaNo: d['Kurum ID'] || '-', tel: d['Telefon'] || '-', yetkili: d['Yetkili'] || '-', sehir: d['Şehir'] || '-',
+      tip: d['Kurum tipi'] || 'Kurum', segment: seg,
+      tipBadge: { fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '20px', color: '#7c3aed', background: '#f1eefc' },
+      segBadge: { fontSize: '12px', fontWeight: 700, padding: '4px 12px', borderRadius: '20px', color: '#fff', background: segColorOf(seg) },
+      waHref: 'WhatsappPanel.dc.html',
+      mailHref: (function () {
+        const u = (window.Nefalix && window.Nefalix.currentUser && window.Nefalix.currentUser()) || {};
+        const who = /enes/i.test(u.id || u.name || '') ? 'enes' : 'kadir';
+        const firm = encodeURIComponent(d['Ad'] || '');
+        const name = encodeURIComponent(d['Yetkili'] || '');
+        return 'https://nefalix.com/iletisim?firm=' + firm + '&name=' + name + '&kart=' + who + '#kaliplar';
+      })(),
+      hasBakiye: H.bakiyeTop > 0, bakiyeLabel: money(H.bakiyeTop, H.bakiyeKur),
+      sideItems,
+      isDetay: tab === 'detaylar', isDuzenle: tab === 'duzenle', isKisiler: tab === 'kisiler', isGorusme: tab === 'gorusme', isTeklif: tab === 'teklif', isSozlesme: tab === 'sozlesme', isNotlar: tab === 'notlar', isDosya: tab === 'dosya', isAktivite: tab === 'aktivite', isTahsilat: tab === 'tahsilat',
+      emptyBox,
+      kurumBilgi: pick(d, [['Yetkili', 'Yetkili'], ['Ünvan', 'Ünvan'], ['Telefon', 'Telefon'], ['E-Posta', 'E-Posta'], ['Web', 'Web'], ['Hekim sayısı', 'Hekim sayısı'], ['Vergi no', 'Vergi no']]),
+      adres: pick(d, [['Şehir', 'Şehir'], ['İlçe', 'İlçe'], ['Adres', 'Adres']]),
+      diger: pick(d, [['Kurum tipi', 'Kurum tipi'], ['Aşama', 'Segment'], ['Referans kaynağı', 'Referans kaynağı'], ['Satış temsilcisi', 'Satış temsilcisi'], ['Kayıt tarihi', 'Kayıt tarihi'], ['Oluşturan', 'Oluşturan']]),
+      notes, noNotes: notes.length === 0, noteKey: this.state.noteKey, gKey: this.state.gKey,
+      gorusmeCount: H.gorusmeler.length, teklifCount: H.teklifler.length, demoCount: H.randevular.length,
+      teklifler, hasTeklif: teklifler.length > 0, noTeklif: teklifler.length === 0,
+      gorusmeler, noGorusme: gorusmeler.length === 0,
+      kisiler,
+      satislar, hasSatis: satislar.length > 0, noSatis: satislar.length === 0,
+      tahsilatLabel: money(H.satisTop, H.satisKur),
+      aktivite: acts.slice(0, 30), hasAktivite: acts.length > 0, noAktivite: acts.length === 0,
+      hasSozlesme: !!sz, noSozlesme: !sz,
+      sz_plan: sz ? sz.plan : '', sz_aylik: sz ? money(sz.aylik, sz.kur) + '/ay' : '', sz_yenileme: sz ? sz.yenileme : '', sz_durum: sz ? sz.durum : '', sz_baslangic: sz ? sz.baslangic : '', sz_koltuk: sz ? sz.koltuk : '',
+      sz_durumBadge: badge(sz && sz.durum === 'Aktif' ? '#16a34a' : '#f59e0b'),
+      lbl, inp,
+      f_ad: d['Ad'] || '', f_tel: d['Telefon'] || '', f_email: d['E-Posta'] || '', f_yetkili: d['Yetkili'] || '', f_unvan: d['Ünvan'] || '', f_web: d['Web'] || '', f_hekim: d['Hekim sayısı'] || '', f_sehir: d['Şehir'] || '', f_ilce: d['İlçe'] || '', f_adres: d['Adres'] || '', f_vergi: d['Vergi no'] || '', f_referans: d['Referans kaynağı'] || '', f_temsilci: d['Satış temsilcisi'] || '',
+      editSaved: this.state.editSaved,
+      onNote: (e) => { this._note = e.target.value; },
+      saveNote: () => { const t = (this._note || '').trim(); if (!t) return; window.Nefalix.addNote(this._id, t); this._note = ''; this.setState(s => ({ ver: s.ver + 1, noteKey: s.noteKey + 1 })); },
+      onEdit: (e) => { this.edit[e.target.getAttribute('data-k')] = e.target.value; },
+      saveEdit: () => { if (Object.keys(this.edit).length) { window.Nefalix.updateKurum(this._id, this.edit); this._d = window.Nefalix.getKurumById(this._id); this.edit = {}; } this.setState({ editSaved: true }); },
+      onG: (e) => { this.g[e.target.getAttribute('data-k')] = e.target.value; },
+      saveG: () => { const g = this.g; window.Nefalix.addGorusme(this._id, { tip: g.tip || 'Telefon', kisi: g.kisi || d['Yetkili'] || '', konu: g.konu || '', sonuc: g.sonuc || 'İlgilendi', sonrakiTarih: g.sonrakiTarih || '' }); this.g = {}; this.setState(s => ({ ver: s.ver + 1, gKey: s.gKey + 1 })); },
+      goDetay: () => this.setState({ tab: 'detaylar', editSaved: false }),
+      goGorusme: () => this.setState({ tab: 'gorusme' }), goTeklif: () => this.setState({ tab: 'teklif' }), goDemo: () => this.setState({ tab: 'aktivite' })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="gelirler" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; font-size:17px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Banka Özet</div>
+      <div style="display:grid; grid-template-columns:1.2fr 1.2fr 1fr 1fr 1fr; padding:14px 24px; background:#fbfaff; font-size:12.5px; font-weight:700; color:#16a34a; border-bottom:1px solid #f0eef8;">
+        <span>Ödeme Aracı</span><span>Ödeme Yöntemi</span><span>Gelir</span><span>Gider</span><span>Net</span>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+        <div class="nf-row" style="{{ r.style }}">
+          <span style="color:#241854; font-weight:600; font-size:13.5px;">{{ r.arac }}</span>
+          <span style="color:#4b4770; font-size:13px;">{{ r.yontem }}</span>
+          <span style="color:#16a34a; font-size:13px; font-weight:600;">{{ r.gelir }}</span>
+          <span style="color:#dc2626; font-size:13px; font-weight:600;">{{ r.gider }}</span>
+          <span style="{{ r.netStyle }}">{{ r.net }}</span>
+        </div>
+      </sc-for>
+      <div style="padding:16px 24px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:700}}">
+function fmt(v, kur) { return Math.round(v).toLocaleString('tr-TR') + ' ' + kur; }
+class Component extends DCLogic {
+  state = { ready: false };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    if (!this.state.ready) return { rows: [], countLabel: '' };
+    const list = window.Nefalix.getKasa();
+    const acc = {};
+    list.forEach(k => {
+      const kur = k['Kur'] || 'TRY'; const yontem = k['Ödeme Yöntemi'] || 'Diğer';
+      const key = yontem + '|' + kur;
+      const v = parseFloat(k['Tutar']) || 0;
+      const a = acc[key] || (acc[key] = { yontem, kur, gelir: 0, gider: 0 });
+      if (v >= 0) a.gelir += v; else a.gider += v;
+    });
+    const rows = Object.values(acc).sort((a, b) => (b.gelir - b.gider) - (a.gelir - a.gider)).map((a, i) => {
+      const net = a.gelir + a.gider;
+      return {
+        arac: a.yontem, yontem: a.kur + ' Hesabı', gelir: fmt(a.gelir, a.kur), gider: fmt(a.gider, a.kur), net: fmt(net, a.kur),
+        netStyle: { fontSize: '13px', fontWeight: 700, color: net >= 0 ? '#16a34a' : '#dc2626' },
+        style: { display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1fr 1fr 1fr', alignItems: 'center', padding: '14px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      };
+    });
+    return { rows, countLabel: rows.length + ' kayıt bulundu.' };
+  }
+}
+</script>
+</body>
+</html>

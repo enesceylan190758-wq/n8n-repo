@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Nefalix Saha CRM</title>
+<link rel="icon" href="/assets/brand/favicon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ink:#0B1220;      /* logo siyah-lacivert */
+  --ink2:#151D2E;
+  --line:#D8E0EF;
+  --bg:#F4F7FC;
+  --card:#FFFFFF;
+  --txt:#151D2E;
+  --mut:#6B7A8D;
+  --brand:#2F6BFF;    /* logo elektrik mavi */
+  --brand-d:#1F4FD6;
+  --brand-soft:#E8EEFF;
+  --accent:#22D3C5;   /* logo cyan uç */
+  --accent-soft:#E6FAF8;
+  --violet:#7C5CF5;
+  --warn:#E8A317;
+  --dang:#D64545;
+  --info:#2F6BFF;
+  --r:10px;
+  --sh:0 1px 2px rgba(11,18,32,.06), 0 4px 14px rgba(11,18,32,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--brand-d);text-decoration:none}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+/* ---------- ANA EKRAN (giriş öncesi) ---------- */
+.logo{display:flex;align-items:center;gap:10px}
+.logo .mark-img{width:34px;height:34px;border-radius:8px;background:#fff;padding:3px;object-fit:contain;flex:none;display:block}
+.logo b{font-size:19px;letter-spacing:-.3px}
+.logo .logo-sub{font-size:11px;font-weight:600;color:#7B8CA0;letter-spacing:.02em}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:12px;flex:none}
+
+#ana{min-height:100vh;background:var(--bg)}
+.ahead{background:var(--ink);color:#fff;padding:14px 26px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:30}
+.ahead .logo b{color:#fff}
+.ahead .sl{font-size:12px;color:#7B8CA0;border-left:1px solid #2C3B4E;padding-left:16px;margin-left:2px}
+.lform{margin-left:auto;display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
+.lform .fg{display:flex;flex-direction:column;gap:3px}
+.lform label{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#7B8CA0;font-weight:700}
+.lform input{width:150px;padding:7px 10px;border:1px solid #2C3B4E;border-radius:8px;background:#16202E;color:#fff;font-size:13px}
+.lform input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,107,255,.25)}
+.lform input::placeholder{color:#546276}
+.lerr{color:#FF9B9B;font-size:12px;font-weight:600;align-self:center}
+
+.hero{background:linear-gradient(145deg,#0B1220 0%,#121A2E 42%,#1A1840 72%,#0E2A32 100%);color:#fff;padding:38px 26px 30px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-80px;top:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,245,.35),transparent 70%);pointer-events:none}
+.hero::before{content:"";position:absolute;left:-40px;bottom:-80px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,197,.22),transparent 68%);pointer-events:none}
+.hero h1,.hero p,.hkpis{position:relative;z-index:1}
+.hero h1{font-size:27px;font-weight:700;letter-spacing:-.6px;margin-bottom:6px}
+.hero p{color:#9FB0C2;max-width:640px;font-size:14px}
+.hkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:24px}
+.hk{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:14px 16px}
+.hk .n{font-family:"JetBrains Mono",monospace;font-size:25px;font-weight:700;letter-spacing:-1px}
+.hk .l{font-size:11px;color:#8FA1B4;text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-top:2px}
+.hk.g .n{color:var(--accent)} .hk.r .n{color:#FF8A8A} .hk.y .n{color:#F5C563}
+.awrap{padding:24px 26px;max-width:1220px;margin:0 auto}
+
+.bar{height:7px;border-radius:4px;background:#EAEEF3;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:4px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.fstep{border:1px solid var(--line);border-radius:10px;padding:13px 14px;background:#fff;position:relative}
+.fstep .k{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:var(--brand);letter-spacing:1px}
+.fstep b{display:block;font-size:13.5px;margin:3px 0 4px}
+.fstep p{font-size:12px;color:var(--mut);line-height:1.5}
+.fstep .who{position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+
+/* ---------- SHELL ---------- */
+#app{display:none;min-height:100vh}
+.shell{display:flex;min-height:100vh}
+aside{width:232px;flex:none;background:var(--ink);color:#AFBCCB;padding:16px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;overflow-y:auto}
+aside .logo{padding:6px 8px 16px;color:#fff}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;width:100%;text-align:left;color:#AFBCCB;transition:.12s}
+.nav:hover{background:#1A2438;color:#fff}
+.nav.on{background:linear-gradient(90deg,var(--brand),var(--violet));color:#fff}
+.nav .ic{width:17px;text-align:center;font-size:14px}
+.nav .cnt{margin-left:auto;background:rgba(255,255,255,.14);padding:1px 7px;border-radius:20px;font-size:11px;font-weight:700}
+.nav.on .cnt{background:rgba(0,0,0,.22)}
+.nav .cnt.hot{background:var(--dang);color:#fff}
+.navgrp{font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:#5C6E82;padding:14px 11px 5px;font-weight:700}
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+header{background:#fff;border-bottom:1px solid var(--line);padding:12px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:20}
+header h1{font-size:16px;font-weight:600;letter-spacing:-.2px}
+header .who{margin-left:auto;display:flex;align-items:center;gap:10px}
+.bell{position:relative;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font-size:15px}
+.bell .dot{position:absolute;top:-5px;right:-5px;background:var(--dang);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.wrap{padding:22px;flex:1}
+
+/* ---------- BLOCKS ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.card-h{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.card-h h3{font-size:13.5px;font-weight:600}
+.card-h .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.card-b{padding:16px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.kpi .n{font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:700;letter-spacing:-1px}
+.kpi .l{font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:2px}
+.kpi.hot .n{color:var(--dang)} .kpi.ok .n{color:var(--accent)} .kpi.w .n{color:var(--warn)}
+
+.btn{padding:8px 13px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;transition:.12s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#F0F3F7}
+.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.p:hover{background:var(--brand-d)}
+.btn.d{background:#fff;color:var(--dang);border-color:#F1C9C9}
+.btn.sm{padding:5px 9px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,107,255,.15)}
+label.f{display:block;font-size:11.5px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:150px}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line);background:#FAFBFC;position:sticky;top:0;z-index:2;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid #F0F3F7;vertical-align:middle}
+tr:hover td{background:#FAFCFD}
+.tscroll{max-height:calc(100vh - 300px);overflow:auto;border-radius:0 0 var(--r) var(--r)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.chip .b{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:600;background:#EEF2F6;color:#54657A}
+.stars{color:var(--warn);letter-spacing:1px;font-size:12px}
+.mut{color:var(--mut)}
+.sml{font-size:12px}
+.empty{padding:44px 20px;text-align:center;color:var(--mut)}
+.empty .e{font-size:30px;margin-bottom:8px;opacity:.5}
+
+/* ---------- MODAL ---------- */
+.mask{position:fixed;inset:0;background:rgba(15,23,35,.5);display:none;align-items:flex-start;justify-content:center;padding:36px 16px;z-index:60;overflow-y:auto}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:620px;box-shadow:0 24px 70px rgba(0,0,0,.3)}
+.modal.lg{max-width:900px}
+.m-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+.m-h h3{font-size:15px;font-weight:600}
+.m-h .x{margin-left:auto;font-size:20px;color:var(--mut);width:28px;height:28px;border-radius:6px}
+.m-h .x:hover{background:#F0F3F7}
+.m-b{padding:20px;display:grid;gap:14px;max-height:70vh;overflow-y:auto}
+.m-f{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;background:#FAFBFC;border-radius:0 0 14px 14px}
+
+/* ---------- TAKVİM ---------- */
+.calnav{display:flex;align-items:center;gap:8px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .dh{text-align:center;font-size:10.5px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;padding:6px 0}
+.day{border:1px solid var(--line);border-radius:8px;min-height:82px;padding:6px;background:#fff;text-align:left;transition:.12s;display:flex;flex-direction:column;gap:3px}
+.day:hover{border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,107,255,.12)}
+.day.pad{background:#FAFBFC;border-style:dashed;cursor:default;opacity:.5}
+.day.pad:hover{border-color:var(--line);box-shadow:none}
+.day.wknd{background:#F7F8FC}
+.day.today{border-color:var(--brand);border-width:2px}
+.day .dn{font-size:12px;font-weight:700;font-family:"JetBrains Mono",monospace}
+.day .free{font-size:10px;font-weight:700;color:var(--brand)}
+.day .full{font-size:10px;font-weight:700;color:var(--dang)}
+.mini{font-size:10px;padding:2px 4px;border-radius:4px;background:var(--brand-soft);color:var(--brand-d);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini.busy{background:#F2F4F7;color:#6B7A8D}
+
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:7px}
+.slot{border:1px solid var(--line);border-radius:8px;padding:8px 6px;text-align:center;transition:.12s;background:#fff}
+.slot .t{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:13px}
+.slot .s{font-size:10px;font-weight:600;margin-top:2px;color:var(--brand)}
+.slot:hover{border-color:var(--brand)}
+.slot.busy{background:#F2F4F7;color:var(--mut)}
+.slot.busy .s{color:var(--mut)}
+.slot.appt{background:var(--accent-soft);border-color:var(--accent)}
+.slot.appt .s{color:#0F8F85}
+.slot.mine{border-color:var(--ink);background:#EEF1F5}
+.slot.past{opacity:.4}
+
+.pill{padding:5px 10px;border-radius:20px;border:1px solid var(--line);font-size:12px;font-weight:600;background:#fff}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+
+.segpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}
+.segbtn{border:1px solid var(--line);border-radius:8px;padding:9px 11px;text-align:left;transition:.12s;background:#fff}
+.segbtn:hover{border-color:var(--ink);background:#FAFBFC}
+.segbtn.on{border-color:var(--ink);border-width:2px;background:#F5F7FA}
+.segbtn .nm{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.segbtn .gn{font-size:11px;color:var(--mut);margin-top:2px}
+.dotc{width:9px;height:9px;border-radius:50%;flex:none}
+
+.note{border-left:3px solid var(--line);padding:8px 0 8px 12px;margin-bottom:10px}
+.note .mt{font-size:11.5px;color:var(--mut);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.note .tx{margin-top:3px;white-space:pre-wrap}
+
+.guide h2{font-size:15px;font-weight:700;margin:0 0 4px}
+.guide h4{font-size:12.5px;font-weight:700;color:var(--brand-d);margin:14px 0 5px;text-transform:uppercase;letter-spacing:.5px}
+.guide p{margin-bottom:8px}
+.quote{background:var(--brand-soft);border-left:3px solid var(--brand);padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:9px;font-size:13.5px}
+.warnbox{background:#FEF6E7;border-left:3px solid var(--warn);padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:9px;font-size:13px}
+.dangbox{background:#FDEEEE;border-left:3px solid var(--dang);padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:9px;font-size:13px}
+.step{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid #F0F3F7}
+.step .num{width:24px;height:24px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;font-family:"JetBrains Mono",monospace}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:200;transform:translateY(80px);opacity:0;transition:.24s}
+.toast.on{transform:none;opacity:1}
+.sync{font-size:11px;color:var(--mut);display:flex;align-items:center;gap:5px}
+.sync .d{width:7px;height:7px;border-radius:50%;background:var(--brand)}
+@media(max-width:980px){.cols{grid-template-columns:1fr}aside{width:62px;padding:12px 8px}aside .logo b,aside .logo .logo-sub,aside .nav span.lb,aside .navgrp{display:none}.nav{justify-content:center}.nav .cnt{display:none}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+
+<!-- ================= ANA EKRAN (giriş öncesi) ================= -->
+<div id="ana">
+  <div class="ahead">
+    <div class="logo"><img class="mark-img" src="/assets/brand/nefalix-logo.png" alt="Nefalix" width="34" height="34"><div><b>Nefalix</b><div class="logo-sub">Saha CRM</div></div></div>
+    <div class="sl">Klinik arama · randevu · görüşme takibi</div>
+    <div class="lform">
+      <div class="fg"><label>Kullanıcı</label><input type="text" id="lg_id" placeholder="enes / abdulkadir / kader" autocomplete="username" onkeydown="if(event.key==='Enter')girisYap()"></div>
+      <button class="btn p" style="padding:8px 18px" onclick="girisYap()">Giriş yap</button>
+      <span class="lerr" id="lg_err"></span>
+    </div>
+  </div>
+  <div id="anaIcerik"></div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+<div class="shell">
+  <aside>
+    <div class="logo"><img class="mark-img" src="/assets/brand/nefalix-logo.png" alt="Nefalix" width="34" height="34"><b>Nefalix</b></div>
+    <div class="navgrp">Günlük İş</div>
+    <button class="nav" data-p="kokpit"><span class="ic">◈</span><span class="lb">Kokpit</span></button>
+    <button class="nav" data-p="dinamik"><span class="ic">◷</span><span class="lb">Dinamik Arama</span><span class="cnt hot" id="c-din">0</span></button>
+    <button class="nav" data-p="arama"><span class="ic">☏</span><span class="lb">Arama Ekranı</span></button>
+    <button class="nav" data-p="takvim"><span class="ic">▦</span><span class="lb">Takvim</span></button>
+    <button class="nav" data-p="randevu"><span class="ic">✓</span><span class="lb">Randevular</span><span class="cnt" id="c-rnd">0</span></button>
+    <div class="navgrp">Veri</div>
+    <button class="nav" data-p="havuz"><span class="ic">▤</span><span class="lb">Klinik Havuzu</span><span class="cnt" id="c-hav">0</span></button>
+    <button class="nav" data-p="gorusme"><span class="ic">✎</span><span class="lb">Görüşme Notları</span></button>
+    <div class="navgrp">Destek</div>
+    <button class="nav" data-p="yardim"><span class="ic">?</span><span class="lb">Yardım</span></button>
+    <button class="nav" data-p="ayar"><span class="ic">⚙</span><span class="lb">Ayarlar</span></button>
+    <div style="margin-top:auto;padding:10px 8px 0">
+      <button class="nav" onclick="cikis()"><span class="ic">⏻</span><span class="lb">Çıkış</span></button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <h1 id="ttl">Kokpit</h1>
+      <div class="who">
+        <span class="sync"><span class="d"></span><span id="syncTx">Yerel</span></span>
+        <button class="bell" onclick="bildirimAc()">🔔<span class="dot" id="bdot" style="display:none">0</span></button>
+        <div class="av" id="meav" style="background:var(--brand)"></div>
+        <div style="line-height:1.2"><div style="font-size:13px;font-weight:600" id="mead"></div><div style="font-size:11px;color:var(--mut)" id="merol"></div></div>
+      </div>
+    </header>
+    <div class="wrap" id="page"></div>
+  </main>
+</div>
+</div>
+
+<div class="mask" id="mask"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   NEFALIX SAHA CRM  ·  v1.0
+   Tek dosya. Sunucu gerekmez. Ekip senkronu için CFG'yi doldur.
+   ============================================================ */
+
+/* ---- 1) SUNUCU AYARI (Enes buradan açacak) ------------------
+   Ekip ortak kullanacaksa Supabase'de şu tabloyu aç:
+
+     create table nefalix_state (
+       id int primary key,
+       data jsonb,
+       rev  int default 1
+     );
+     insert into nefalix_state (id, data, rev) values (1, '{}', 0);
+     -- RLS kapalı veya anon'a select/update izni ver.
+
+   Sonra aşağıdaki 3 satırı doldur, dosyayı yükle. Bitti.
+------------------------------------------------------------- */
+const CFG = {
+  BACKEND: 'server',       // ortak sunucu (nefalix.com API → Supabase)
+  API_GET: '/api/crm/state',
+  API_SAVE: '/api/crm/save',
+  API_LOGIN: '/api/crm/login',
+  API_LOGOUT: '/api/crm/logout',
+  API_NOTIFY: '/api/crm/notify-randevu',
+  POLL_MS: 15000
+};
+
+/* ---- 2) SEGMENTLER (sekmeler) — gün = otomatik hatırlatma --- */
+const SEGMENTS = [
+  {k:'aranmadi',  ad:'Aranmadı',                       gun:0,   renk:'#94A3B8', kat:'yeni'},
+  {k:'ulasilamadi',ad:'Ulaşılamadı Tekrar Aranacak',   gun:2,   renk:'#64748B', kat:'takip'},
+  {k:'mesaj',     ad:'Mesajlaşılıyor',                 gun:3,   renk:'#2F6BFF', kat:'takip'},
+  {k:'gun2',      ad:'2 Gün Sonra Aranacak',           gun:2,   renk:'#2F6BFF', kat:'takip'},
+  {k:'kisa',      ad:'Kısa Vadede Düşünecek (2 Hafta)',gun:14,  renk:'#7C5CF5', kat:'takip'},
+  {k:'orta',      ad:'Orta Vadede Düşünecek (1 Ay)',   gun:30,  renk:'#7C5CF5', kat:'takip'},
+  {k:'uzun',      ad:'Uzun Vadede Düşünecek (2 Ay)',   gun:60,  renk:'#7C5CF5', kat:'takip'},
+  {k:'karar',     ad:'Karar Verici Yok / Yönlendirdi', gun:5,   renk:'#E8A317', kat:'takip'},
+  {k:'randevu',   ad:'Randevu Verildi',                gun:0,   renk:'#2F6BFF', kat:'sicak'},
+  {k:'gorusuldu', ad:'Görüşme Yapıldı',                gun:3,   renk:'#2F6BFF', kat:'sicak'},
+  {k:'teklif',    ad:'Teklif Verildi',                 gun:5,   renk:'#2F6BFF', kat:'sicak'},
+  {k:'sicak',     ad:'Sıcak — Yakında Kapanacak',      gun:2,   renk:'#E8630A', kat:'sicak'},
+  {k:'pilot',     ad:'Pilot Başladı',                  gun:7,   renk:'#2F6BFF', kat:'sicak'},
+  {k:'satildi',   ad:'Satıldı / Müşteri Oldu',         gun:null,renk:'#1F4FD6', kat:'kapali'},
+  {k:'ilgilenmiyor',ad:'İlgilenmiyor',                 gun:90,  renk:'#D64545', kat:'kapali'},
+  {k:'uygundegil',ad:'Uygun Değil / Hedef Dışı',       gun:null,renk:'#D64545', kat:'kapali'},
+  {k:'yanlis',    ad:'Yanlış Numara / Kapalı',         gun:null,renk:'#94A3B8', kat:'kapali'}
+];
+const SEG = Object.fromEntries(SEGMENTS.map(s=>[s.k,s]));
+
+/* ---- 3) SABİTLER -------------------------------------------- */
+const SAAT = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+const GUN  = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+const AY   = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+/* ---- KULLANICILAR — girişte yalnızca kod (kullanıcı adı) ---- */
+const USERS = [
+  {id:'ak', kod:'abdulkadir', sifre:'4X7K0ytgwJ', ad:'Abdülkadir Yaşar', rol:'Kurucu · Saha',   renk:'#22D3C5', saha:true},
+  {id:'en', kod:'enes',       sifre:'8SOHcroY18', ad:'Enes Ceylan',      rol:'CTO · Saha',      renk:'#2F6BFF', saha:true},
+  {id:'kd', kod:'kader',      sifre:'Xbp1IBfogO', ad:'Kader Hanım',      rol:'Arama & Randevu', renk:'#7C5CF5', saha:false},
+  {id:'mi', kod:'destek',     sifre:'NXgGYHC7J3', ad:'Destek / 4. Kişi', rol:'Destek',          renk:'#E8A317', saha:false}
+];
+const SEED = [{"brans":"Diş Kliniği","ad":"Yeditepe Diş Kliniği (Özel Yeditepe Ağız ve Diş Sağlığı Kliniği)","semt":"Şişli","bolge":"Şişli / Nişantaşı","adres":"Halaskargazi Cad., Şişli, İstanbul","tel":"+90 212 281 62 87","web":"yeditepedis.com.tr","olcek":"Çoklu uzman kadrosu (multidisipliner)","uluslararasi":"Evet","skor":5,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Bayındır Beşiktaş Diş Kliniği (Acıbadem Grubu)","semt":"Beşiktaş","bolge":"Beşiktaş / Levent / Etiler","adres":"Beşiktaş merkez, İstanbul","tel":"+90 212 259 74 75","web":"acibadem.com.tr","olcek":"255 m², 6 üniteli, 8 hekim","uluslararasi":"Evet","skor":5,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Vera Smile (Vera Clinic Diş Birimi)","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Teşvikiye, Hakkı Yeten Cd. No:11, Şişli","tel":"+90 555 888 81 23","web":"verasmile.com / veraclinic.net","olcek":"17 şube, 50+ hekim","uluslararasi":"Evet","skor":5,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"International Plus","semt":"Küçükçekmece (Halkalı)","bolge":"Avrupa Yakası (Bahçelievler/Halkalı)","adres":"Halkalı Merkez Mah. Basın Ekspres Yan Yolu No:9/5, Küçükçekmece","tel":"+90 850 309 4461","web":"Web sitesinden teyit edilecek","olcek":"200.000+ hasta, 133+ ülkeden hasta geçmişi","uluslararasi":"Evet","skor":5,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"DentaDent","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 212 660 44 00","web":"dentadent.com.tr","olcek":"Orta ölçek","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Swiss CenterDent İstanbul","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 212 353 63 83","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon, Avrupa standartları vurgusu","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Özel Nişantaşı Allianoi Ağız ve Diş Sağlığı Kliniği","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Teşvikiye Mah., Vali Konağı Cad. No:97, Şişli","tel":"+90 533 297 18 70","web":"allianoi.com","olcek":"Çok hekimli poliklinik","uluslararasi":"Belirtilmemiş","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Klinik Nişantaşı (Dr. Erdi İçen)","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Teşvikiye Mah., Vali Konağı Cad. No:86/A, Şişli","tel":"+90 216 316 47 47","web":"kliniknisantasi.com","olcek":"Tek lokasyon, premium konumlandırma","uluslararasi":"Belirtilmemiş","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Prof. Dr. Ömer Kutay İmplant & Estetik Diş Kliniği","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Valikonağı Cd. Mim Kemal Ap. No:72/1, Nişantaşı, Şişli","tel":"+90 212 231 32 92","web":"omerkutay.com","olcek":"Tek lokasyon, 35 yıllık geçmiş","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"DentNis (Dr. Abdulkadir Narin)","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Nişantaşı, Şişli","tel":"+90 212 246 09 03","web":"dentnis.com","olcek":"Tek lokasyon, estetik diş odaklı","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Dentram Diş Klinikleri (Levent Şubesi)","semt":"Beşiktaş / Levent","bolge":"Beşiktaş / Levent / Etiler","adres":"Çilekli Cad. No:4, Levent, Beşiktaş","tel":"+90 212 280 88 00","web":"dentram.com","olcek":"Çok şubeli zincir","uluslararasi":"Belirtilmemiş","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"DentaRay Clinic","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Teşvikiye, Güzelbahçe Sk. No:21, Şişli","tel":"+90 536 774 35 76","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon, kendi laboratuvarı","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"YEG Clinic","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Nişantaşı Halaskargazi, Vali Konağı Cd. No:79 D:1, Nişantaşı","tel":"+90 539 825 81 80","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon, 15+ yıl tecrübeli hekimler","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Ata Diş Kliniği","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 444 7396","web":"atadisklinigi.com.tr","olcek":"Tek lokasyon, implant odaklı","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"UniqDent","semt":"Şişli (Maslak)","bolge":"Şişli / Nişantaşı","adres":"Maslak Mah. Büyükdere Cad. No:239, Şişli","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"One Dent Diş Kliniği","semt":"Şişli (Mecidiyeköy)","bolge":"Şişli / Nişantaşı","adres":"Mecidiyeköy, Şişli","tel":"+90 531 674 81 05","web":"sislidishekimi.com","olcek":"Tek lokasyon, 20 yıllık tecrübe","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Dt. Burak Rahimi Diş Kliniği","semt":"Beşiktaş (Akat)","bolge":"Beşiktaş / Levent / Etiler","adres":"Akat Mah. Zeytinoğlu Cad., Beşiktaş","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Adent Ağız ve Diş Sağlığı Polikliniği","semt":"Beşiktaş (Levent/Etiler)","bolge":"Beşiktaş / Levent / Etiler","adres":"Nispetiye Mah. Aytar Cad. Bilgin Sok. No:1, Levent","tel":"+90 530 315 74 12","web":"Web sitesinden teyit edilecek","olcek":"Poliklinik, çok hekimli","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Diş Levent Ağız ve Diş Sağlığı Polikliniği","semt":"Beşiktaş","bolge":"Beşiktaş / Levent / Etiler","adres":"Sanayi Mah. Eski Büyükdere Cad. Silahtaroğlu Sk. No:11, Beşiktaş","tel":"+90 212 325 92 50","web":"Web sitesinden teyit edilecek","olcek":"Poliklinik, çok hekimli","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Doç. Dr. Emir Yüzbaşıoğlu Muayenehanesi","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Teşvikiye Mah. Teşvikiye Cd. No:24/1, Nişantaşı","tel":"+90 530 646 75 21","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim, akademisyen unvanlı","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Mehmet Akbul / Diş Levent Polikliniği","semt":"Beşiktaş (4. Levent)","bolge":"Beşiktaş / Levent / Etiler","adres":"Sanayi Mah. Eski Büyükdere Cad., 4. Levent, Beşiktaş","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Poliklinik","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Dt. Tijen Seçerli Dürer Muayenehanesi","semt":"Beşiktaş (1. Levent)","bolge":"Beşiktaş / Levent / Etiler","adres":"Nispetiye Mah. Peker Sok. Tuğ Apt., 1. Levent","tel":"+90 212 275 93 30","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"F&S Clinic","semt":"Beşiktaş (Nisbetiye)","bolge":"Beşiktaş / Levent / Etiler","adres":"Nisbetiye, Erdoğan İş Merkezi, Aytar Cd. No:38","tel":"+90 212 278 12 21","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Özel Adent Ağız ve Diş Sağlığı Polikliniği","semt":"Beşiktaş (Etiler)","bolge":"Beşiktaş / Levent / Etiler","adres":"Nisbetiye Mah. Bilgin Sok. No:1/4, Etiler","tel":"+90 530 315 74 12","web":"Web sitesinden teyit edilecek","olcek":"Poliklinik","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"My Dent Ağız ve Diş Sağlığı Polikliniği","semt":"Beşiktaş","bolge":"Beşiktaş / Levent / Etiler","adres":"Barbaros Bulvarı Özgür Apt. No:55/3, Beşiktaş","tel":"+90 212 261 33 22","web":"Web sitesinden teyit edilecek","olcek":"Poliklinik","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Desen Karabağlar Muayenehanesi","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Ergenekon Mah., Halaskargazi Cd. Harbiye Han No:2, Şişli","tel":"+90 533 683 22 66","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Dt. Erhan Erkan Kliniği","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Halaskargazi Rumeli Cad., Nişantaşı, Şişli","tel":"+90 530 528 26 90","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Dt. Kamile Balıkçı Muayenehanesi","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Halaskargazi Cd., Nişantaşı, Şişli","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Dt. Zeynep Ceylan Muayenehanesi","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Halaskargazi Cd., Nişantaşı, Şişli","tel":"+90 533 669 05 60","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Dr. Dt. Aslıhan Yıldırım Türkmen Muayenehanesi","semt":"Beşiktaş","bolge":"Beşiktaş / Levent / Etiler","adres":"Halaskargazi Cd., Beşiktaş yakını","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Diş Kliniği","ad":"Özel My Dent Ağız ve Diş Sağlığı Polikliniği (Semra Aydın)","semt":"Beşiktaş","bolge":"Beşiktaş / Levent / Etiler","adres":"Barbaros Bulvarı Özgür Apt. No:55/3, Beşiktaş","tel":"+90 212 261 33 22","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Enes","dalga":1},{"brans":"Diş Kliniği","ad":"Konaklar Mah. Diş Polikliniği (Selvili Sk.)","semt":"Beşiktaş (4. Levent)","bolge":"Beşiktaş / Levent / Etiler","adres":"Konaklar Mah. Selvili Sk. No:13/A, 4. Levent, Beşiktaş","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Poliklinik","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"Vera Clinic","semt":"Şişli (Teşvikiye)","bolge":"Şişli / Nişantaşı","adres":"Teşvikiye, Terrace Fulya Center, Hakkı Yeten Cd. No:13 K:11, Şişli","tel":"+90 542 743 54 08","web":"veraclinic.net","olcek":"30.000+ operasyon, çok hizmetli (saç+estetik+diş)","uluslararasi":"Evet","skor":5,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Esteworld","semt":"Ataşehir / Bahçelievler / Üsküdar","bolge":"Ataşehir","adres":"Çoklu lokasyon: Ataşehir, Bahçelievler, Üsküdar (2 klinik), Altunizade","tel":"+90 850 532 5496","web":"esteworld.com","olcek":"Çok şubeli zincir + cerrahi kompleks","uluslararasi":"Evet","skor":5,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"Serkan Aygın Clinic","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 555 100 40 40","web":"serkanaygin.com","olcek":"Tek ana klinik, yüksek marka bilinirliği","uluslararasi":"Evet","skor":5,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Asmed (Dr. Koray Erdoğan)","semt":"Şişli","bolge":"Şişli / Nişantaşı","adres":"Cumhuriyet Mah., Silahşör Cd. No:65/46, Şişli","tel":"+90 216 464 11 11","web":"asmed.com","olcek":"Tek klinik, uluslararası tanınırlık","uluslararasi":"Evet","skor":5,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"Hermest Hair Transplant","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 534 664 15 15","web":"Web sitesinden teyit edilecek","olcek":"10+ yıl, çok hekimli (3+ doktor)","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Este Favor Hair Transplant","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 543 120 20 59","web":"Web sitesinden teyit edilecek","olcek":"Butik VIP hizmet modeli","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"Nim Clinic","semt":"Ataşehir","bolge":"Ataşehir","adres":"Ataşehir, İstanbul","tel":"+90 546 747 10 10","web":"Web sitesinden teyit edilecek","olcek":"A++ ve JCI sertifikalı","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Dr. Evren Gökeşme Saç Ekimi Kliniği","semt":"Ataşehir","bolge":"Ataşehir","adres":"Ataşehir, İstanbul","tel":"+90 551 385 09 50","web":"Web sitesinden teyit edilecek","olcek":"Tek klinik, 2016'dan beri faaliyette","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"MedHair Clinic","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 552 000 33 33","web":"medhairclinic.eu","olcek":"FUE/DHI/Sapphire, 7/24 destek vurgusu","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Estetistanbul Tıp Merkezi","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 506 776 93 30","web":"estetistanbul.com","olcek":"Dr. Hamid Aydın liderliğinde, 25+ yıl tecrübe","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"ClinicHair","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Orta ölçek","uluslararasi":"Evet","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Bienlife Clinic Saç Ekim Merkezi","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 552 150 11 50","web":"Web sitesinden teyit edilecek","olcek":"Tek klinik, saç ön hattı tasarımı uzmanlığı","uluslararasi":"Evet","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"HairNeva Saç Ekimi Merkezi","semt":"Beşiktaş","bolge":"Beşiktaş / Levent / Etiler","adres":"Beşiktaş, İstanbul","tel":"+90 533 134 63 37","web":"Web sitesinden teyit edilecek","olcek":"Tek klinik","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Dr. Ziya Yavuz Klinik","semt":"Şişli (Fulya)","bolge":"Şişli / Nişantaşı","adres":"Fulya, Şişli","tel":"+90 544 788 43 88","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim, ek medikal estetik hizmetleri var","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"Transmed (Dr. Melike Külahçı)","semt":"Levent (İç Levent)","bolge":"Beşiktaş / Levent / Etiler","adres":"Fulyalı Sok. No:7, İç Levent, İstanbul","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim, saç ekimi + estetik cerrahi kombinasyonu","uluslararasi":"Evet","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Saç Ekimi","ad":"Hair of Istanbul","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 530 688 42 47","web":"Web sitesinden teyit edilecek","olcek":"Orta ölçek","uluslararasi":"Evet","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Saç Ekimi","ad":"Clinichair (Custom Hair Implantation)","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"CHI tekniği odaklı niş klinik","uluslararasi":"Evet","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"Estethica","semt":"Ataşehir / Levent / Bakırköy / İncirli","bolge":"Beşiktaş / Levent / Etiler","adres":"Şube 1: Küçükbakkalköy Mah., Ataşehir; Şube 2: Levent Mah. Yeni Sülün Sok. No:13, 3. Levent","tel":"+90 850 222 3845","web":"estethica.net","olcek":"4 şube, dünyanın en büyük estetik cerrahi merkezlerinden biri iddiası","uluslararasi":"Evet","skor":5,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Esteworld","semt":"Bahçelievler / Etiler / Altunizade","bolge":"Beşiktaş / Levent / Etiler","adres":"Bahçelievler: Naci Kasım Cad. No:7; Altunizade: Kısıklı Cad. No:7; Etiler: Nispetiye Cad. Aydın Sok. No:1","tel":"+90 212 555 80 90","web":"esteworld.com.tr","olcek":"3 klinik + 1 tıp merkezi, 1994'ten beri faaliyette, Londra ofisi + 35 ülkede temsilcilik","uluslararasi":"Evet","skor":5,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"ClinicPlast","semt":"Şişli / Nişantaşı (Harbiye)","bolge":"Şişli / Nişantaşı","adres":"Harbiye Mahallesi, Mim Kemal Öke Caddesi, Kristal Apt. No:17 D:4, Nişantaşı","tel":"+90 539 580 95 95","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon, sertifikalı cerrah kadrosu","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Turkeyana Clinic","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 507 552 20 20","web":"Web sitesinden teyit edilecek","olcek":"Orta-büyük ölçek","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"İstanbul Aesthetic Center","semt":"Şişli (Esentepe)","bolge":"Şişli / Nişantaşı","adres":"Esentepe, Keskin Kalem Sok. No:1, Şişli","tel":"+90 212 266 07 42","web":"istanbulaestheticcenter.com","olcek":"Tek lokasyon, çok geniş hizmet yelpazesi (estetik+saç+diş)","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Lavien Clinic","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 532 525 54 25","web":"tr.lavienclinic.com","olcek":"2008'den beri faaliyette, uzman plastik cerrah kadrosu","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"Avşar Klinik (Dr. Yakup Avşar / Dilek Avşar)","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 212 270 09 93","web":"avsarclinic.com","olcek":"Çift hekim kadrosu (ödüllü cerrahlar)","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Neo Estetik (Prof. Burhan Özalp)","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 532 157 05 77","web":"neoestetik.com","olcek":"Tek hekim, profesör unvanlı kurucu","uluslararasi":"Evet","skor":4,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"Memorial Ataşehir Hastanesi — Plastik ve Rekonstrüktif Cerrahi Bölümü","semt":"Ataşehir","bolge":"Ataşehir","adres":"Ataşehir, İstanbul","tel":"+90 216 570 66 66","web":"memorial.com.tr","olcek":"Büyük hastane bünyesinde bölüm, çok hekimli","uluslararasi":"Evet","skor":4,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Femmeplast","semt":"Ataşehir (Küçükbakkalköy)","bolge":"Ataşehir","adres":"Dere Boyu Cad. No:33, Küçükbakkalköy, Ataşehir","tel":"+90 216 255 75 75","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon, geniş hizmet yelpazesi","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"İstanbul Alfa Tıp Merkezi","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 850 244 9075","web":"alfatip.com.tr","olcek":"Tıp merkezi bünyesinde estetik/plastik cerrahi birimi","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Op. Dr. Ali Çetinkaya Kliniği","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 532 663 43 60","web":"dralicetinkaya.com","olcek":"Tek hekim","uluslararasi":"Evet","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"İstanbul Kranioplast Estetik Cerrahi Merkezi (Dr. Muzaffer Çelik)","semt":"Beşiktaş (Levent)","bolge":"Beşiktaş / Levent / Etiler","adres":"Nispetiye Caddesi Dağlı İş Merkezi No:40/7, Levent, Beşiktaş","tel":"+90 212 283 92 92","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Op. Dr. Tuğrul Kihtir Kliniği","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 850 811 6871","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim, akademik geçmiş (Messina Üni. ihtisas)","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"Enes","dalga":1},{"brans":"Estetik/Plastik","ad":"Estecenter Plastik Cerrahi Merkezi","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 543 458 63 70","web":"estecenter.com","olcek":"Çok hekimli merkez","uluslararasi":"Evet","skor":3,"sorumlu":"Abdülkadir","dalga":1},{"brans":"Estetik/Plastik","ad":"Avrupa Hospital — Estetik Cerrahi Bölümü","semt":"İstanbul (genel)","bolge":"İstanbul (genel / belirtilmemiş)","adres":"Web sitesinden teyit edilecek","tel":"+90 212 597 08 30","web":"Web sitesinden teyit edilecek","olcek":"Hastane bünyesinde bölüm","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"Enes","dalga":1},{"brans":"Tıp Merkezi","ad":"Acıbadem Ataşehir Tıp Merkezi","semt":"Ataşehir","bolge":"Ataşehir","adres":"Ataşehir, İstanbul (Acıbadem Holding binası ile aynı alan)","tel":"444 55 55","web":"acibadem.com.tr","olcek":"Büyük grup, çok branşlı poliklinik","uluslararasi":"Evet","skor":4,"sorumlu":"","dalga":2},{"brans":"Tıp Merkezi","ad":"İstanbul Alfa Tıp Merkezi","semt":"İstanbul (genel)","bolge":"İstanbul (genel)","adres":"Web sitesinden teyit edilecek","tel":"Web sitesinden teyit edilecek","web":"alfatip.com.tr","olcek":"Çok branşlı, estetik/plastik cerrahi birimi de var","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"","dalga":2},{"brans":"Tıp Merkezi","ad":"Estetistanbul Tıp Merkezi","semt":"İstanbul (genel)","bolge":"İstanbul (genel)","adres":"Web sitesinden teyit edilecek","tel":"Web sitesinden teyit edilecek","web":"estetistanbul.com","olcek":"Saç ekimi + estetik kombinasyonu sunan tıp merkezi","uluslararasi":"Evet","skor":3,"sorumlu":"","dalga":2},{"brans":"Tıp Merkezi","ad":"Avicenna International Hospital (Tıp Merkezi birimi)","semt":"Ataşehir","bolge":"Ataşehir","adres":"Ataşehir, İstanbul","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"15.000 m² kapalı alan, çok branşlı","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"","dalga":2},{"brans":"Tıp Merkezi","ad":"Esteworld Altunizade Tıp Merkezi","semt":"Üsküdar (Altunizade)","bolge":"Üsküdar (Altunizade)","adres":"Altunizade Mah. Kısıklı Cad. No:7, Üsküdar","tel":"0216 474 54 54","web":"esteworld.com.tr","olcek":"Estetik odaklı tıp merkezi, cerrahi kompleks dahil","uluslararasi":"Evet","skor":4,"sorumlu":"","dalga":2},{"brans":"Hastane","ad":"American Hospital (Amerikan Hastanesi)","semt":"Şişli (Nişantaşı/Teşvikiye)","bolge":"Şişli (Nişantaşı/Teşvikiye)","adres":"Güzelbahçe Sk. No:20, Nişantaşı, Teşvikiye, Şişli","tel":"Web sitesinden teyit edilecek","web":"amerikanhastanesi.org","olcek":"278 yatak, 36 yoğun bakım, 12 ameliyathane, JCI akreditasyonu","uluslararasi":"Evet","skor":5,"sorumlu":"","dalga":2},{"brans":"Hastane","ad":"Memorial Ataşehir Hastanesi","semt":"Ataşehir","bolge":"Ataşehir","adres":"Ataşehir merkezi, İstanbul","tel":"444 7 444","web":"memorial.com.tr","olcek":"7/24 hizmet, çok branşlı, büyük ölçek","uluslararasi":"Evet","skor":5,"sorumlu":"","dalga":2},{"brans":"Hastane","ad":"Acıbadem Ataşehir Hastanesi","semt":"Ataşehir","bolge":"Ataşehir","adres":"Acıbadem Holding binası ile aynı alan, Ataşehir","tel":"444 55 55","web":"acibadem.com.tr","olcek":"298 yatak, 65.000 m² kapalı alan","uluslararasi":"Evet","skor":5,"sorumlu":"","dalga":2},{"brans":"Hastane","ad":"Medical Park Pendik Hastanesi","semt":"Pendik","bolge":"Pendik","adres":"Fevzi Çakmak Mah., D100 Eski Karakol Sokak No:9, Pendik","tel":"444 44 84","web":"medicalpark.com.tr","olcek":"Çok branşlı, kemik iliği nakli/onkoloji gibi referans merkezi hizmetleri","uluslararasi":"Evet","skor":4,"sorumlu":"","dalga":2},{"brans":"Hastane","ad":"Bayındır İçerenköy Hastanesi","semt":"Ataşehir (İçerenköy)","bolge":"Ataşehir (İçerenköy)","adres":"İçerenköy, Ataşehir, İstanbul","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"7.200 m², 96 yatak, 22 yoğun bakım, 6 ameliyathane","uluslararasi":"Belirtilmemiş","skor":4,"sorumlu":"","dalga":2},{"brans":"Muayenehane","ad":"Dr. Lida Çiteli Muayenehanesi","semt":"İstanbul (genel)","bolge":"İstanbul (genel)","adres":"Web sitesinden teyit edilecek","tel":"Web sitesinden teyit edilecek","web":"drlidaciteli.com","olcek":"Tek hekim, medikal estetik","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"","dalga":2},{"brans":"Muayenehane","ad":"Dr. Cihan Özel Muayenehanesi","semt":"Ataşehir (Emaar Square Heights)","bolge":"Ataşehir (Emaar Square Heights)","adres":"Emaar Square Heights, Ataşehir","tel":"Web sitesinden teyit edilecek","web":"drcihanozel.com","olcek":"Tek hekim, botoks/dolgu/mezoterapi odaklı","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"","dalga":2},{"brans":"Muayenehane","ad":"Op. Dr. İlkay Şamil Beydilli Muayenehanesi","semt":"Kadıköy (Bağdat Caddesi)","bolge":"Kadıköy (Bağdat Caddesi)","adres":"Bağdat Caddesi civarı, Kadıköy","tel":"Web sitesinden teyit edilecek","web":"ilkaybeydilli.com.tr","olcek":"Tek hekim, botoks odaklı","uluslararasi":"Belirtilmemiş","skor":3,"sorumlu":"","dalga":2},{"brans":"Muayenehane","ad":"Uzm. Dr. Suzan Alp Klinik","semt":"Kadıköy (Caddebostan)","bolge":"Kadıköy (Caddebostan)","adres":"Caddebostan Mah., Bağdat Cad. Tatari Apt. No:1 Kat:3 Daire:5, Kadıköy","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim, cilt bakımı uzmanı","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"","dalga":2},{"brans":"Muayenehane","ad":"Dr. Günay Arslan Köybaşı Muayenehanesi","semt":"Sarıyer (Yeniköy)","bolge":"Sarıyer (Yeniköy)","adres":"Köybaşı Cad. No:164, Yeniköy, Sarıyer","tel":"Web sitesinden teyit edilecek","web":"Web sitesinden teyit edilecek","olcek":"Tek hekim","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"","dalga":2},{"brans":"Güzellik/Cilt","ad":"Opal Klinik","semt":"Kadıköy","bolge":"Kadıköy","adres":"Kadıköy, İstanbul (modern tesis)","tel":"Web sitesinden teyit edilecek","web":"opal.clinic","olcek":"Çok hekimli (3 doktor), medikal estetik + diyetisyenlik","uluslararasi":"Belirtilmemiş","skor":4,"sorumlu":"","dalga":2},{"brans":"Güzellik/Cilt","ad":"Sema Estetik","semt":"Beykoz (Kavacık)","bolge":"Beykoz (Kavacık)","adres":"Orhan Veli Kanık Caddesi, Şehit Murat Akgül Sokak No:2 K:3, Kavacık, Beykoz","tel":"0216 322 69 00","web":"semaestetik.com","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"","dalga":2},{"brans":"Güzellik/Cilt","ad":"Nişantaşı Güzellik Merkezi (Süleyman Nazif Sok.)","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Süleyman Nazif Sok. No:3/1, Nişantaşı, Şişli","tel":"0212 225 22 80","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"","dalga":2},{"brans":"Güzellik/Cilt","ad":"Valikonağı Cad. Güzellik Merkezi","semt":"Şişli / Nişantaşı","bolge":"Şişli / Nişantaşı","adres":"Valikonağı Cad. No:52/27, Nişantaşı, Şişli","tel":"0212 234 32 34","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"","dalga":2},{"brans":"Güzellik/Cilt","ad":"Bağdat Caddesi Cilt ve Vücut Bakım Salonu","semt":"Kadıköy (Şaşkınbakkal)","bolge":"Kadıköy (Şaşkınbakkal)","adres":"Bağdat Cad. No:384, Şaşkınbakkal, Kadıköy","tel":"0216 358 12 42","web":"Web sitesinden teyit edilecek","olcek":"Tek lokasyon","uluslararasi":"Belirtilmemiş","skor":2,"sorumlu":"","dalga":2}];
+
+/* ---- 4) DEPOLAMA -------------------------------------------- */
+const Depo = {
+  async oku(){
+    if(CFG.BACKEND==='server'){
+      try{
+        const r = await fetch(CFG.API_GET, { credentials:'include', cache:'no-store' });
+        if(r.status===401) return null;
+        const j = await r.json();
+        if(j && j.data && j.data.clinics) return j.data;
+        return null;
+      }catch(e){ console.warn('Sunucu okunamadı', e); return null; }
+    }
+    try{ const s = localStorage.getItem('nefalix_crm'); return s? JSON.parse(s):null; }catch(e){ return null; }
+  },
+  async yaz(st){
+    st.rev = (st.rev||0)+1;
+    if(CFG.BACKEND==='server'){
+      try{
+        const r = await fetch(CFG.API_SAVE, {
+          method:'POST',
+          credentials:'include',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ data: st })
+        });
+        if(!r.ok) throw new Error('save '+r.status);
+        return;
+      }catch(e){ console.warn('Sunucuya yazılamadı', e); }
+    }
+    try{ localStorage.setItem('nefalix_crm', JSON.stringify(st)); }catch(e){}
+  }
+};
+
+/* ---- 5) DURUM ----------------------------------------------- */
+let S = null, ME = null, SAYFA = 'kokpit', kaydetZ = null;
+
+function bugun(){ const d=new Date(); return iso(d); }
+function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function tarihTR(s){ if(!s) return '—'; const [y,m,g]=s.split('-'); return `${g}.${m}.${y}`; }
+function ekleGun(s,n){ const d=new Date(s+'T12:00:00'); d.setDate(d.getDate()+n); return iso(d); }
+function farkGun(s){ const a=new Date(bugun()+'T00:00:00'), b=new Date(s+'T00:00:00'); return Math.round((b-a)/86400000); }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function usr(id){ return USERS.find(u=>u.id===id) || {ad:'—',renk:'#94A3B8'}; }
+function bas(s){ return (s||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function bosDurum(){
+  return {
+    rev:0,
+    clinics: SEED.map((c,i)=>({
+      id:'c'+(i+1), ...c,
+      segment:'aranmadi', sonArama:null, hatirlatma:null, aramaSayisi:0
+    })),
+    notes:[], busy:[], appts:[], notifs:[]
+  };
+}
+
+async function kaydet(sessiz){
+  clearTimeout(kaydetZ);
+  kaydetZ = setTimeout(async ()=>{ await Depo.yaz(S); if(!sessiz) durumIsigi('kaydedildi'); }, 250);
+}
+function durumIsigi(t){
+  const e=document.getElementById('syncTx');
+  e.textContent = CFG.BACKEND==='server' ? 'Sunucu · '+t : 'Yerel · '+t;
+  setTimeout(()=>{ e.textContent = CFG.BACKEND==='server'?'Sunucu':'Yerel'; }, 1800);
+}
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2400); }
+
+/* ---- 6) İŞ MANTIĞI ------------------------------------------ */
+function segmentAta(cid, sk, notMetni, kimId){
+  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
+  const s = SEG[sk];
+  c.segment = sk;
+  c.sonArama = bugun();
+  c.aramaSayisi = (c.aramaSayisi||0)+1;
+  c.hatirlatma = (s.gun===null || s.gun===0) ? null : ekleGun(bugun(), s.gun);
+  if(sk==='randevu') c.hatirlatma = null; // randevu takvimden takip edilir
+  S.notes.unshift({
+    id:uid(), clinicId:cid, userId:(kimId||ME.id), tarih:new Date().toISOString(),
+    segment:sk, metin:(notMetni||'').trim()
+  });
+  kaydet();
+}
+
+function takipListesi(uid_){
+  // Hatırlatma günü gelmiş/geçmiş klinikler — takibin sahibine göre
+  return S.clinics
+    .filter(c=>c.hatirlatma)
+    .filter(c=>!uid_ || sahibi(c)===uid_)
+    .map(c=>({c, fark:farkGun(c.hatirlatma)}))
+    .filter(x=>x.fark<=7)
+    .sort((a,b)=>a.fark-b.fark);
+}
+// Takibin sahibi = kliniği en son arayan/not giren kişi. Hiç aranmadıysa Excel'deki sorumlu.
+function sahibi(c){
+  const n = S.notes.find(x=>x.clinicId===c.id);
+  return n ? n.userId : sorumluId(c);
+}
+function sahipAd(c){ const i=sahibi(c); return i? usr(i).ad.split(' ')[0] : (c.sorumlu||'—'); }
+function sorumluId(c){
+  const n=(c.sorumlu||'').toLowerCase();
+  if(n.includes('abd')) return 'ak';
+  if(n.includes('enes')) return 'en';
+  if(n.includes('kader')) return 'kd';
+  return '';
+}
+function gecikmisSayi(uid_){ return takipListesi(uid_).filter(x=>x.fark<=0).length; }
+
+function slotDurum(tarih, saat){
+  const mesgul = S.busy.filter(b=>b.tarih===tarih && b.saat===saat).map(b=>b.userId);
+  const rand   = S.appts.find(a=>a.tarih===tarih && a.saat===saat && a.durum!=='iptal');
+  const sahaci = USERS.filter(u=>u.saha).map(u=>u.id);
+  const musait = sahaci.filter(id=>!mesgul.includes(id));
+  return {mesgul, rand, musait, sahaci};
+}
+
+function bildirim(userIds, metin, sayfa){
+  userIds.forEach(u=>S.notifs.unshift({id:uid(),userId:u,tarih:new Date().toISOString(),metin,sayfa,okundu:false}));
+}
+function okunmamis(){ return S.notifs.filter(n=>n.userId===ME.id && !n.okundu).length; }
+
+/* ---- 7) ROTA ------------------------------------------------ */
+const SAYFALAR = {
+  kokpit:{t:'Kokpit', f:pKokpit},
+  dinamik:{t:'Dinamik Arama — Günü Gelen Takipler', f:pDinamik},
+  arama:{t:'Arama Ekranı', f:pArama},
+  takvim:{t:'Takvim — Müsaitlik & Randevu', f:pTakvim},
+  randevu:{t:'Randevular', f:pRandevu},
+  havuz:{t:'Klinik Havuzu', f:pHavuz},
+  gorusme:{t:'Görüşme Notları', f:pGorusme},
+  yardim:{t:'Yardım', f:pYardim},
+  ayar:{t:'Ayarlar', f:pAyar}
+};
+function git(p){
+  SAYFA=p;
+  document.querySelectorAll('.nav[data-p]').forEach(b=>b.classList.toggle('on', b.dataset.p===p));
+  document.getElementById('ttl').textContent = SAYFALAR[p].t;
+  document.getElementById('page').innerHTML = SAYFALAR[p].f();
+  rozetler();
+  window.scrollTo(0,0);
+}
+function ciz(){ document.getElementById('page').innerHTML = SAYFALAR[SAYFA].f(); rozetler(); }
+function rozetler(){
+  const g = takipListesi(ME.id).filter(x=>x.fark<=0).length;
+  const dn=document.getElementById('c-din'); dn.textContent=g; dn.style.display = g?'':'none';
+  const r = S.appts.filter(a=>a.tarih>=bugun() && a.durum!=='iptal').length;
+  const rn=document.getElementById('c-rnd'); rn.textContent=r; rn.style.display=r?'':'none';
+  document.getElementById('c-hav').textContent = S.clinics.length;
+  const ok = okunmamis(), bd=document.getElementById('bdot');
+  bd.textContent=ok; bd.style.display= ok?'grid':'none';
+}
+
+/* ============ SAYFA: KOKPİT ============ */
+function pKokpit(){
+  const t = takipListesi(ME.id);
+  const gec = t.filter(x=>x.fark<0), bgn = t.filter(x=>x.fark===0);
+  const arandi = S.clinics.filter(c=>c.segment!=='aranmadi').length;
+  const rnd = S.appts.filter(a=>a.durum!=='iptal' && a.tarih>=bugun());
+  const benimRnd = rnd.filter(a=>a.katilimcilar.includes(ME.id));
+  const sicak = S.clinics.filter(c=>SEG[c.segment]?.kat==='sicak').length;
+
+  const gorevKart = ME.id==='kd'
+   ? `<div class="card"><div class="card-h"><h3>Bugünkü işin</h3></div><div class="card-b">
+        <div class="step"><div class="num">1</div><div><b>Arama Ekranı</b>'nı aç, listedeki kliniği ara.<br><span class="mut sml">Ne söyleyeceğini bilmiyorsan Saha Rehberi'nde hazır cümleler var.</span></div></div>
+        <div class="step"><div class="num">2</div><div>Görüşme bitince <b>sonucu bir sekmeye</b> at (Ulaşılamadı / Düşünecek / Randevu…).<br><span class="mut sml">Sistem geri dönüş tarihini kendisi hesaplar.</span></div></div>
+        <div class="step"><div class="num">3</div><div>İlgilenen klinik olursa <b>Takvim</b>'den boş saati seç, randevuyu yaz.<br><span class="mut sml">Abdülkadir Bey ve Enes Bey'e bildirim gider.</span></div></div>
+        <div class="step" style="border:0"><div class="num">4</div><div>Ertesi gün <b>Dinamik Arama</b>'yı aç: günü gelenler orada listelenir.</div></div>
+        <div style="margin-top:12px"><button class="btn p" onclick="git('arama')">☏ Aramaya başla</button></div>
+      </div></div>`
+   : `<div class="card"><div class="card-h"><h3>Yaklaşan görüşmelerin</h3><div class="r"><button class="btn sm" onclick="git('takvim')">Takvimi aç</button></div></div>
+      ${benimRnd.length? `<div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Bölge</th><th></th></tr></thead><tbody>
+        ${benimRnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,8).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+        return `<tr><td class="mono">${tarihTR(a.tarih)}</td><td class="mono"><b>${a.saat}</b></td><td><b>${esc(c.ad||a.baslik||'—')}</b></td><td class="sml mut">${esc(c.semt||'')}</td>
+        <td><button class="btn sm" onclick="klinikAc('${a.clinicId}')">Aç</button></td></tr>`}).join('')}
+      </tbody></table></div>`
+      : `<div class="empty"><div class="e">▦</div>Planlanmış görüşmen yok.<br><span class="sml">Kader Hanım randevu oluşturduğunda burada görünecek.</span></div>`}
+      </div>`;
+
+  return `
+  <div class="grid kpis" style="margin-bottom:14px">
+    <div class="kpi ${gec.length?'hot':''}"><div class="n">${gec.length}</div><div class="l">Gecikmiş takip</div></div>
+    <div class="kpi w"><div class="n">${bgn.length}</div><div class="l">Bugün dönülecek</div></div>
+    <div class="kpi ok"><div class="n">${rnd.length}</div><div class="l">Planlı randevu</div></div>
+    <div class="kpi"><div class="n">${arandi}<span style="font-size:15px;color:var(--mut)">/${S.clinics.length}</span></div><div class="l">Aranan klinik</div></div>
+    <div class="kpi ok"><div class="n">${sicak}</div><div class="l">Sıcak fırsat</div></div>
+  </div>
+  <div class="cols">
+    ${gorevKart}
+    <div class="card"><div class="card-h"><h3>Günü gelen / gecikmiş</h3><div class="r"><button class="btn sm" onclick="git('dinamik')">Tümü</button></div></div>
+      ${t.filter(x=>x.fark<=0).length ? `<div class="tscroll" style="max-height:none"><table><tbody>
+        ${t.filter(x=>x.fark<=0).slice(0,9).map(({c,fark})=>`<tr>
+          <td><b>${esc(c.ad)}</b><div class="sml mut">${esc(c.semt||'')} · ${esc(c.brans||'')}</div></td>
+          <td>${segChip(c.segment)}</td>
+          <td class="sml ${fark<0?'':'mut'}" style="${fark<0?'color:var(--dang);font-weight:700':''}">${fark<0?Math.abs(fark)+' gün gecikti':'Bugün'}</td>
+          <td><button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button></td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="empty"><div class="e">✓</div>Bekleyen takip yok. Temiz liste.</div>`}
+    </div>
+  </div>`;
+}
+
+/* ============ SAYFA: DİNAMİK ARAMA ============ */
+let dinFilt = 'benim';
+function pDinamik(){
+  const hepsi = takipListesi(dinFilt==='benim'?ME.id:null);
+  const grup = {
+    gecikmis: hepsi.filter(x=>x.fark<0),
+    bugun:    hepsi.filter(x=>x.fark===0),
+    yarin:    hepsi.filter(x=>x.fark===1),
+    hafta:    hepsi.filter(x=>x.fark>1 && x.fark<=7)
+  };
+  const blok = (bas_,arr,renk)=> !arr.length ? '' : `
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-h"><span class="chip" style="background:${renk}1A;color:${renk}"><span class="b"></span>${bas_}</span>
+        <div class="r"><span class="mut sml">${arr.length} klinik</span></div></div>
+      <div class="tscroll" style="max-height:none"><table><thead><tr>
+        <th>Klinik</th><th>Branş</th><th>Telefon</th><th>Mevcut sekme</th><th>Dönüş tarihi</th><th>Takip sahibi</th><th></th></tr></thead><tbody>
+      ${arr.map(({c,fark})=>`<tr>
+        <td><b>${esc(c.ad)}</b><div class="sml mut">${esc(c.semt||'')}</div></td>
+        <td class="sml">${esc(c.brans||'')}</td>
+        <td class="mono sml">${esc(c.tel||'—')}</td>
+        <td>${segChip(c.segment)}</td>
+        <td class="sml mono">${tarihTR(c.hatirlatma)} ${fark<0?`<span style="color:var(--dang);font-weight:700">(${Math.abs(fark)}g)</span>`:''}</td>
+        <td class="sml">${esc(sahipAd(c))}</td>
+        <td style="white-space:nowrap">
+          <button class="btn sm" onclick="klinikAc('${c.id}')">Kart</button>
+          <button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button>
+        </td></tr>`).join('')}
+      </tbody></table></div>
+    </div>`;
+
+  return `
+  <div class="row" style="margin-bottom:14px;align-items:center">
+    <div class="tabs" style="flex:none">
+      <button class="pill ${dinFilt==='benim'?'on':''}" onclick="dinFilt='benim';ciz()">Bana ait</button>
+      <button class="pill ${dinFilt==='hepsi'?'on':''}" onclick="dinFilt='hepsi';ciz()">Tüm ekip</button>
+    </div>
+    <div class="mut sml" style="flex:1;align-self:center">Bir klinik en son kimin tarafından arandıysa takip ona düşer. Sonuç girildiğinde otomatik olarak yeni sahibine geçer.</div>
+  </div>
+  ${blok('Gecikmiş', grup.gecikmis, '#D64545')}
+  ${blok('Bugün dönülecek', grup.bugun, '#E8A317')}
+  ${blok('Yarın', grup.yarin, '#3B76D9')}
+  ${blok('Bu hafta', grup.hafta, '#7C5CD6')}
+  ${!hepsi.length? `<div class="card"><div class="empty"><div class="e">✓</div>Bekleyen dönüş yok.<br><span class="sml">Bir klinik bir sekmeye atandığında, sekmenin gün süresi kadar sonra burada belirir.</span></div></div>`:''}
+  `;
+}
+
+/* ============ SAYFA: ARAMA EKRANI ============ */
+let arFilt = {q:'', brans:'', sorumlu:'', seg:'aranmadi'};
+function pArama(){
+  let liste = S.clinics.filter(c=>{
+    if(arFilt.seg && c.segment!==arFilt.seg) return false;
+    if(arFilt.brans && c.brans!==arFilt.brans) return false;
+    if(arFilt.sorumlu && (c.sorumlu||'')!==arFilt.sorumlu) return false;
+    if(arFilt.q){ const q=arFilt.q.toLowerCase(); if(!((c.ad||'')+(c.semt||'')+(c.tel||'')).toLowerCase().includes(q)) return false; }
+    return true;
+  }).sort((a,b)=>(b.skor||0)-(a.skor||0));
+
+  const branslar = [...new Set(S.clinics.map(c=>c.brans).filter(Boolean))];
+  const sorumlular = [...new Set(S.clinics.map(c=>c.sorumlu).filter(Boolean))];
+  const hedef = liste[0];
+
+  return `
+  <div class="card" style="margin-bottom:14px"><div class="card-b">
+    <div class="row">
+      <div style="flex:2"><label class="f">Ara</label><input type="text" value="${esc(arFilt.q)}" oninput="arFilt.q=this.value;ciz()" placeholder="Klinik adı, semt, telefon…"></div>
+      <div><label class="f">Sekme</label><select onchange="arFilt.seg=this.value;ciz()">
+        <option value="">Hepsi</option>
+        ${SEGMENTS.map(s=>`<option value="${s.k}" ${arFilt.seg===s.k?'selected':''}>${s.ad}</option>`).join('')}
+      </select></div>
+      <div><label class="f">Branş</label><select onchange="arFilt.brans=this.value;ciz()">
+        <option value="">Hepsi</option>${branslar.map(b=>`<option ${arFilt.brans===b?'selected':''}>${esc(b)}</option>`).join('')}</select></div>
+      <div><label class="f">Sorumlu</label><select onchange="arFilt.sorumlu=this.value;ciz()">
+        <option value="">Hepsi</option>${sorumlular.map(b=>`<option ${arFilt.sorumlu===b?'selected':''}>${esc(b)}</option>`).join('')}</select></div>
+    </div>
+  </div></div>
+
+  ${hedef? `<div class="cols">
+    <div class="card">
+      <div class="card-h"><h3>Sıradaki klinik</h3><div class="r"><span class="mut sml">${liste.length} klinik bekliyor</span></div></div>
+      <div class="card-b">
+        <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">${esc(hedef.ad)}</div>
+        <div style="margin:5px 0 12px"><span class="tag">${esc(hedef.brans||'')}</span> <span class="tag">${esc(hedef.semt||'')}</span> <span class="stars">${'★'.repeat(Math.round(hedef.skor||0))}${'☆'.repeat(5-Math.round(hedef.skor||0))}</span></div>
+        <table style="margin-bottom:12px">
+          <tr><td class="mut sml" style="width:110px">Telefon</td><td class="mono"><b>${esc(hedef.tel||'—')}</b></td></tr>
+          <tr><td class="mut sml">Adres</td><td class="sml">${esc(hedef.adres||'—')}</td></tr>
+          <tr><td class="mut sml">Web</td><td class="sml">${esc(hedef.web||'—')}</td></tr>
+          <tr><td class="mut sml">Ölçek</td><td class="sml">${esc(hedef.olcek||'—')}</td></tr>
+          <tr><td class="mut sml">Uluslararası</td><td class="sml">${esc(hedef.uluslararasi||'—')}</td></tr>
+          <tr><td class="mut sml">Sorumlu</td><td class="sml">${esc(hedef.sorumlu||'—')}</td></tr>
+        </table>
+        <div class="row">
+          <a class="btn p" style="flex:none" href="tel:${esc((hedef.tel||'').replace(/\s/g,''))}">☏ Ara</a>
+          <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((hedef.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
+          <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((hedef.ad||'')+' '+(hedef.semt||'')+' İstanbul')}">Haritada aç</a>
+          <button class="btn" style="flex:none" onclick="klinikAc('${hedef.id}')">Kartı aç</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Görüşme sonucunu işaretle</h3></div>
+      <div class="card-b">
+        <div class="mut sml" style="margin-bottom:10px">Bir sekme seç — sistem geri dönüş tarihini otomatik hesaplar ve sorumlusunun <b>Dinamik Arama</b> panelinde o gün listeler.</div>
+        <div class="segpick">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`
+          <button class="segbtn" onclick="aramaKaydiAc('${hedef.id}','${s.k}')">
+            <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
+            <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
+          </button>`).join('')}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-h"><h3>Bekleyen liste</h3></div>
+    <div class="tscroll"><table><thead><tr><th>#</th><th>Klinik</th><th>Branş</th><th>Semt</th><th>Telefon</th><th>Skor</th><th>Sorumlu</th><th></th></tr></thead><tbody>
+      ${liste.slice(0,120).map((c,i)=>`<tr>
+        <td class="mono mut sml">${i+1}</td>
+        <td><b>${esc(c.ad)}</b></td><td class="sml">${esc(c.brans||'')}</td><td class="sml">${esc(c.semt||'')}</td>
+        <td class="mono sml">${esc(c.tel||'—')}</td><td class="stars">${'★'.repeat(Math.round(c.skor||0))}</td>
+        <td class="sml">${esc(c.sorumlu||'—')}</td>
+        <td><button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç gir</button></td></tr>`).join('')}
+    </tbody></table></div>
+  </div>`
+  : `<div class="card"><div class="empty"><div class="e">✓</div>Bu filtrede klinik kalmadı.</div></div>`}`;
+}
+
+/* ============ SAYFA: TAKVİM ============ */
+let calAy = 6, calYil = 2026, calGun = null; // 6 = Temmuz
+function pTakvim(){
+  const ilk = new Date(calYil, calAy, 1);
+  const gunSay = new Date(calYil, calAy+1, 0).getDate();
+  let bosluk = (ilk.getDay()+6)%7;
+  let hucre = '';
+  for(let i=0;i<bosluk;i++) hucre += `<div class="day pad"></div>`;
+  for(let g=1; g<=gunSay; g++){
+    const t = `${calYil}-${String(calAy+1).padStart(2,'0')}-${String(g).padStart(2,'0')}`;
+    const dow = new Date(calYil,calAy,g).getDay();
+    const wknd = dow===0||dow===6;
+    const rnd = S.appts.filter(a=>a.tarih===t && a.durum!=='iptal');
+    let bosSlot=0;
+    SAAT.forEach(s=>{ const d=slotDurum(t,s); if(d.musait.length && !d.rand) bosSlot++; });
+    const gecmis = t < bugun();
+    hucre += `<button class="day ${wknd?'wknd':''} ${t===bugun()?'today':''}" onclick="calGun='${t}';ciz()">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="dn">${g}</span>
+        ${gecmis?'':`<span class="${bosSlot?'free':'full'}" style="margin-left:auto">${bosSlot?bosSlot+' boş':'dolu'}</span>`}
+      </div>
+      ${rnd.slice(0,2).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};return `<div class="mini">${a.saat} ${esc((c.ad||a.baslik||'').slice(0,14))}</div>`}).join('')}
+      ${rnd.length>2?`<div class="mini busy">+${rnd.length-2} daha</div>`:''}
+    </button>`;
+  }
+
+  const g = calGun;
+  const detay = !g ? `<div class="card"><div class="empty"><div class="e">▦</div>Bir güne tıkla, saatler burada açılsın.</div></div>` : (()=>{
+    const d = new Date(g+'T12:00:00');
+    return `<div class="card">
+      <div class="card-h"><h3>${d.getDate()} ${AY[d.getMonth()]} ${d.getFullYear()} · ${GUN[(d.getDay()+6)%7]}</h3>
+        <div class="r"><span class="mut sml">${ME.saha?'Kendi meşgul saatini işaretlemek için saate tıkla':'Boş saate tıklayıp randevu oluştur'}</span></div></div>
+      <div class="card-b">
+        <div class="slots">${SAAT.map(s=>{
+          const st = slotDurum(g,s);
+          const benMesgul = st.mesgul.includes(ME.id);
+          if(st.rand){ const c=S.clinics.find(x=>x.id===st.rand.clinicId)||{};
+            return `<button class="slot appt" onclick="randevuAc('${st.rand.id}')"><div class="t">${s}</div><div class="s">${esc((c.ad||'Randevu').slice(0,16))}</div></button>`; }
+          if(!st.musait.length) return `<button class="slot busy"><div class="t">${s}</div><div class="s">Kimse müsait değil</div></button>`;
+          const cls = ME.saha ? (benMesgul?'busy mine':'') : '';
+          const act = ME.saha ? `mesgulTogg('${g}','${s}')` : `randevuYeni('${g}','${s}')`;
+          return `<button class="slot ${cls}" onclick="${act}">
+            <div class="t">${s}</div>
+            <div class="s">${ME.saha ? (benMesgul?'Meşgulsün':'Müsaitsin') : st.musait.map(i=>usr(i).ad.split(' ')[0]).join(' · ')}</div>
+          </button>`;
+        }).join('')}</div>
+        ${ME.saha? `<div class="mut sml" style="margin-top:12px">Meşgul işaretlediğin saatler Kader Hanım'a <b>müsait değil</b> olarak görünür — o saate randevu yazamaz.</div>`
+                 : `<div class="mut sml" style="margin-top:12px">Yeşil saatlerde yazan isimler o saatte müsait olan kişilerdir. Tıkla, randevu oluştur; ilgili kişilere bildirim düşer.</div>`}
+      </div></div>`;
+  })();
+
+  return `
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-h">
+      <div class="calnav">
+        <button class="btn sm" onclick="ayGit(-1)">‹</button>
+        <h3 style="min-width:150px;text-align:center">${AY[calAy]} ${calYil}</h3>
+        <button class="btn sm" onclick="ayGit(1)">›</button>
+      </div>
+      <div class="r">
+        <span class="chip" style="background:var(--brand-soft);color:var(--brand-d)"><span class="b"></span>Randevu</span>
+        <span class="chip" style="background:#F2F4F7;color:#6B7A8D"><span class="b"></span>Meşgul</span>
+        <button class="btn sm" onclick="calGun=bugun();calAy=new Date().getMonth();calYil=new Date().getFullYear();ciz()">Bugün</button>
+      </div>
+    </div>
+    <div class="card-b">
+      <div class="cal" style="margin-bottom:5px">${GUN.map(x=>`<div class="dh">${x}</div>`).join('')}</div>
+      <div class="cal">${hucre}</div>
+    </div>
+  </div>
+  ${detay}`;
+}
+function ayGit(n){ calAy+=n; if(calAy>11){calAy=0;calYil++;} if(calAy<0){calAy=11;calYil--;} calGun=null; ciz(); }
+function mesgulTogg(t,s){
+  const i = S.busy.findIndex(b=>b.tarih===t && b.saat===s && b.userId===ME.id);
+  if(i>=0) S.busy.splice(i,1); else S.busy.push({id:uid(),tarih:t,saat:s,userId:ME.id});
+  kaydet(); ciz();
+}
+
+/* ============ SAYFA: RANDEVULAR ============ */
+function pRandevu(){
+  const list = S.appts.filter(a=>a.durum!=='iptal').sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat));
+  const gelecek = list.filter(a=>a.tarih>=bugun()), gecmis = list.filter(a=>a.tarih<bugun());
+  const tablo = (arr,gec)=> !arr.length? `<div class="empty"><div class="e">▦</div>Kayıt yok.</div>` : `
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Adres</th><th>Katılımcı</th><th>Durum</th><th></th></tr></thead><tbody>
+    ${arr.map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};return `<tr>
+      <td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
+      <td><b>${esc(c.ad||a.baslik||'—')}</b><div class="sml mut">${esc(c.brans||'')}</div></td>
+      <td class="sml mut">${esc((c.adres||'').slice(0,42))}</td>
+      <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td>
+      <td>${a.durum==='yapildi'?'<span class="chip" style="background:var(--brand-soft);color:var(--brand-d)"><span class="b"></span>Yapıldı</span>':'<span class="chip" style="background:#FEF6E7;color:#B27A00"><span class="b"></span>Planlandı</span>'}</td>
+      <td style="white-space:nowrap">${gec&&a.durum!=='yapildi'?`<button class="btn sm p" onclick="gorusmeNotAc('${a.clinicId}','${a.id}')">Notu gir</button>`:''}
+        <button class="btn sm" onclick="randevuAc('${a.id}')">Detay</button></td></tr>`}).join('')}
+    </tbody></table></div>`;
+  return `
+  <div class="card" style="margin-bottom:14px"><div class="card-h"><h3>Yaklaşan randevular</h3>
+    <div class="r"><span class="mut sml">${gelecek.length} kayıt</span>${ME.id==='kd'?'<button class="btn sm p" onclick="git(\'takvim\')">+ Takvimden ekle</button>':''}</div></div>${tablo(gelecek,false)}</div>
+  <div class="card"><div class="card-h"><h3>Geçmiş randevular</h3><div class="r"><span class="mut sml">${gecmis.length} kayıt</span></div></div>${tablo(gecmis.reverse(),true)}</div>`;
+}
+
+/* ============ SAYFA: KLİNİK HAVUZU ============ */
+let hvFilt = {q:'',brans:'',bolge:'',seg:'',sorumlu:''};
+function pHavuz(){
+  let L = S.clinics.filter(c=>{
+    if(hvFilt.q){const q=hvFilt.q.toLowerCase(); if(!((c.ad||'')+(c.semt||'')+(c.tel||'')+(c.adres||'')).toLowerCase().includes(q)) return false;}
+    if(hvFilt.brans && c.brans!==hvFilt.brans) return false;
+    if(hvFilt.bolge && c.bolge!==hvFilt.bolge) return false;
+    if(hvFilt.seg && c.segment!==hvFilt.seg) return false;
+    if(hvFilt.sorumlu && (c.sorumlu||'')!==hvFilt.sorumlu) return false;
+    return true;
+  });
+  const uniq = k=>[...new Set(S.clinics.map(c=>c[k]).filter(Boolean))];
+  return `
+  <div class="card" style="margin-bottom:14px"><div class="card-b">
+    <div class="row" style="margin-bottom:10px">
+      <div style="flex:2"><label class="f">Ara</label><input type="text" value="${esc(hvFilt.q)}" oninput="hvFilt.q=this.value;ciz()" placeholder="Klinik / semt / telefon"></div>
+      <div><label class="f">Branş</label><select onchange="hvFilt.brans=this.value;ciz()"><option value="">Hepsi</option>${uniq('brans').map(b=>`<option ${hvFilt.brans===b?'selected':''}>${esc(b)}</option>`).join('')}</select></div>
+      <div><label class="f">Bölge</label><select onchange="hvFilt.bolge=this.value;ciz()"><option value="">Hepsi</option>${uniq('bolge').map(b=>`<option ${hvFilt.bolge===b?'selected':''}>${esc(b)}</option>`).join('')}</select></div>
+      <div><label class="f">Sekme</label><select onchange="hvFilt.seg=this.value;ciz()"><option value="">Hepsi</option>${SEGMENTS.map(s=>`<option value="${s.k}" ${hvFilt.seg===s.k?'selected':''}>${s.ad}</option>`).join('')}</select></div>
+      <div><label class="f">Sorumlu</label><select onchange="hvFilt.sorumlu=this.value;ciz()"><option value="">Hepsi</option>${uniq('sorumlu').map(b=>`<option ${hvFilt.sorumlu===b?'selected':''}>${esc(b)}</option>`).join('')}</select></div>
+    </div>
+    <div class="row">
+      <button class="btn" style="flex:none" onclick="document.getElementById('xls').click()">⬆ Excel yükle</button>
+      <input type="file" id="xls" accept=".xlsx,.xls,.csv" style="display:none" onchange="excelYukle(this)">
+      <button class="btn" style="flex:none" onclick="excelIndir()">⬇ Excel'e aktar</button>
+      <button class="btn" style="flex:none" onclick="klinikYeni()">+ Klinik ekle</button>
+      <div style="flex:1"></div>
+      <span class="mut sml" style="flex:none;align-self:center">${L.length} / ${S.clinics.length} klinik</span>
+    </div>
+  </div></div>
+  <div class="card"><div class="tscroll"><table><thead><tr>
+    <th>Klinik</th><th>Branş</th><th>Bölge</th><th>Telefon</th><th>Skor</th><th>Sekme</th><th>Dönüş</th><th>Sorumlu</th><th></th></tr></thead><tbody>
+    ${L.map(c=>{const f=c.hatirlatma?farkGun(c.hatirlatma):null; return `<tr>
+      <td><b>${esc(c.ad)}</b><div class="sml mut">${esc(c.semt||'')}</div></td>
+      <td class="sml">${esc(c.brans||'')}</td><td class="sml mut">${esc(c.bolge||'')}</td>
+      <td class="mono sml">${esc(c.tel||'—')}</td>
+      <td class="stars">${'★'.repeat(Math.round(c.skor||0))}</td>
+      <td>${segChip(c.segment)}</td>
+      <td class="sml mono ${f!==null&&f<0?'':'mut'}" style="${f!==null&&f<0?'color:var(--dang);font-weight:700':''}">${c.hatirlatma?tarihTR(c.hatirlatma):'—'}</td>
+      <td class="sml">${esc(c.sorumlu||'—')}</td>
+      <td style="white-space:nowrap"><button class="btn sm" onclick="klinikAc('${c.id}')">Kart</button>
+      <button class="btn sm p" onclick="aramaKaydiAc('${c.id}')">Sonuç</button></td></tr>`}).join('')}
+  </tbody></table></div></div>`;
+}
+
+/* ============ SAYFA: GÖRÜŞME NOTLARI ============ */
+function pGorusme(){
+  const N = S.notes.slice(0,200);
+  return `
+  <div class="card"><div class="card-h"><h3>Tüm görüşme kayıtları</h3><div class="r"><span class="mut sml">${S.notes.length} kayıt</span></div></div>
+  ${N.length? `<div class="tscroll"><table><thead><tr><th>Tarih</th><th>Klinik</th><th>Sekme</th><th>Not</th><th>Kaydeden</th><th></th></tr></thead><tbody>
+    ${N.map(n=>{const c=S.clinics.find(x=>x.id===n.clinicId)||{};const d=new Date(n.tarih);return `<tr>
+      <td class="mono sml">${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}<div class="mut" style="font-size:11px">${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</div></td>
+      <td><b>${esc(c.ad||'—')}</b><div class="sml mut">${esc(c.semt||'')}</div></td>
+      <td>${segChip(n.segment)}</td>
+      <td class="sml" style="max-width:380px">${esc(n.metin||'—')}</td>
+      <td class="sml">${esc(usr(n.userId).ad.split(' ')[0])}</td>
+      <td><button class="btn sm" onclick="klinikAc('${n.clinicId}')">Kart</button></td></tr>`}).join('')}
+  </tbody></table></div>` : `<div class="empty"><div class="e">✎</div>Henüz görüşme notu yok.<br><span class="sml">Arama Ekranı'ndan bir sonuç işaretlediğinde buraya düşer.</span></div>`}
+  </div>`;
+}
+
+/* ============ SAYFA: SİSTEM KILAVUZU ============ */
+/* ============ SAYFA: YARDIM (Sistem + Saha) ============ */
+let _yardimTab = 'sistem';
+function pYardim(){
+  const tab = _yardimTab === 'saha' ? 'saha' : 'sistem';
+  return `<div class="tabs" style="margin-bottom:14px">
+    <button class="pill ${tab==='sistem'?'on':''}" onclick="_yardimTab='sistem';ciz()">Sistem</button>
+    <button class="pill ${tab==='saha'?'on':''}" onclick="_yardimTab='saha';ciz()">Saha</button>
+  </div>
+  ${tab==='saha' ? pRehber() : pKilavuz()}`;
+}
+
+function pKilavuz(){
+  return `<div class="grid" style="gap:14px">
+
+  <div class="card guide"><div class="card-b">
+    <h2 style="font-size:19px;margin-bottom:8px">Bu sistem neyi çözüyor?</h2>
+    <p>Saha satışında iş genelde şuradan kopar: klinik "iki hafta sonra ara" der, o iki hafta unutulur. Ya da Kader Hanım randevu alır ama Abdülkadir Bey'in o saatte başka işi vardır. Ya da görüşmeden çıkılır, not kimsenin defterinde kalır ve bir daha dönülmez.</p>
+    <p>Bu sistem üç şeyi garantiye alır: <b>(1)</b> hiçbir geri dönüş unutulmaz, <b>(2)</b> müsait olmadığınız saate randevu yazılamaz, <b>(3)</b> her görüşmenin kaydı bir yerde durur.</p>
+    <div class="quote"><b>Temel kural:</b> Sistemde tek bir zorunluluk var — <b>her aramadan sonra bir sekme seçilir.</b> Geri kalan her şey (dönüş tarihi, listeler, bildirimler) bundan otomatik türer. Sekme seçilmezse sistem çalışmaz.</div>
+  </div></div>
+
+  <div class="card"><div class="card-h"><h3>Kim ne yapıyor</h3></div>
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th style="width:150px">Kişi</th><th>Sorumluluğu</th><th>Hangi panelleri kullanır</th></tr></thead><tbody>
+    <tr><td><div style="display:flex;align-items:center;gap:8px"><span class="av" style="background:#7C5CD6;width:26px;height:26px;font-size:10px">KH</span><b>Kader Hanım</b></div><div class="sml mut" style="margin-top:4px">Arama & Randevu</div></td>
+      <td class="sml">Klinikleri arar. Amacı satış değil, <b>10 dakikalık yüz yüze randevu almak</b>. Görüşme sonucunu sekmeye atar. İlgilenen klinikler için takvimden randevu oluşturur.</td>
+      <td class="sml"><b>Arama Ekranı</b> (ana çalışma masası) → <b>Takvim</b> (randevu yazmak için) → <b>Dinamik Arama</b> (ertesi gün dönülecekler) → <b>Yardım · Saha</b></td></tr>
+    <tr><td><div style="display:flex;align-items:center;gap:8px"><span class="av" style="background:var(--accent);width:26px;height:26px;font-size:10px">AY</span><b>Abdülkadir Bey</b></div><div class="sml mut" style="margin-top:4px">Kurucu · Saha</div></td>
+      <td class="sml">Meşgul saatlerini takvime işaretler. Randevulara gider. Görüşmeden çıkınca <b>notu ve yeni sekmeyi girer</b>. Kokpit'ten genel duruma bakar.</td>
+      <td class="sml"><b>Takvim</b> (meşgul saatleri) → <b>Randevular</b> (nereye gideceğim) → <b>Görüşme sonucu</b> (dönünce) → <b>Dinamik Arama</b> (kendi takipleri)</td></tr>
+    <tr><td><div style="display:flex;align-items:center;gap:8px"><span class="av" style="background:#3B76D9;width:26px;height:26px;font-size:10px">EC</span><b>Enes Bey</b></div><div class="sml mut" style="margin-top:4px">CTO · Saha</div></td>
+      <td class="sml">Abdülkadir Bey ile aynı akış. Ek olarak: <b>sistemin canlıya alınması, yedeklenmesi ve sunucu bağlantısı</b> onun sorumluluğunda.</td>
+      <td class="sml">Yukarıdakilerin tamamı + <b>Ayarlar</b> (sunucu bağlantısı, yedek)</td></tr>
+    <tr><td><div style="display:flex;align-items:center;gap:8px"><span class="av" style="background:#E8A317;width:26px;height:26px;font-size:10px">DK</span><b>Destek / 4. Kişi</b></div><div class="sml mut" style="margin-top:4px">Destek</div></td>
+      <td class="sml">Kader Hanım'a arama desteği verir. Aynı arama akışını kullanır; sahaya çıkmaz, takvimde müsaitlik girmez.</td>
+      <td class="sml"><b>Arama Ekranı</b> · <b>Dinamik Arama</b> · <b>Klinik Havuzu</b></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="card guide"><div class="card-h"><h3>Sekme mantığı — sistemin kalbi</h3></div><div class="card-b">
+    <p>Her aramadan sonra bir sekme seçilir. Her sekmenin bir <b>gün değeri</b> vardır. Sistem şunu yapar:</p>
+    <div class="quote" style="font-family:'JetBrains Mono',monospace;font-size:13px">Bugünün tarihi + sekmenin gün değeri = <b>geri dönüş tarihi</b></div>
+    <p>Örnek: Bugün 13 Temmuz'da bir kliniği aradınız, telefon açılmadı. <b>"Ulaşılamadı Tekrar Aranacak"</b> sekmesini seçtiniz. Bu sekmenin değeri 2 gün. Sistem 15 Temmuz'u yazar. 15 Temmuz sabahı o klinik <b>Dinamik Arama</b> panelinizde otomatik belirir.</p>
+    <h4>Üç sekme grubu var</h4>
+    <div class="cols" style="gap:12px">
+      <div>
+        <p class="sml"><b style="color:#64748B">TAKİP</b> — henüz sonuç yok, tekrar dönülecek. Sistem gün sayar.</p>
+        <p class="sml" style="margin-top:8px"><b style="color:var(--brand)">SICAK</b> — süreç ilerledi. Kısa aralıklarla dönülür (2–7 gün).</p>
+        <p class="sml" style="margin-top:8px"><b style="color:#D64545">KAPALI</b> — iş bitti (satıldı / ilgilenmiyor / yanlış numara). Bu sekmelerde <b>dönüş kurulmaz</b>, klinik listeden düşer.</p>
+      </div>
+      <div>
+        <div class="warnbox" style="margin:0"><b>Dikkat: "Randevu Verildi" sekmesi özeldir.</b> Dönüş tarihi kurmaz, çünkü o klinik artık takvimden takip edilir. Randevuyu takvimde oluşturduğunuzda sekme kendiliğinden buna geçer.</div>
+      </div>
+    </div>
+    <h4>Sekme süreleri değiştirilebilir mi?</h4>
+    <p class="sml">Evet ama koddan. <b>Ayarlar</b> sayfasında tüm sekmeler ve gün değerleri listelenir. Değişiklik gerekirse Enes Bey dosyanın başındaki <span class="mono">SEGMENTS</span> bloğundan günü günceller.</p>
+  </div></div>
+
+  <div class="card guide"><div class="card-h"><h3>Takip kimin üzerinde? — sahiplik kuralı</h3></div><div class="card-b">
+    <p>Bu, sistemdeki en kritik ikinci kural. Karışıklık çıkmasın diye tek bir cümleyle tanımlı:</p>
+    <div class="quote"><b>Bir kliniğin takibi, o kliniği en son arayan / not giren kişiye aittir.</b></div>
+    <p class="sml">Yani:</p>
+    <div class="step"><div class="num">1</div><div class="sml">Kader Hanım arar, "2 gün sonra aranacak" der → klinik <b>Kader Hanım'ın</b> Dinamik Arama listesine düşer. Sizin ekranınızda görünmez, gereksiz gürültü olmaz.</div></div>
+    <div class="step"><div class="num">2</div><div class="sml">Kader Hanım randevu alır → randevu size ve Enes Bey'e <b>bildirim</b> olarak düşer, Randevular panelinde görünür.</div></div>
+    <div class="step" style="border:0"><div class="num">3</div><div class="sml">Siz saha görüşmesine gider, dönünce not + sekme girersiniz → takip artık <b>size</b> geçer. Kader Hanım'ın listesinden düşer.</div></div>
+    <p class="sml" style="margin-top:10px">Kimin neyi takip ettiğini görmek isterseniz: <b>Dinamik Arama → Tüm ekip</b> sekmesi. Ana ekrandaki "Ekip durumu" tablosu da herkesin bekleyen takip sayısını gösterir.</p>
+  </div></div>
+
+  <div class="card guide"><div class="card-h"><h3>Takvim nasıl işliyor</h3></div><div class="card-b">
+    <p>Takvim çift yönlü çalışır — kimin ne göreceği rolüne bağlıdır.</p>
+    <div class="cols" style="gap:14px">
+      <div>
+        <h4>Abdülkadir Bey & Enes Bey ne görür</h4>
+        <p class="sml">Her saat "Müsaitsin" yazar. Meşgul olduğunuz saate <b>tıklarsınız</b>, "Meşgulsün" olur. Başka bir işiniz varsa, doktor randevunuz varsa, toplantınız varsa — o saati kapatın.</p>
+        <p class="sml" style="margin-top:6px">Kapatmadığınız her saat Kader Hanım'a <b>açık</b> görünür.</p>
+      </div>
+      <div>
+        <h4>Kader Hanım ne görür</h4>
+        <p class="sml">Her saatin altında <b>o saatte müsait olan kişilerin adı</b> yazar. "Abdülkadir · Enes" yazıyorsa ikisi de boş. Sadece "Enes" yazıyorsa Abdülkadir Bey meşgul — randevuya Enes Bey gider.</p>
+        <p class="sml" style="margin-top:6px">Hiç kimse müsait değilse saat gri olur ve <b>tıklanamaz</b>. Yanlışlıkla çakışan randevu yazmak mümkün değil.</p>
+      </div>
+    </div>
+    <h4>Randevu oluşturulduğunda ne olur</h4>
+    <p class="sml">Kader Hanım boş saate tıklar → klinik seçer → kimin gideceğini işaretler → kaydeder. O anda <b>üç şey</b> olur:</p>
+    <p class="sml">① Seçilen kişilere çan ikonundan bildirim düşer. &nbsp; ② Klinik "Randevu Verildi" sekmesine geçer. &nbsp; ③ O saat takvimde kilitlenir, üstüne başka randevu yazılamaz.</p>
+    <div class="warnbox">Randevu iptal edilirse (Randevular → Detay → İptal) saat tekrar açılır ve katılımcılara bildirim gider.</div>
+  </div></div>
+
+  <div class="card guide"><div class="card-h"><h3>Veri yönetimi</h3></div><div class="card-b">
+    <h4>Veriler nerede duruyor?</h4>
+    <p class="sml">Şu an mod: <b class="mono">${CFG.BACKEND}</b>.</p>
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th style="width:130px">Mod</th><th>Ne demek</th><th>Ne zaman kullanılır</th></tr></thead><tbody>
+      <tr><td><b class="mono">local</b></td><td class="sml">Veri sadece <b>o tarayıcıda</b> durur. Kader Hanım'ın girdiğini siz göremezsiniz. Herkes kendi kopyasında çalışır.</td><td class="sml">Tek kişi test ederken. <b>Ekip çalışması için uygun değildir.</b></td></tr>
+      <tr><td><b class="mono">supabase</b></td><td class="sml">Veri ortak bir sunucuda durur. Herkes aynı veriyi görür, 15 saniyede bir otomatik tazelenir.</td><td class="sml"><b>Canlı kullanım budur.</b> Enes Bey'in açması gerekir.</td></tr>
+    </tbody></table></div>
+    ${CFG.BACKEND!=='server' ? `<div class="dangbox" style="margin-top:12px"><b>Şu an yerel moddasınız.</b> Bu haliyle 3-4 kişi kullanamaz — herkes kendi kopyasında ayrı veri biriktirir ve sonunda hangisinin doğru olduğu bilinemez. Canlıya almadan önce Enes Bey <b>Ayarlar → Sunucu Bağlantısı</b> adımını tamamlamalı. 10 dakikalık iş: Supabase'de tek tablo açmak ve dosyanın başındaki 3 satırı doldurmak.</div>` : `<div class="quote" style="margin-top:12px"><b>Sunucu modu açık.</b> Ekip aynı veriyi görüyor. Değişiklikler 15 saniye içinde herkese yansır.</div>`}
+
+    <h4>Yedekleme — kimin işi, ne sıklıkta</h4>
+    <div class="step"><div class="num">✓</div><div class="sml"><b>Haftada bir, cuma günü:</b> Enes Bey <b>Ayarlar → Yedek indir (JSON)</b> ile tam yedek alır. Dosyayı Drive'a atar. Bu dosya her şeyi içerir: klinikler, notlar, randevular, meşgul saatler.</div></div>
+    <div class="step" style="border:0"><div class="num">✓</div><div class="sml"><b>Ay sonu:</b> <b>Ayarlar → Excel'e aktar</b> ile rapor alınır. 3 sayfa çıkar: Klinikler (güncel sekmeleriyle), Görüşme Notları, Randevular. Aylık değerlendirme bunun üzerinden yapılır.</div></div>
+
+    <h4>Yeni klinik listesi eklemek</h4>
+    <p class="sml"><b>Klinik Havuzu → Excel yükle.</b> Excel'de "İşletme Adı" sütunu olması yeterli; branş, semt, telefon, adres, skor, sorumlu sütunlarını da otomatik tanır. <b>Aynı isimdeki klinik iki kez eklenmez</b> — mevcut listeyi bozma riski yok. Tek tek eklemek için "+ Klinik ekle".</p>
+
+    <h4>Bir şey ters giderse</h4>
+    <p class="sml">Yanlış veri girildi, liste karıştı → <b>Ayarlar → Yedek yükle</b> ile son yedeğe dönülür. Sıfırdan başlamak gerekirse <b>Ayarlar → Tüm veriyi sıfırla</b> (85 klinik geri gelir, girilen tüm notlar silinir — geri alınamaz).</p>
+  </div></div>
+
+  <div class="card guide"><div class="card-h"><h3>Giriş</h3></div><div class="card-b">
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th>Kişi</th><th>Kullanıcı adı</th></tr></thead><tbody>
+      ${USERS.map(u=>`<tr><td><b>${u.ad}</b></td><td class="mono">${u.kod}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="quote" style="margin-top:12px">Girişte <b>yalnızca kullanıcı adı</b> istenir (enes · abdulkadir · kader · destek).</div>
+  </div></div>
+
+  <div class="card guide"><div class="card-h"><h3>Günlük rutin — kısa özet</h3></div><div class="card-b">
+    <div class="cols" style="gap:14px">
+      <div>
+        <h4>Kader Hanım · her sabah</h4>
+        <div class="step"><div class="num">1</div><div class="sml"><b>Dinamik Arama</b>'yı aç. Gecikmiş ve bugünkü dönüşleri bitir.</div></div>
+        <div class="step"><div class="num">2</div><div class="sml"><b>Arama Ekranı</b>'na geç. Sekmesi "Aranmadı" olan, skoru yüksek kliniklerden devam et.</div></div>
+        <div class="step" style="border:0"><div class="num">3</div><div class="sml">Her aramadan sonra <b>mutlaka sekme seç</b>. Not yazmak isteğe bağlı ama sekme zorunlu.</div></div>
+      </div>
+      <div>
+        <h4>Abdülkadir Bey & Enes Bey · haftada bir</h4>
+        <div class="step"><div class="num">1</div><div class="sml"><b>Pazartesi sabahı:</b> Takvim'i aç, o haftaki meşgul saatlerini işaretle. Bu yapılmazsa Kader Hanım dolu saatinize randevu yazar.</div></div>
+        <div class="step"><div class="num">2</div><div class="sml"><b>Her görüşme sonrası:</b> Randevular → "Notu gir". Aynı gün yapın, ertesi güne bırakmayın.</div></div>
+        <div class="step" style="border:0"><div class="num">3</div><div class="sml"><b>Cuma:</b> Kokpit'ten haftayı değerlendir. Hedef: 50 arama, 5 yüz yüze görüşme.</div></div>
+      </div>
+    </div>
+  </div></div>
+
+  </div>`;
+}
+
+/* ============ SAYFA: SAHA REHBERİ ============ */
+function pRehber(){
+  return `<div class="grid" style="gap:14px">
+  <div class="card"><div class="card-h"><h3>İş akışı — kim ne yapıyor</h3></div><div class="card-b">
+    <div class="step"><div class="num">1</div><div><b>Kader Hanım — Arama</b><div class="sml mut">Klinik Havuzu'ndan / Arama Ekranı'ndan sırayla arar. Amaç: yüz yüze görüşme randevusu almak. Satış yapmak değil.</div></div></div>
+    <div class="step"><div class="num">2</div><div><b>Kader Hanım — Sonucu işaretle</b><div class="sml mut">Her aramadan sonra bir sekme seçilir. Sistem geri dönüş gününü kendi hesaplar.</div></div></div>
+    <div class="step"><div class="num">3</div><div><b>Kader Hanım — Randevu</b><div class="sml mut">Takvim'de Abdülkadir Bey / Enes Bey'in müsait saatine randevu yazar. İkisine bildirim gider.</div></div></div>
+    <div class="step"><div class="num">4</div><div><b>Abdülkadir & Enes — Saha görüşmesi</b><div class="sml mut">Randevuya gidilir. Aşağıdaki sunum omurgası izlenir.</div></div></div>
+    <div class="step" style="border:0"><div class="num">5</div><div><b>Görüşme sonrası</b><div class="sml mut">Klinik kartı açılır, görüşme notu + yeni sekme girilir. Sistem bir sonraki dönüşü planlar.</div></div></div>
+  </div></div>
+
+  <div class="cols">
+    <div class="card guide"><div class="card-h"><h3>1 · Telefonda banko engelini aşma</h3></div><div class="card-b">
+      <h4>Açılış</h4>
+      <div class="quote">"Merhaba, kolay gelsin. Kliniğinizin Google harita itibarını ve randevu sonrası hastaların olumsuz yorum bırakmasını engelleyen sistemle ilgili Klinik Müdürü / Başhekim ile görüşecektim. Kendisi odasında mı acaba?"</div>
+      <h4>Beklenen itiraz</h4>
+      <p class="sml mut">"Yönetici meşgul / toplantıda. Bu tarz şeylerle ilgilenmiyoruz, info@ adresine mail atın."</p>
+      <h4>Ters köşe cevabı</h4>
+      <div class="quote">"Anlıyorum, mail atabilirim ama konu standart tanıtım değil. Gizlice 1-2 yıldız bırakan hastaları Google'a yazmadan önce içeride yakalayıp müdüre alarm düşüren, KVKK uyumlu bir entegrasyon kuruyoruz. Müdür Bey'e hangi dahili numaradan ulaşabilirim, ya da notumu hangi isimle iletirsiniz?"</div>
+      <div class="dangbox"><b>Kural:</b> Asla "ürün satıyorum / pazarlama yapıyorum" denmez. "Entegrasyon", "KVKK uyumu", "yorumu haritaya düşmeden yakalama" gibi teknik ifadeler kullanılır.</div>
+    </div></div>
+
+    <div class="card guide"><div class="card-h"><h3>2 · Dijital mesajlar</h3></div><div class="card-b">
+      <h4>LinkedIn (Klinik Müdürü / Başhekim)</h4>
+      <div class="quote">"Merhaba [İsim] Bey/Hanım, sağlık sektöründe dijital itibarı yönetmek zor — lüks yazılımlar SMS odaklı kaldığı için hastalar açmıyor, KVKK/HBYS entegrasyonu da yok. Biz tamamen WhatsApp-First çalışan, randevu bitince mikro anket gönderip mutlu hastayı Google Haritalar'a yönlendiren, kırgın hastayı haritaya gitmeden içeride yakalayan bir sistem geliştirdik: Nefalix AI. Sitenizi inceledim. 1 aylık ücretsiz pilotu göstermek için haftaya Salı 10 dakikalık bir kahve molası isteyebilir miyim? Detaylar: nefalixai.com"</div>
+      <h4>Görüşmeden 1 gün önce WhatsApp</h4>
+      <div class="quote">"Yarınki görüşmemiz öncesi ön inceleme yapabilmeniz adına web sitemizi paylaşıyorum: nefalixai.com"</div>
+      <h4>Paketler</h4>
+      <p class="sml">Starter <b>9.000 TL/ay</b> · Professional <b>14.000 TL/ay</b> · Lansmana özel ilk 10 klinik için %20 yıllık indirim (fiyat sabitleme).</p>
+      <div class="warnbox">Rehberde iki farklı fiyat seti geçiyordu (9/14 bin ve 12/35 bin). Sahaya çıkmadan <b>tek fiyat listesi</b> netleştirilmeli.</div>
+    </div></div>
+  </div>
+
+  <div class="cols">
+    <div class="card guide"><div class="card-h"><h3>3 · Yüz yüze görüşme akışı</h3></div><div class="card-b">
+      <h4>Slayt 1 — Doğal tanışma</h4><p class="sml">Kısa hal hatır, kliniğin tasarımına samimi övgü.</p>
+      <h4>Slayt 2 — Düşündürücü sorular (sor, sus, cevabı bekle)</h4>
+      <div class="quote">• "Google puanınızı şu an kim yönetiyor, bankonun her hastadan yorum isteyecek vakti var mı?"<br>• "Mutsuz ayrılan hasta, eve gidip Google'a yazmadan önce yakalamanın bir yolu var mı?"<br>• "SMS açılma oranı Türkiye'de %5 — hastalarınızın kaçı SMS'e bakıyor?"</div>
+      <h4>Slayt 3 — Biz kimiz</h4><p class="sml">"Nefalix AI eski usul SMS'i çöpe atıyor, tamamen WhatsApp üzerinden yürüyor; HBYS'nize bağlanıyor, hasta kapıdan çıkar çıkmaz otonom devreye giriyor."</p>
+      <h4>Slayt 4 — Önce / Sonra</h4>
+      <p class="sml">Yorum bırakma %3-5 → %40-55 · SMS açılma %5 → WhatsApp %92 · Negatif yorum Google'a düşüyor → içeride yakalanıyor</p>
+      <div class="warnbox"><b>Bu rakamlar hedeftir</b> — "kanıtlanmış sonuç" gibi sunulmaz. Pilot sonrası gerçek veriyle güncellenecek.</div>
+      <h4>Zirve — Canlı demo (kendi telefonundan)</h4>
+      <p class="sml"><b>Senaryo 1</b> (mutlu hasta, 9-10 puan) → gerçek Google Maps linkine yönlendirir.<br><b>Senaryo 2</b> (kriz anı, 4 puan) → Google linki gizlenir, "sorunu yazar mısınız?" formu açılır + müdüre anlık kriz alarmı düşer.</p>
+      <div class="quote">Kapanış: "Hastayı otoparka inmeden yakalıyorsunuz."</div>
+    </div></div>
+
+    <div class="card guide"><div class="card-h"><h3>4 · Teknik yol ayrımı & kapanış</h3></div><div class="card-b">
+      <h4>Seçenek A — Güçlü CRM/HBYS varsa</h4>
+      <p class="sml">"n8n tabanlı entegrasyonlarımızı sisteminizin arkasında görünmez bir motor olarak çalıştırabiliriz; ekibiniz yeni panel öğrenmez."</p>
+      <h4>Seçenek B — Altyapı yoksa</h4>
+      <p class="sml">"Ultra minimalist Nefalix Dashboard üzerinden tüm WhatsApp akışını tek merkezden yönetirsiniz."</p>
+      <h4>Kapanış soruları</h4>
+      <div class="quote">• "1 ay sonra yorum artışı + kriz hastası yakalama raporlandığında, Starter mı Professional mı uygun?"<br>• "Randevu yazılımına bağlamak için kiminle görüşmeliyiz, kurulumu yarın başlatabilir miyiz?"<br>• "Kararı kiminle birlikte alıyorsunuz — 2. toplantıyı ortak katılımla mı planlayalım?"<br>• "Pilotu hangi şubede / hangi hekimin hastalarında başlatalım?"<br>• "Ücretsiz pilot için tek ihtiyacımız hasta çıkış anındaki numara — bunu banko mu, HBYS mi veriyor?"</div>
+      <h4>Haftalık hedefler</h4>
+      <p class="sml">Outbound arama: min. <b>50 klinik/hafta</b> · Yüz yüze randevu: min. <b>5/hafta</b> · Aylık pilot: min. <b>3 klinik</b> · Demo→pilot oranı hedefi: <b>%60+</b></p>
+    </div></div>
+  </div>
+
+  <div class="card guide"><div class="card-h"><h3>5 · İtiraz karşılama — ezberlenecek 7 cevap</h3></div>
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th style="width:230px">İtiraz</th><th>Cevap</th></tr></thead><tbody>
+      <tr><td><b>"Zaten bir ajans/yazılımla çalışıyoruz"</b></td><td class="sml">Harika, dijital itibarın önemini biliyorsunuz. Çoğu ajans/SMS reaktif; biz randevu biter bitmez WhatsApp'tan otonom devreye giren bir katmanız — mevcut sisteminizin yerine değil üstüne. 1 ay ücretsiz pilotta yan yana görün.</td></tr>
+      <tr><td><b>"Bütçemiz yok / pahalı"</b></td><td class="sml">İlk ay tamamen ücretsiz. Ayda tek bir kriz hastasını haritaya düşmeden yakalamak bile ortalama işlem bedeliniz kadar kaybı önler — bu masraf değil, kayıp önleme.</td></tr>
+      <tr><td><b>"Merkez / ortak onayı gerekiyor"</b></td><td class="sml">Kararı birlikte aldığınız kişiyle 15 dakikalık ortak demo planlayalım. Ücretsiz pilotu başlatmak için büyük onaya gerek yok; veriyle konuşuruz, sonra birlikte karar verirsiniz.</td></tr>
+      <tr><td><b>"KVKK / yasal risk var mı?"</b></td><td class="sml">Tam tersine — sistem KVKK uyumlu kurgulandı; hasta kendi iradesiyle Google'a yazar, biz yorumu reklam olarak yeniden yayınlamayız.</td></tr>
+      <tr><td><b>"WhatsApp spam olmaz mı?"</b></td><td class="sml">Hayır — hizmet sonrası tek seferlik memnuniyet anketi. İYS onay akışı modüle ekleniyor. Spam değil, hizmetin doğal parçası.</td></tr>
+      <tr><td><b>"Şu an çok yoğunuz / vaktim yok"</b></td><td class="sml">Tam da o yüzden: banko her hastaya "yorum yapın" diyemiyor, biz otomatik yapıyoruz. 10 dakikalık canlı demo yeter.</td></tr>
+      <tr><td><b>"Mail atın, inceleyelim"</b></td><td class="sml">Tabii atarım. Ancak konu standart tanıtım değil, kliniğe özel teknik kurulum. 10 dakikalık canlı demoda kendi telefonumdan göstereyim; mailden anlaşılmıyor, görünce anlaşılıyor.</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="card guide"><div class="card-h"><h3>6 · Sahada asla söylenmeyecekler</h3></div><div class="card-b">
+    <div class="dangbox">"Kliniğin yorumlarını pazarlama materyali yapıyoruz" <b>DENMEZ</b> — hasta kendi iradesiyle yazar, biz reklam olarak yeniden yayınlamayız (12 Kasım 2025 Sağlık Reklam Yönetmeliği).</div>
+    <div class="dangbox">"%40-55 artış / %92 açılma / Türkiye'nin ilk sistemi" gibi kanıtsız ve "ilk/lider" iddiaları <b>kesin sonuç gibi sunulmaz</b> — hedef olarak sunulur.</div>
+    <div class="dangbox">Sağlık Bakanlığı / sertifika logosu <b>izinsiz kullanılmaz</b> — sadece gerçek ve doğrulanabilir rozetler.</div>
+  </div></div>
+  </div>`;
+}
+
+/* ============ SAYFA: AYARLAR ============ */
+function pAyar(){
+  return `<div class="cols">
+  <div class="card"><div class="card-h"><h3>Veri yedeği</h3></div><div class="card-b grid" style="gap:10px">
+    <p class="sml mut">Tüm klinikler, notlar, randevular ve meşgul saatler tek dosyada. Haftada bir yedek al.</p>
+    <div class="row">
+      <button class="btn" style="flex:none" onclick="yedekAl()">⬇ Yedek indir (JSON)</button>
+      <button class="btn" style="flex:none" onclick="document.getElementById('jf').click()">⬆ Yedek yükle</button>
+      <input type="file" id="jf" accept=".json" style="display:none" onchange="yedekYukle(this)">
+      <button class="btn" style="flex:none" onclick="excelIndir()">⬇ Excel'e aktar</button>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:6px 0">
+    <button class="btn d" style="flex:none;width:fit-content" onclick="sifirla()">Tüm veriyi sıfırla</button>
+  </div></div>
+
+  <div class="card"><div class="card-h"><h3>Sunucu bağlantısı</h3></div><div class="card-b">
+    <div class="quote"><b>Ortak sunucu açık.</b> Mod: <span class="mono">${CFG.BACKEND}</span>. Tüm ekip <b>nefalix.com/crm</b> üzerinden aynı klinik listesini, notları ve randevuları görür. Değişiklikler ~15 sn içinde senkron olur.</div>
+    <p class="sml mut" style="margin-top:12px">Klinik paneli (<span class="mono">/dashboard</span>) bundan ayrıdır — burası sadece Nefalix iç Saha CRM.</p>
+  </div></div>
+
+  <div class="card"><div class="card-h"><h3>Sekmeler ve gün süreleri</h3></div>
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th>Sekme</th><th>Otomatik dönüş</th><th>Kategori</th></tr></thead><tbody>
+      ${SEGMENTS.map(s=>`<tr><td>${segChip(s.k)}</td><td class="mono sml">${s.gun===null?'—':(s.gun===0?'Takvimden':'+'+s.gun+' gün')}</td><td class="sml mut">${s.kat}</td></tr>`).join('')}
+    </tbody></table></div>
+  </div>
+
+  <div class="card"><div class="card-h"><h3>Kullanıcılar</h3></div>
+    <div class="tscroll" style="max-height:none"><table><thead><tr><th>Kişi</th><th>Kullanıcı adı</th><th>Takvimde müsaitlik girer mi</th></tr></thead><tbody>
+      ${USERS.map(u=>`<tr><td><div style="display:flex;align-items:center;gap:8px"><span class="av" style="background:${u.renk};width:26px;height:26px;font-size:11px">${bas(u.ad)}</span><span><b>${u.ad}</b><div class="sml mut">${u.rol}</div></span></div></td>
+        <td class="mono">${u.kod}</td><td class="sml">${u.saha?'Evet':'Hayır'}</td></tr>`).join('')}
+    </tbody></table>
+    <div style="padding:12px 16px" class="sml mut">Girişte yalnızca kullanıcı adı istenir. Ortak veri <b>nefalix.com/crm</b> üzerinden senkron çalışır.</div>
+    </div>
+  </div>
+  </div>`;
+}
+
+/* ---- YARDIMCI: SEGMENT ÇİPİ ---- */
+function segChip(k){
+  const s = SEG[k] || SEG.aranmadi;
+  return `<span class="chip" style="background:${s.renk}1A;color:${s.renk}"><span class="b"></span>${s.ad}</span>`;
+}
+
+/* ============ MODALLAR ============ */
+function mAc(html, lg){ const m=document.getElementById('modal'); m.className='modal'+(lg?' lg':''); m.innerHTML=html; document.getElementById('mask').classList.add('on'); }
+function mKapat(){ document.getElementById('mask').classList.remove('on'); }
+document.getElementById('mask').onclick = e=>{ if(e.target.id==='mask') mKapat(); };
+
+/* --- Arama sonucu gir --- */
+let _segSec = null;
+function aramaKaydiAc(cid, presel){
+  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
+  _segSec = presel || (c.segment!=='aranmadi'? c.segment : null);
+  mAc(`<div class="m-h"><h3>Görüşme sonucu — ${esc(c.ad)}</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <div class="row" style="gap:8px">
+      <a class="btn p" style="flex:none" href="tel:${esc((c.tel||'').replace(/\s/g,''))}">☏ ${esc(c.tel||'—')}</a>
+      <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
+      <div style="flex:1"></div>
+      <span class="mut sml" style="flex:none;align-self:center">${c.aramaSayisi||0} kez arandı</span>
+    </div>
+    <div>
+      <label class="f">Sonuç sekmesi — dönüş tarihi otomatik hesaplanır</label>
+      <div class="segpick" id="sp">${SEGMENTS.filter(s=>s.k!=='aranmadi').map(s=>`
+        <button class="segbtn ${_segSec===s.k?'on':''}" data-k="${s.k}" onclick="segSec('${s.k}')">
+          <div class="nm"><span class="dotc" style="background:${s.renk}"></span>${s.ad}</div>
+          <div class="gn">${s.gun===null?'Dönüş yok':(s.gun===0?'Takvimden takip':'+'+s.gun+' gün sonra döner')}</div>
+        </button>`).join('')}</div>
+    </div>
+    <div><label class="f">Görüşme notu</label>
+      <textarea id="nt" rows="4" placeholder="Kiminle görüşüldü, ne dedi, bir sonraki adım ne?"></textarea></div>
+    <div id="sonuc" class="sml mut"></div>
+  </div>
+  <div class="m-f"><button class="btn" onclick="mKapat()">Vazgeç</button>
+    <button class="btn p" onclick="aramaKaydet('${cid}')">Kaydet</button></div>`);
+  segOnizle();
+}
+function segSec(k){ _segSec=k; document.querySelectorAll('#sp .segbtn').forEach(b=>b.classList.toggle('on', b.dataset.k===k)); segOnizle(); }
+function segOnizle(){
+  const e=document.getElementById('sonuc'); if(!e) return;
+  if(!_segSec){ e.innerHTML='Bir sekme seç.'; return; }
+  const s=SEG[_segSec];
+  e.innerHTML = s.gun===null ? '↳ Bu sekmede otomatik dönüş kurulmaz; klinik listeden düşer.'
+    : s.gun===0 ? '↳ Randevu takvimden takip edilecek.'
+    : `↳ Dönüş tarihi: <b class="mono">${tarihTR(ekleGun(bugun(), s.gun))}</b> — o gün <b>Dinamik Arama</b> panelinde listelenir.`;
+}
+function aramaKaydet(cid){
+  if(!_segSec){ toast('Önce bir sekme seç.'); return; }
+  const nt = document.getElementById('nt').value;
+  segmentAta(cid, _segSec, nt);
+  const c = S.clinics.find(x=>x.id===cid);
+  if(_segSec==='randevu'){
+    mKapat();
+    toast('Randevu sekmesi atandı — takvimden saati seç.');
+    calGun = bugun(); git('takvim');
+    return;
+  }
+  mKapat(); toast('Kaydedildi: '+SEG[_segSec].ad); ciz();
+}
+
+/* --- Klinik kartı --- */
+function klinikAc(cid){
+  const c = S.clinics.find(x=>x.id===cid); if(!c) return;
+  const N = S.notes.filter(n=>n.clinicId===cid);
+  const R = S.appts.filter(a=>a.clinicId===cid && a.durum!=='iptal');
+  mAc(`<div class="m-h"><h3>${esc(c.ad)}</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <div class="row" style="align-items:center">
+      <div style="flex:none">${segChip(c.segment)}</div>
+      <div style="flex:none"><span class="tag">${esc(c.brans||'')}</span></div>
+      <div style="flex:none"><span class="stars">${'★'.repeat(Math.round(c.skor||0))}${'☆'.repeat(5-Math.round(c.skor||0))}</span></div>
+      <div style="flex:1"></div>
+      <div style="flex:none" class="sml mut">${c.hatirlatma?`Dönüş: <b class="mono">${tarihTR(c.hatirlatma)}</b>`:'Planlı dönüş yok'}</div>
+    </div>
+    <div class="cols" style="gap:14px">
+      <table>
+        <tr><td class="mut sml" style="width:92px">Telefon</td><td class="mono"><b>${esc(c.tel||'—')}</b></td></tr>
+        <tr><td class="mut sml">Semt</td><td class="sml">${esc(c.semt||'—')}</td></tr>
+        <tr><td class="mut sml">Bölge</td><td class="sml">${esc(c.bolge||'—')}</td></tr>
+        <tr><td class="mut sml">Adres</td><td class="sml">${esc(c.adres||'—')}</td></tr>
+      </table>
+      <table>
+        <tr><td class="mut sml" style="width:92px">Web</td><td class="sml">${esc(c.web||'—')}</td></tr>
+        <tr><td class="mut sml">Ölçek</td><td class="sml">${esc(c.olcek||'—')}</td></tr>
+        <tr><td class="mut sml">Uluslararası</td><td class="sml">${esc(c.uluslararasi||'—')}</td></tr>
+        <tr><td class="mut sml">Sorumlu</td><td class="sml">${esc(c.sorumlu||'—')}</td></tr>
+      </table>
+    </div>
+    <div class="row" style="gap:8px">
+      <a class="btn p" style="flex:none" href="tel:${esc((c.tel||'').replace(/\s/g,''))}">☏ Ara</a>
+      <a class="btn" style="flex:none" target="_blank" href="https://wa.me/${esc((c.tel||'').replace(/[^0-9]/g,''))}">WhatsApp</a>
+      <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Harita</a>
+      <button class="btn" style="flex:none" onclick="mKapat();aramaKaydiAc('${cid}')">+ Görüşme sonucu</button>
+    </div>
+    ${R.length? `<div><label class="f">Randevular</label>${R.map(a=>`<div class="note" style="border-color:var(--brand)"><div class="mt"><b class="mono">${tarihTR(a.tarih)} ${a.saat}</b> · ${a.katilimcilar.map(i=>usr(i).ad.split(' ')[0]).join(', ')} · ${a.durum==='yapildi'?'Yapıldı':'Planlandı'}</div>${a.notu?`<div class="tx sml">${esc(a.notu)}</div>`:''}</div>`).join('')}</div>`:''}
+    <div><label class="f">Görüşme geçmişi (${N.length})</label>
+      ${N.length? N.map(n=>{const d=new Date(n.tarih);const s=SEG[n.segment]||SEG.aranmadi;return `
+        <div class="note" style="border-color:${s.renk}">
+          <div class="mt">${segChip(n.segment)} <span>${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span> <span>· ${esc(usr(n.userId).ad)}</span></div>
+          ${n.metin? `<div class="tx">${esc(n.metin)}</div>`:'<div class="tx mut sml">— not girilmemiş —</div>'}
+        </div>`}).join('') : '<div class="mut sml">Henüz görüşme kaydı yok.</div>'}
+    </div>
+  </div>
+  <div class="m-f"><button class="btn" onclick="mKapat()">Kapat</button></div>`, true);
+}
+
+/* --- Randevu oluştur --- */
+function randevuYeni(t,s){
+  const st = slotDurum(t,s);
+  const secilebilir = S.clinics.filter(c=>['randevu','sicak','teklif','gorusuldu','mesaj','kisa','orta','uzun','gun2','ulasilamadi','karar','aranmadi','pilot'].includes(c.segment))
+    .sort((a,b)=>{const p=x=>x.segment==='randevu'?0:(SEG[x.segment]?.kat==='sicak'?1:2); return p(a)-p(b) || (b.skor||0)-(a.skor||0);});
+  mAc(`<div class="m-h"><h3>Randevu oluştur — ${tarihTR(t)} · ${s}</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <div><label class="f">Klinik</label>
+      <select id="rk">${secilebilir.map(c=>`<option value="${c.id}" ${c.segment==='randevu'?'':''}>${esc(c.ad)} — ${esc(c.semt||'')} ${c.segment==='randevu'?'· randevu bekliyor':''}</option>`).join('')}</select></div>
+    <div><label class="f">Kim gidecek?</label>
+      <div class="row">${USERS.filter(u=>u.saha).map(u=>{
+        const mesgul = st.mesgul.includes(u.id);
+        return `<label style="flex:none;display:flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;${mesgul?'opacity:.45':''}">
+          <input type="checkbox" class="rkat" value="${u.id}" ${mesgul?'disabled':'checked'} style="width:auto">
+          <span class="av" style="background:${u.renk};width:24px;height:24px;font-size:10px">${bas(u.ad)}</span>
+          <span>${u.ad.split(' ')[0]}${mesgul?' (meşgul)':''}</span></label>`}).join('')}</div></div>
+    <div><label class="f">Not (isteğe bağlı)</label><input type="text" id="rn" placeholder="Kiminle görüşülecek, hangi kata çıkılacak…"></div>
+    <div class="sml mut">Kaydedildiğinde seçilen kişilere bildirim düşer ve klinik "Randevu Verildi" sekmesine geçer.</div>
+  </div>
+  <div class="m-f"><button class="btn" onclick="mKapat()">Vazgeç</button><button class="btn p" onclick="randevuKaydet('${t}','${s}')">Randevuyu oluştur</button></div>`);
+}
+function randevuMailGonder(payload){
+  if(CFG.BACKEND!=='server') return;
+  fetch(CFG.API_NOTIFY, {
+    method:'POST',
+    credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(()=>{});
+}
+function randevuKaydet(t,s){
+  const cid = document.getElementById('rk').value;
+  const kat = [...document.querySelectorAll('.rkat:checked')].map(x=>x.value);
+  if(!kat.length){ toast('En az bir kişi seç.'); return; }
+  const c = S.clinics.find(x=>x.id===cid);
+  const notu = document.getElementById('rn').value;
+  S.appts.push({id:uid(), clinicId:cid, tarih:t, saat:s, katilimcilar:kat, olusturan:ME.id, durum:'planli', notu});
+  c.segment='randevu'; c.hatirlatma=null;
+  S.notes.unshift({id:uid(),clinicId:cid,userId:ME.id,tarih:new Date().toISOString(),segment:'randevu',metin:`Randevu alındı: ${tarihTR(t)} ${s}`});
+  bildirim(kat, `Yeni randevu: ${c.ad} · ${tarihTR(t)} ${s}`, 'randevu');
+  randevuMailGonder({
+    event:'created', clinic:c.ad, tarih:t, saat:s,
+    adres:c.adres||'', tel:c.tel||'', notu:notu||'',
+    olusturan:ME.ad,
+    katilimcilar: kat.map(i=>usr(i).ad)
+  });
+  kaydet(); mKapat(); toast('Randevu oluşturuldu — panel + mail bildirimi.'); ciz();
+}
+function randevuAc(aid){
+  const a = S.appts.find(x=>x.id===aid); if(!a) return;
+  const c = S.clinics.find(x=>x.id===a.clinicId)||{};
+  mAc(`<div class="m-h"><h3>Randevu — ${esc(c.ad||'')}</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <table>
+      <tr><td class="mut sml" style="width:100px">Tarih</td><td class="mono"><b>${tarihTR(a.tarih)} · ${a.saat}</b></td></tr>
+      <tr><td class="mut sml">Adres</td><td class="sml">${esc(c.adres||'—')}</td></tr>
+      <tr><td class="mut sml">Telefon</td><td class="mono sml">${esc(c.tel||'—')}</td></tr>
+      <tr><td class="mut sml">Katılımcı</td><td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad}</span>`).join(' ')}</td></tr>
+      <tr><td class="mut sml">Oluşturan</td><td class="sml">${esc(usr(a.olusturan).ad)}</td></tr>
+      <tr><td class="mut sml">Not</td><td class="sml">${esc(a.notu||'—')}</td></tr>
+    </table>
+    <div class="row">
+      <a class="btn" style="flex:none" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent((c.ad||'')+' '+(c.semt||'')+' İstanbul')}">Haritada aç</a>
+      <button class="btn" style="flex:none" onclick="mKapat();klinikAc('${a.clinicId}')">Klinik kartı</button>
+    </div>
+  </div>
+  <div class="m-f">
+    <button class="btn d" onclick="randevuIptal('${aid}')">Randevuyu iptal et</button>
+    <div style="flex:1"></div>
+    <button class="btn" onclick="mKapat()">Kapat</button>
+    <button class="btn p" onclick="mKapat();gorusmeNotAc('${a.clinicId}','${aid}')">Görüşme notunu gir</button>
+  </div>`);
+}
+function randevuIptal(aid){
+  const a=S.appts.find(x=>x.id===aid); a.durum='iptal';
+  const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+  bildirim(a.katilimcilar.filter(i=>i!==ME.id), 'Randevu iptal edildi: '+tarihTR(a.tarih)+' '+a.saat, 'randevu');
+  randevuMailGonder({
+    event:'cancelled', clinic:c.ad||'Klinik', tarih:a.tarih, saat:a.saat,
+    adres:c.adres||'', tel:c.tel||'', notu:a.notu||'',
+    olusturan:ME.ad,
+    katilimcilar: (a.katilimcilar||[]).map(i=>usr(i).ad)
+  });
+  kaydet(); mKapat(); toast('Randevu iptal edildi — panel + mail.'); ciz();
+}
+function gorusmeNotAc(cid, aid){
+  const a = S.appts.find(x=>x.id===aid);
+  if(a) a.durum='yapildi';
+  kaydet(true);
+  aramaKaydiAc(cid, 'gorusuldu');
+}
+
+/* --- Klinik ekle --- */
+function klinikYeni(){
+  mAc(`<div class="m-h"><h3>Yeni klinik ekle</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    <div class="row"><div><label class="f">Klinik adı *</label><input id="k_ad" type="text"></div>
+      <div><label class="f">Branş</label><input id="k_br" type="text" placeholder="Diş Kliniği"></div></div>
+    <div class="row"><div><label class="f">Semt</label><input id="k_sm" type="text"></div>
+      <div><label class="f">Bölge grubu</label><input id="k_bl" type="text"></div></div>
+    <div class="row"><div><label class="f">Telefon</label><input id="k_tl" type="text" placeholder="+90 ..."></div>
+      <div><label class="f">Skor (1-5)</label><input id="k_sk" type="number" min="1" max="5" value="3"></div></div>
+    <div><label class="f">Adres</label><input id="k_ad2" type="text"></div>
+    <div class="row"><div><label class="f">Web</label><input id="k_wb" type="text"></div>
+      <div><label class="f">Sorumlu</label><select id="k_sr"><option value="">—</option><option>Abdülkadir</option><option>Enes</option><option>Kader</option></select></div></div>
+  </div>
+  <div class="m-f"><button class="btn" onclick="mKapat()">Vazgeç</button><button class="btn p" onclick="klinikKaydet()">Ekle</button></div>`);
+}
+function klinikKaydet(){
+  const ad = document.getElementById('k_ad').value.trim();
+  if(!ad){ toast('Klinik adı zorunlu.'); return; }
+  S.clinics.unshift({id:'c'+uid(), ad, brans:document.getElementById('k_br').value, semt:document.getElementById('k_sm').value,
+    bolge:document.getElementById('k_bl').value, tel:document.getElementById('k_tl').value, adres:document.getElementById('k_ad2').value,
+    web:document.getElementById('k_wb').value, skor:Number(document.getElementById('k_sk').value)||3, olcek:'', uluslararasi:'',
+    sorumlu:document.getElementById('k_sr').value, segment:'aranmadi', sonArama:null, hatirlatma:null, aramaSayisi:0});
+  kaydet(); mKapat(); toast('Klinik eklendi.'); ciz();
+}
+
+/* --- Bildirimler --- */
+function bildirimAc(){
+  const N = S.notifs.filter(n=>n.userId===ME.id).slice(0,40);
+  mAc(`<div class="m-h"><h3>Bildirimler</h3><button class="x" onclick="mKapat()">×</button></div>
+  <div class="m-b">
+    ${N.length? N.map(n=>{const d=new Date(n.tarih);return `<div class="note" style="border-color:${n.okundu?'var(--line)':'var(--brand)'}">
+      <div class="mt"><span class="mono">${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span>${n.okundu?'':'<span class="tag" style="background:var(--brand-soft);color:var(--brand-d)">yeni</span>'}</div>
+      <div class="tx">${esc(n.metin)}</div></div>`}).join('') : '<div class="empty"><div class="e">🔔</div>Bildirim yok.</div>'}
+  </div>
+  <div class="m-f"><button class="btn" onclick="hepsiOkundu()">Tümünü okundu işaretle</button><button class="btn p" onclick="mKapat()">Kapat</button></div>`);
+}
+function hepsiOkundu(){ S.notifs.forEach(n=>{ if(n.userId===ME.id) n.okundu=true; }); kaydet(true); mKapat(); rozetler(); }
+
+/* --- Excel al/ver --- */
+function isHeaderClinic(ad, brans, tel){
+  const a = String(ad||'').trim().toLocaleLowerCase('tr');
+  const b = String(brans||'').trim().toLocaleLowerCase('tr');
+  const t = String(tel||'').trim().toLocaleLowerCase('tr');
+  if(!a) return true;
+  const badAd = ['işletme adı','isletme adi','ad','klinik adı','klinik adi','firma','firma adı'];
+  const badBr = ['branş','brans'];
+  const badTel = ['telefon','tel','gsm'];
+  if(badAd.includes(a)) return true;
+  if(badBr.includes(b) && badTel.includes(t)) return true;
+  if(b==='branş' || b==='brans') return true;
+  if(t==='telefon') return true;
+  return false;
+}
+
+
+function excelYukle(inp){
+  const f = inp.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = e=>{
+    const wb = XLSX.read(e.target.result, {type:'array'});
+    const sh = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sh, {defval:''});
+    const bul = (r,...k)=>{ for(const key of Object.keys(r)){ const kk=key.toLocaleLowerCase('tr'); if(k.some(x=>kk.includes(x))) return r[key]; } return ''; };
+    let n=0, skip=0;
+    rows.forEach(r=>{
+      const ad = String(bul(r,'işletme','isletme','klinik','ad','firma')||'').trim();
+      const brans = String(bul(r,'branş','brans')||'');
+      const tel = String(bul(r,'telefon','tel','gsm')||'');
+      if(isHeaderClinic(ad, brans, tel)){ skip++; return; }
+      if(S.clinics.some(c=>c.ad.toLowerCase()===ad.toLowerCase())) return;
+      S.clinics.push({
+        id:'c'+uid(), ad,
+        brans, semt:String(bul(r,'semt','ilçe','ilce')||''),
+        bolge:String(bul(r,'bölge','bolge')||''), adres:String(bul(r,'adres')||''),
+        tel, web:String(bul(r,'web','site')||''),
+        olcek:String(bul(r,'ölçek','olcek')||''), uluslararasi:String(bul(r,'uluslararası','uluslararasi')||''),
+        skor:Number(bul(r,'skor','puan'))||3, sorumlu:String(bul(r,'sorumlu')||''),
+        segment:'aranmadi', sonArama:null, hatirlatma:null, aramaSayisi:0
+      });
+      n++;
+    });
+    kaydet();
+    toast(n+' klinik eklendi.' + (skip ? ' '+skip+' başlık satırı atlandı.' : ''));
+    ciz(); inp.value='';
+  };
+  rd.readAsArrayBuffer(f);
+}
+function excelIndir(){
+  const kl = S.clinics.map(c=>({
+    'Branş':c.brans,'İşletme Adı':c.ad,'Semt / İlçe':c.semt,'Bölge Grubu':c.bolge,'Adres':c.adres,'Telefon':c.tel,
+    'Web Sitesi':c.web,'Tahmini Ölçek':c.olcek,'Uluslararası Hasta':c.uluslararasi,'Skor (1-5)':c.skor,
+    'Sekme / Durum':SEG[c.segment]?.ad||'', 'Son Arama':c.sonArama||'', 'Dönüş Tarihi':c.hatirlatma||'',
+    'Arama Sayısı':c.aramaSayisi||0,'Sorumlu':c.sorumlu
+  }));
+  const nt = S.notes.map(n=>{const c=S.clinics.find(x=>x.id===n.clinicId)||{};
+    return {'Tarih':new Date(n.tarih).toLocaleString('tr-TR'),'Klinik':c.ad||'','Sekme':SEG[n.segment]?.ad||'','Not':n.metin,'Kaydeden':usr(n.userId).ad};});
+  const rn = S.appts.filter(a=>a.durum!=='iptal').map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+    return {'Tarih':tarihTR(a.tarih),'Saat':a.saat,'Klinik':c.ad||'','Adres':c.adres||'','Katılımcı':a.katilimcilar.map(i=>usr(i).ad).join(', '),'Durum':a.durum,'Not':a.notu||''};});
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(kl), 'Klinikler');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(nt.length?nt:[{'Tarih':'','Klinik':''}]), 'Görüşme Notları');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rn.length?rn:[{'Tarih':'','Klinik':''}]), 'Randevular');
+  XLSX.writeFile(wb, 'Nefalix_CRM_'+bugun()+'.xlsx');
+}
+function yedekAl(){
+  const b = new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='nefalix_yedek_'+bugun()+'.json'; a.click();
+}
+function yedekYukle(inp){
+  const f=inp.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=e=>{ try{ const j=JSON.parse(e.target.result); if(!j.clinics) throw 0; j.clinics=j.clinics.filter(c=>!isHeaderClinic(c.ad,c.brans,c.tel)); S=j; kaydet(); toast('Yedek yüklendi.'); ciz(); }catch(err){ toast('Dosya okunamadı.'); } inp.value=''; };
+  rd.readAsText(f);
+}
+function sifirla(){ if(confirm('Tüm veriler silinip başlangıç klinik listesi geri yüklenecek. Emin misiniz?')){ S=bosDurum(); kaydet(); toast('Sıfırlandı.'); ciz(); } }
+
+/* ============ ANA EKRAN (giriş öncesi genel durum) ============ */
+function anaCiz(){
+  const top = S.clinics.length;
+  const arandi = S.clinics.filter(c=>c.segment!=='aranmadi').length;
+  const sicak = S.clinics.filter(c=>SEG[c.segment]?.kat==='sicak').length;
+  const kapali = S.clinics.filter(c=>c.segment==='satildi').length;
+  const rnd = S.appts.filter(a=>a.durum!=='iptal' && a.tarih>=bugun());
+  const gecikmis = S.clinics.filter(c=>c.hatirlatma && farkGun(c.hatirlatma)<0).length;
+  const bugunku = S.clinics.filter(c=>c.hatirlatma && farkGun(c.hatirlatma)===0).length;
+
+  // bu hafta (son 7 gün) yapılan aramalar
+  const hafta = new Date(); hafta.setDate(hafta.getDate()-7);
+  const buHafta = S.notes.filter(n=>new Date(n.tarih)>=hafta);
+  const haftaAra = buHafta.length;
+  const haftaRnd = S.appts.filter(a=>a.durum!=='iptal' && S.notes.some(n=>n.clinicId===a.clinicId)).filter(a=>new Date(a.tarih+'T12:00:00')>=hafta).length;
+
+  const ekip = USERS.map(u=>{
+    const ara = S.notes.filter(n=>n.userId===u.id).length;
+    const ha = buHafta.filter(n=>n.userId===u.id).length;
+    const rn = S.appts.filter(a=>a.durum!=='iptal' && a.katilimcilar.includes(u.id)).length;
+    const takip = takipListesi(u.id).filter(x=>x.fark<=0).length;
+    return {u, ara, ha, rn, takip};
+  });
+
+  const yuzde = (a,b)=>Math.min(100, Math.round(a/b*100));
+
+  document.getElementById('anaIcerik').innerHTML = `
+  <div class="hero">
+    <h1>Saha operasyonunun tek ekranı</h1>
+    <p>85 klinik listelendi. Kader Hanım arar ve randevu oluşturur; Abdülkadir Bey ile Enes Bey görüşmeye gider. Sistem geri dönüş günlerini kendisi hesaplar — kimse takvimde iz sürmek zorunda kalmaz.</p>
+    <div class="hkpis">
+      <div class="hk"><div class="n">${top}</div><div class="l">Klinik havuzu</div></div>
+      <div class="hk g"><div class="n">${arandi}</div><div class="l">Aranan klinik</div></div>
+      <div class="hk y"><div class="n">${rnd.length}</div><div class="l">Planlı randevu</div></div>
+      <div class="hk g"><div class="n">${sicak}</div><div class="l">Sıcak fırsat</div></div>
+      <div class="hk r"><div class="n">${gecikmis}</div><div class="l">Gecikmiş dönüş</div></div>
+      <div class="hk"><div class="n">${kapali}</div><div class="l">Kazanılan klinik</div></div>
+    </div>
+  </div>
+
+  <div class="awrap">
+    <div class="cols" style="margin-bottom:16px">
+      <div class="card"><div class="card-h"><h3>Bu haftanın hedefleri</h3><div class="r"><span class="mut sml">son 7 gün</span></div></div><div class="card-b grid" style="gap:14px">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><b>Outbound arama</b><span class="mono">${haftaAra} / 50</span></div>
+          <div class="bar"><i style="width:${yuzde(haftaAra,50)}%"></i></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><b>Yüz yüze randevu</b><span class="mono">${haftaRnd} / 5</span></div>
+          <div class="bar"><i style="width:${yuzde(haftaRnd,5)}%;background:var(--warn)"></i></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><b>Havuzun taranan kısmı</b><span class="mono">${arandi} / ${top}</span></div>
+          <div class="bar"><i style="width:${yuzde(arandi,top)}%;background:var(--info)"></i></div>
+        </div>
+        ${gecikmis||bugunku ? `<div class="warnbox" style="margin:0"><b>${gecikmis} gecikmiş</b>, <b>${bugunku} bugün dönülecek</b> klinik var. Giriş yapıp Dinamik Arama panelini açın.</div>`:''}
+      </div></div>
+
+      <div class="card"><div class="card-h"><h3>Ekip durumu</h3></div>
+        <div class="tscroll" style="max-height:none"><table><thead><tr><th>Kişi</th><th>Toplam kayıt</th><th>Bu hafta</th><th>Randevu</th><th>Bekleyen takip</th></tr></thead><tbody>
+        ${ekip.map(e=>`<tr>
+          <td><div style="display:flex;align-items:center;gap:8px"><span class="av" style="background:${e.u.renk};width:26px;height:26px;font-size:10px">${bas(e.u.ad)}</span>
+            <span><b>${e.u.ad}</b><div class="sml mut">${e.u.rol}</div></span></div></td>
+          <td class="mono">${e.ara}</td><td class="mono">${e.ha}</td><td class="mono">${e.rn}</td>
+          <td class="mono ${e.takip?'':'mut'}" style="${e.takip?'color:var(--dang);font-weight:700':''}">${e.takip}</td></tr>`).join('')}
+        </tbody></table></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px"><div class="card-h"><h3>Sistem nasıl işliyor</h3><div class="r"><span class="mut sml">Giriş yaptıktan sonra "Sistem Kılavuzu" sekmesinde detayı var</span></div></div>
+      <div class="card-b"><div class="flow">
+        <div class="fstep"><span class="who" style="background:#F1EBFB;color:#7C5CD6">Kader</span><div class="k">01</div><b>Ara</b><p>Arama Ekranı'nda sıradaki klinik açılır. Tek tuşla aranır. Hedef satış değil, 10 dakikalık randevu.</p></div>
+        <div class="fstep"><span class="who" style="background:#F1EBFB;color:#7C5CD6">Kader</span><div class="k">02</div><b>Sekmeye at</b><p>16 sekmeden biri seçilir. Sistem geri dönüş gününü otomatik hesaplar.</p></div>
+        <div class="fstep"><span class="who" style="background:#F1EBFB;color:#7C5CD6">Kader</span><div class="k">03</div><b>Randevu yaz</b><p>Takvimde boş saate randevu girilir. Sahaya çıkacak kişilere bildirim düşer.</p></div>
+        <div class="fstep"><span class="who" style="background:var(--brand-soft);color:var(--brand-d)">Abdülkadir + Enes</span><div class="k">04</div><b>Görüşmeye git</b><p>Randevular panelinden adres alınır. Saha Rehberi'ndeki sunum omurgası izlenir.</p></div>
+        <div class="fstep"><span class="who" style="background:var(--brand-soft);color:var(--brand-d)">Abdülkadir + Enes</span><div class="k">05</div><b>Notu gir</b><p>Görüşmeden çıkınca not + yeni sekme yazılır. Takip artık o kişiye düşer.</p></div>
+        <div class="fstep"><span class="who" style="background:#EEF2F6;color:#54657A">Sistem</span><div class="k">06</div><b>Günü gelince hatırlat</b><p>Dinamik Arama panelinde o gün otomatik listelenir. Kimse kimseye "unuttun mu" demez.</p></div>
+      </div></div>
+    </div>
+
+    ${rnd.length ? `<div class="card"><div class="card-h"><h3>Yaklaşan görüşmeler</h3></div>
+      <div class="tscroll" style="max-height:none"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Klinik</th><th>Semt</th><th>Kim gidiyor</th></tr></thead><tbody>
+      ${rnd.sort((a,b)=>(a.tarih+a.saat).localeCompare(b.tarih+b.saat)).slice(0,6).map(a=>{const c=S.clinics.find(x=>x.id===a.clinicId)||{};
+        return `<tr><td class="mono sml"><b>${tarihTR(a.tarih)}</b></td><td class="mono"><b>${a.saat}</b></td>
+        <td><b>${esc(c.ad||'—')}</b></td><td class="sml mut">${esc(c.semt||'')}</td>
+        <td>${a.katilimcilar.map(i=>`<span class="tag" style="background:${usr(i).renk}1A;color:${usr(i).renk}">${usr(i).ad.split(' ')[0]}</span>`).join(' ')}</td></tr>`}).join('')}
+      </tbody></table></div></div>` : `
+      <div class="card"><div class="empty"><div class="e">▦</div>Henüz planlanmış randevu yok.<br><span class="sml">Kader Hanım takvimden ilk randevuyu oluşturduğunda burada görünecek.</span></div></div>`}
+
+    <div style="text-align:center;color:var(--mut);font-size:11.5px;padding:26px 0 10px">
+      Nefalix Saha CRM · İç kullanım aracıdır, dışarıya paylaşılmaz.
+      ${CFG.BACKEND!=='server' ? '<br><b style="color:var(--warn)">Yerel mod:</b> veriler sadece bu tarayıcıda tutuluyor. Ekip ortak çalışacaksa Ayarlar → Sunucu Bağlantısı.' : ''}
+    </div>
+  </div>`;
+}
+
+/* ============ GİRİŞ ============ */
+async function sunucuGiris(kod){
+  const r = await fetch(CFG.API_LOGIN, {
+    method:'POST',
+    credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ kod })
+  });
+  if(!r.ok){
+    let msg='Sunucu girişi başarısız';
+    try{ const j=await r.json(); if(j.error) msg=j.error; }catch(e){}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+async function crmYukle(){
+  const kayit = await Depo.oku();
+  S = (kayit && kayit.clinics && kayit.clinics.length) ? kayit : bosDurum();
+  ['notes','busy','appts','notifs'].forEach(k=>{ if(!S[k]) S[k]=[]; });
+  if(!(kayit && kayit.clinics && kayit.clinics.length)) await Depo.yaz(S);
+}
+async function girisYap(){
+  const kod = (document.getElementById('lg_id').value||'').trim().toLowerCase();
+  const err = document.getElementById('lg_err');
+  const u = USERS.find(x=>x.kod===kod);
+  if(!u){
+    err.textContent = 'Kullanıcı adı hatalı. (enes / abdulkadir / kader / destek)';
+    setTimeout(()=>err.textContent='', 3500);
+    return;
+  }
+  err.textContent='';
+  try{
+    if(CFG.BACKEND==='server') await sunucuGiris(kod);
+    await crmYukle();
+    await giris(u.id);
+  }catch(e){
+    err.textContent = e.message || 'Giriş başarısız';
+    setTimeout(()=>err.textContent='', 4500);
+  }
+}
+async function giris(id){
+  ME = USERS.find(u=>u.id===id);
+  try{ sessionStorage.setItem('nfx_me', id); }catch(e){}
+  document.getElementById('ana').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('meav').textContent = bas(ME.ad);
+  document.getElementById('meav').style.background = ME.renk;
+  document.getElementById('mead').textContent = ME.ad;
+  document.getElementById('merol').textContent = ME.rol;
+  ciz();
+  git(ME.id==='kd' ? 'arama' : 'kokpit');
+}
+function cikis(){
+  try{ sessionStorage.removeItem('nfx_me'); }catch(e){}
+  if(CFG.BACKEND==='server'){
+    fetch(CFG.API_LOGOUT, { method:'POST', credentials:'include' }).finally(()=>location.reload());
+    return;
+  }
+  location.reload();
+}
+
+document.querySelectorAll('.nav[data-p]').forEach(b=>b.onclick=()=>git(b.dataset.p));
+
+(async function init(){
+  S = bosDurum();
+  ['notes','busy','appts','notifs'].forEach(k=>{ if(!S[k]) S[k]=[]; });
+  anaCiz();
+  let m=null; try{ m=sessionStorage.getItem('nfx_me'); }catch(e){}
+  if(m && USERS.some(u=>u.id===m)){
+    try{
+      // Cookie hâlâ geçerliyse ortak veriyi yükle; değilse yeniden giriş
+      const kayit = await Depo.oku();
+      if(kayit && kayit.clinics){
+        S = kayit;
+        ['notes','busy','appts','notifs'].forEach(k=>{ if(!S[k]) S[k]=[]; });
+        await giris(m);
+      } else {
+        try{ sessionStorage.removeItem('nfx_me'); }catch(e){}
+      }
+    }catch(e){ try{ sessionStorage.removeItem('nfx_me'); }catch(e2){} }
+  }
+
+  if(CFG.BACKEND==='server'){
+    setInterval(async ()=>{
+      if(!ME) return;
+      const uzak = await Depo.oku();
+      if(uzak && uzak.rev > (S.rev||0)){ S = uzak; ciz(); durumIsigi('güncellendi'); }
+    }, CFG.POLL_MS);
+  }
+})();
+</script>
+</body>
+</html>

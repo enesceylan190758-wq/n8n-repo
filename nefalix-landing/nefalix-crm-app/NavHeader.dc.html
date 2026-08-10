@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  .nf-tabitem:hover { background: rgba(255,255,255,0.14) !important; }
+  .nf-dditem:hover { background: #f1eefc !important; color: #4c1d95 !important; }
+  .nf-iconbtn:hover { background: rgba(255,255,255,0.22) !important; }
+</style>
+</helmet>
+<div style="width:100%; font-family: 'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif;">
+  <div style="height:66px; background:linear-gradient(90deg,#1c1240 0%,#2b1a72 48%,#1b3f96 100%); display:flex; align-items:center; padding:0 28px; gap:24px;">
+    <a href="Dashboard.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none;">
+      <img src="assets/nefalix-icon.png" alt="Nefalix" style="height:32px; width:32px; object-fit:contain;" />
+      <span style="color:#fff; font-size:19px; font-weight:700; letter-spacing:0.2px;">{{ clinicName }}</span>
+    </a>
+    <div style="flex:1; max-width:520px;">
+      <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.14); border-radius:10px; padding:9px 14px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c7c3f0" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input placeholder="Ara ({{ clinicName }})" style="background:transparent; border:none; outline:none; color:#fff; font-size:13.5px; width:100%;" />
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; flex-shrink:0; position:relative;">
+      <div class="nf-iconbtn" style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#2dd4bf"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5.1-1.3A10 10 0 1012 2zm5.6 14.3c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.2-3.5-.7-2.9-1.2-4.8-4.2-5-4.4-.1-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6c-.1.2-.2.3 0 .6.2.3.9 1.5 1.9 2.4 1.3 1.1 2.3 1.5 2.6 1.6.3.1.4.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.8.9c.2.1.4.2.4.4.1.2.1.9-.1 1.6z"></path></svg>
+      </div>
+      <div class="nf-iconbtn" onClick="{{ toggleBell }}" style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 01-3.4 0"></path></svg>
+        <sc-if value="{{ hasNotif }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute; top:5px; right:6px; width:8px; height:8px; border-radius:50%; background:#f87171; border:1.5px solid #241854;"></span>
+        </sc-if>
+        <div style="{{ bellPanelStyle }}">
+          <div style="padding:16px 18px; font-weight:700; color:#1e1147; font-size:14px; border-bottom:1px solid #eee;">Bildirimler</div>
+          <div style="padding:34px 20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.5"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 01-3.4 0"></path></svg>
+            <span style="color:#16a34a; font-size:13px; font-weight:600;">Bildiriminiz bulunmamaktadır!</span>
+          </div>
+        </div>
+      </div>
+      <a href="Dashboard.dc.html" class="nf-iconbtn" style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+      </a>
+      <div onClick="{{ toggleAvatar }}" style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#a78bfa,#22d3ee); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#1e1147; font-size:13px; font-weight:700;">{{ userInitials }}</div>
+      <div style="{{ avatarPanelStyle }}">
+        <div style="padding:18px 20px 14px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee;">
+          <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#a78bfa,#22d3ee); display:flex; align-items:center; justify-content:center; color:#1e1147; font-size:14px; font-weight:700; flex-shrink:0;">{{ userInitials }}</div>
+          <div>
+            <div style="font-size:14px; font-weight:700; color:#1e1147;">{{ userName }}</div>
+            <div style="font-size:12px; color:#8b87a8;">{{ userEmail }}</div>
+          </div>
+        </div>
+        <div style="padding:10px;">
+          <div class="nf-dditem" style="padding:10px 12px; border-radius:8px; font-size:13.5px; color:#1e1147; cursor:pointer;">Profilim</div>
+          <div class="nf-dditem" onClick="{{ doLogout }}" style="padding:10px 12px; border-radius:8px; font-size:13.5px; color:#dc2626; cursor:pointer;">Çıkış Yap</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#241854; display:flex; align-items:stretch; flex-wrap:wrap; padding:0 10px; position:relative; z-index:80;">
+    <sc-for list="{{ menus }}" as="menu" hint-placeholder-count="10">
+      <div onMouseEnter="{{ menu.onEnter }}" onMouseLeave="{{ onLeave }}" style="position:relative;">
+        <div class="nf-tabitem" style="{{ menu.tabStyle }}">
+          <sc-if value="{{ menu.showIcon }}" hint-placeholder-val="{{ false }}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+          </sc-if>
+          <sc-if value="{{ menu.hasLabel }}" hint-placeholder-val="{{ true }}">
+            <span>{{ menu.label }}</span>
+          </sc-if>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c7c3f0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </div>
+        <div style="{{ menu.dropdownStyle }}">
+          <sc-for list="{{ menu.items }}" as="it" hint-placeholder-count="4">
+            <a class="nf-dditem" href="{{ it.href }}" style="display:block; text-decoration:none; padding:10px 20px; font-size:13.5px; color:#241854; cursor:pointer; white-space:nowrap;">{{ it.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:132},&quot;activePage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;crm&quot;,&quot;danisan&quot;,&quot;randevu&quot;,&quot;gelirler&quot;,&quot;giderler&quot;,&quot;whatsapp&quot;,&quot;rapor&quot;,&quot;sistem&quot;,&quot;destek&quot;]},&quot;clinicName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Nefalix&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Ahmet Yılmaz&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;userInitials&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;AY&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;userEmail&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;ahmet.yilmaz@nefalix.com&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const MENU_DATA = [
+  {key:'home', label:'', showIcon:true, items:[{label:'Göstergeler'},{label:'Son Yapılan İşlemler'}]},
+  {key:'crm', label:'CRM', items:[{label:'Yeni Lead'},{label:'Lead Listesi'},{label:'Salesline'},{label:'Dinamik Arama'},{label:'Dinamik Arama - Havuz'},{label:'Lead Dönüşüm Geçmişi'},{label:'Lead Takibi'},{label:'CRM Ayarları'}]},
+  {key:'kurum', label:'KURUM', items:[{label:'Yeni Kurum'},{label:'Kurum Listesi'},{label:'Yeni Teklif'},{label:'Teklifler'},{label:'Notlar & Görevler'},{label:'Şikayetler'}]},
+  {key:'randevu', label:'DEMO / TOPLANTI', items:[{label:'Yeni Toplantı'},{label:'Takvim'},{label:'Toplantı Listesi'},{label:'Etkinlikler'},{label:'Kurulum Takvimi'}]},
+  {key:'gelirler', label:'GELİRLER', items:[{label:'Yeni Satış'},{label:'Kasa'},{label:'Satış Listesi'},{label:'Bakiye Listesi'},{label:'Banka Özet'},{label:'Faturalar'},{label:'Gelirler'}]},
+  {key:'giderler', label:'GİDERLER', items:[{label:'Gider Kaydet'},{label:'Yeni Firma'},{label:'Firma Listesi'},{label:'Yeni Ödeme/Ürün Alımı'},{label:'Firma Ödemeleri'},{label:'Ödenecekler'},{label:'Onaylar'},{label:'Giderler'}]},
+  {key:'whatsapp', label:'WHATSAPP', items:[{label:'Whatsapp Yönetim Paneli'},{label:'Whatsapp Raporları'},{label:'Meta Yönetim Paneli'}]},
+  {key:'mail', label:'MAIL', items:[{label:'Toplu Mail'},{label:'İletişim Kalıpları'},{label:'E-posta İmzası'}]},
+  {key:'rapor', label:'RAPOR', items:[{label:'Tüm Raporlar'}]},
+  {key:'sistem', label:'SİSTEM', items:[{label:'Yetki'},{label:'Ayarlar'},{label:'Güvenlik Ayarları'},{label:'Personel'},{label:'Prim Ayarlamaları'},{label:'Entegrasyonlar'},{label:'Api Yönetimi'},{label:'Hizmet'},{label:'Paket'},{label:'Ürün'},{label:'Tanımlamalar'},{label:'Toplu Sms Gönderim Onayları'}]},
+  {key:'destek', label:'DESTEK', items:[{label:'Kayıtlarım'},{label:'Yeni Destek Kaydı'}]},
+];
+
+const ROUTES = {
+  'Göstergeler': 'Dashboard.dc.html',
+  'Yeni Lead': 'YeniLead.dc.html',
+  'Lead Listesi': 'LeadListesi.dc.html',
+  'Dinamik Arama': 'DinamikArama.dc.html',
+  'Dinamik Arama - Havuz': 'DinamikAramaHavuz.dc.html',
+  'Toplu Mail': '/toplu-mail',
+  'İletişim Kalıpları': '/iletisim',
+  'E-posta İmzası': '/iletisim/imza',
+  'Salesline': 'Salesline.dc.html',
+  'Yeni Kurum': 'YeniKurum.dc.html',
+  'Kurum Listesi': 'KurumListesi.dc.html',
+  'Son Yapılan İşlemler': 'SonYapilanIslemler.dc.html',
+  'Yeni Toplantı': 'YeniRandevu.dc.html',
+  'Takvim': 'RandevuTakvim.dc.html',
+  'Toplantı Listesi': 'RandevuListe.dc.html',
+  'Yeni Satış': 'YeniSatis.dc.html',
+  'Kasa': 'Kasa.dc.html',
+  'Satış Listesi': 'SatisListesi.dc.html',
+  'Bakiye Listesi': 'BakiyeListesi.dc.html',
+  'Banka Özet': 'BankaOzet.dc.html',
+  'Gelirler': 'GelirlerListe.dc.html',
+  'Gider Kaydet': 'GiderKaydet.dc.html',
+  'Giderler': 'Giderler.dc.html',
+  'Tüm Raporlar': 'Raporlar.dc.html',
+  'Yeni Teklif': 'YeniTeklif.dc.html',
+  'Teklifler': 'Teklifler.dc.html',
+  'Notlar & Görevler': 'NotlarGorevler.dc.html',
+  'Faturalar': 'Faturalar.dc.html',
+  'Yeni Firma': 'FirmaListesi.dc.html',
+  'Firma Listesi': 'FirmaListesi.dc.html',
+  'Whatsapp Yönetim Paneli': 'WhatsappPanel.dc.html',
+  'Yetki': 'Yetki.dc.html',
+  'Ayarlar': 'Ayarlar.dc.html',
+  'Personel': 'Personel.dc.html',
+  'Hizmet': 'Hizmet.dc.html',
+  'Paket': 'Paket.dc.html',
+  'Ürün': 'Urun.dc.html',
+  'Kayıtlarım': 'Destek.dc.html',
+  'Yeni Destek Kaydı': 'Destek.dc.html',
+  // ikincil sayfalar en yakın modüle yönlendirilir (ölü link olmaması için)
+  'Lead Dönüşüm Geçmişi': 'LeadListesi.dc.html',
+  'Lead Takibi': 'DinamikAramaHavuz.dc.html',
+  'CRM Ayarları': 'Ayarlar.dc.html',
+  'Şikayetler': 'Destek.dc.html',
+  'Etkinlikler': 'RandevuTakvim.dc.html',
+  'Kurulum Takvimi': 'RandevuTakvim.dc.html',
+  'Yeni Ödeme/Ürün Alımı': 'GiderKaydet.dc.html',
+  'Firma Ödemeleri': 'Giderler.dc.html',
+  'Ödenecekler': 'Giderler.dc.html',
+  'Onaylar': 'Giderler.dc.html',
+  'Whatsapp Raporları': 'WhatsappPanel.dc.html',
+  'Meta Yönetim Paneli': 'WhatsappPanel.dc.html',
+  'Güvenlik Ayarları': 'Ayarlar.dc.html',
+  'Prim Ayarlamaları': 'Ayarlar.dc.html',
+  'Entegrasyonlar': 'Ayarlar.dc.html',
+  'Api Yönetimi': 'Ayarlar.dc.html',
+  'Tanımlamalar': 'Hizmet.dc.html',
+  'Toplu Sms Gönderim Onayları': 'Destek.dc.html'
+};
+
+class Component extends DCLogic {
+  state = { openMenu: null, avatarOpen: false, bellOpen: false, user: null };
+
+  componentDidMount() {
+    const u = window.Nefalix && window.Nefalix.currentUser && window.Nefalix.currentUser();
+    if (u) this.setState({ user: u });
+  }
+
+  renderVals() {
+    const activePage = this.props.activePage || 'home';
+    const user = this.state.user;
+    const menus = MENU_DATA.map(m => {
+      const isOpen = this.state.openMenu === m.key;
+      const isActive = activePage === m.key;
+      return {
+        key: m.key,
+        label: m.label,
+        hasLabel: !!m.label,
+        showIcon: !!m.showIcon,
+        onEnter: () => this.setState({ openMenu: m.key, avatarOpen: false, bellOpen: false }),
+        tabStyle: {
+          display: 'flex', alignItems: 'center', gap: '5px', padding: '15px 12px', cursor: 'pointer',
+          color: '#fff', fontSize: '12px', fontWeight: 600, letterSpacing: '0.2px', whiteSpace: 'nowrap',
+          background: (isOpen || isActive) ? 'rgba(255,255,255,0.14)' : 'transparent',
+          borderBottom: isActive ? '3px solid #2dd4bf' : '3px solid transparent',
+          userSelect: 'none'
+        },
+        dropdownStyle: {
+          display: isOpen ? 'block' : 'none', position: 'absolute', top: '100%', left: 0, minWidth: '235px',
+          background: '#fff', borderRadius: '0 0 10px 10px', boxShadow: '0 18px 40px rgba(15,10,50,0.28)',
+          padding: '8px 0', zIndex: 300
+        },
+        items: m.items.map(it => ({ label: it.label, href: ROUTES[it.label] || '#' }))
+      };
+    });
+    return {
+      menus,
+      onLeave: () => this.setState({ openMenu: null }),
+      clinicName: this.props.clinicName || 'Nefalix',
+      userName: (user && user.name) || this.props.userName || 'Ahmet Yılmaz',
+      userInitials: (user && user.initials) || this.props.userInitials || 'AY',
+      userEmail: (user && user.email) || this.props.userEmail || 'ahmet.yilmaz@nefalix.com',
+      doLogout: () => { if (window.Nefalix) { window.Nefalix.logout(); window.Nefalix.nav('Login.dc.html'); } else { location.href = 'Login.dc.html'; } },
+      hasNotif: false,
+      toggleBell: () => this.setState(s => ({ bellOpen: !s.bellOpen, avatarOpen: false })),
+      toggleAvatar: () => this.setState(s => ({ avatarOpen: !s.avatarOpen, bellOpen: false })),
+      bellPanelStyle: {
+        display: this.state.bellOpen ? 'block' : 'none', position: 'absolute', top: '48px', right: 0, width: '300px',
+        background: '#fff', borderRadius: '12px', boxShadow: '0 18px 40px rgba(15,10,50,0.28)', zIndex: 300
+      },
+      avatarPanelStyle: {
+        display: this.state.avatarOpen ? 'block' : 'none', position: 'absolute', top: '48px', right: 0, width: '250px',
+        background: '#fff', borderRadius: '12px', boxShadow: '0 18px 40px rgba(15,10,50,0.28)', zIndex: 300
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

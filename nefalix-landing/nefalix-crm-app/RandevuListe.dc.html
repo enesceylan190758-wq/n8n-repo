@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="randevu" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8;">
+        <div style="font-size:17px; font-weight:700; color:#241854;">Randevu Listesi</div>
+        <div style="display:flex; gap:10px;">
+          <div class="nf-btn" onClick="{{ doExcel }}" style="background:#16a34a; border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+          <div class="nf-btn" onClick="{{ doPdf }}" style="background:#dc2626; border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+          <a href="RandevuTakvim.dc.html" class="nf-btn" style="background:#fff; border:1px solid #e6e2f5; border-radius:9px; padding:9px 16px; font-size:13px; font-weight:600; color:#4b4770;">📅 Takvim</a>
+          <a href="YeniRandevu.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:10px 16px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Randevu</a>
+        </div>
+      </div>
+      <div style="padding:16px 24px; display:flex; gap:12px; align-items:center; border-bottom:1px solid #f0eef8;">
+        <div style="display:flex; align-items:center; gap:8px; border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; flex:1;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b87a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input class="nf-input" placeholder="Randevu ara (ad, doktor, oda)..." onInput="{{ onQ }}" style="border:none; outline:none; font-size:13.5px; color:#241854; width:100%; background:transparent;" />
+        </div>
+        <select onChange="{{ onStatus }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; font-size:13px; color:#4b4770; background:#fff; cursor:pointer;">
+          <option value="">Tüm durumlar</option>
+          <sc-for list="{{ statusOpts }}" as="s" hint-placeholder-count="5"><option value="{{ s.key }}">{{ s.label }}</option></sc-for>
+        </select>
+      </div>
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:1fr 0.7fr 1.4fr 1.1fr 1.2fr 1fr 1fr; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+          <span>Tarih</span><span>Saat</span><span>Kurum</span><span>Tip</span><span>Doktor</span><span>Oda</span><span>Durum</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14">
+          <div class="nf-row" style="{{ r.style }}">
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.tarih }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.saat }}</span>
+            <a href="{{ r.href }}" style="font-weight:600; color:#241854; font-size:13px;">{{ r.ad }}</a>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.tip }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.doktor }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.oda }}</span>
+            <span style="{{ r.badge }}">{{ r.durum }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 24px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900}}">
+const MO = { '01': 0, '02': 1, '03': 2, '04': 3, '05': 4, '06': 5, '07': 6, '08': 7, '09': 8, '10': 9, '11': 10, '12': 11 };
+class Component extends DCLogic {
+  state = { ready: false, q: '', status: '' }; _q = '';
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const S = window.Nefalix ? window.Nefalix.RND_STATUS : [];
+    const statusOpts = S.map(s => ({ key: s.key, label: s.label }));
+    if (!this.state.ready) return { loading: true, ready: false, statusOpts };
+    const stColor = {}, stLabel = {}; S.forEach(s => { stColor[s.key] = s.color; stLabel[s.key] = s.label; });
+    let list = window.Nefalix.getRandevu();
+    if (this.state.status) list = list.filter(r => r.durum === this.state.status);
+    const q = this.state.q.toLowerCase().trim();
+    if (q) list = list.filter(r => (r.ad + ' ' + r.doktor + ' ' + r.oda).toLowerCase().includes(q));
+    list.sort((a, b) => {
+      const pa = a.tarih.split('.'), pb = b.tarih.split('.');
+      const da = pa[2] + pa[1] + pa[0] + a.saat, db = pb[2] + pb[1] + pb[0] + b.saat;
+      return da < db ? -1 : 1;
+    });
+    const rows = list.map((r, i) => ({
+      tarih: r.tarih, saat: r.saat, ad: r.ad, tip: r.tip, doktor: r.doktor, oda: r.oda,
+      durum: stLabel[r.durum] || r.durum,
+      href: 'KurumKarti.dc.html?id=' + encodeURIComponent(r.danisanId || ''),
+      badge: { fontSize: '11.5px', fontWeight: 600, padding: '4px 11px', borderRadius: '20px', justifySelf: 'start', color: stColor[r.durum] || '#666', background: (stColor[r.durum] || '#666') + '22' },
+      style: { display: 'grid', gridTemplateColumns: '1fr 0.7fr 1.4fr 1.1fr 1.2fr 1fr 1fr', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+    }));
+    return {
+      ready: true, loading: false, rows, statusOpts, countLabel: list.length + ' randevu gösteriliyor.',
+      onQ: (e) => { this._q = e.target.value; this.setState({ q: e.target.value }); },
+      onStatus: (e) => this.setState({ status: e.target.value }),
+      doExcel: () => this.exp('excel', list, stLabel), doPdf: () => this.exp('pdf', list, stLabel)
+    };
+  }
+  exp(kind, list, stLabel) {
+    const headers = ['Tarih', 'Saat', 'Danışan', 'Tip', 'Doktor', 'Oda', 'Durum'];
+    const rows = list.map(r => [r.tarih, r.saat, r.ad, r.tip, r.doktor, r.oda, stLabel[r.durum] || r.durum]);
+    if (kind === 'excel') window.Nefalix.exportExcel('randevu-listesi', headers, rows);
+    else window.Nefalix.exportPDF('Randevu Listesi', headers, rows);
+  }
+}
+</script>
+</body>
+</html>

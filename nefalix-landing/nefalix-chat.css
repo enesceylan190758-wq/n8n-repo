@@ -1,0 +1,15 @@
+:root {
+  --chat--color-primary: #0d9488;
+  --chat--color-primary-shade-50: #0f766e;
+  --chat--color-secondary: #0a1128;
+  --chat--toggle--background: #0d9488;
+  --chat--toggle--hover--background: #0f766e;
+  --chat--toggle--color: #ffffff;
+  --chat--window--width: 400px;
+  --chat--window--height: 600px;
+  --chat--border-radius: 16px;
+  --chat--message--bot--background: #f0fdfa;
+  --chat--message--bot--color: #1e293b;
+  --chat--message--user--background: #0d9488;
+  --chat--message--user--color: #ffffff;
+}

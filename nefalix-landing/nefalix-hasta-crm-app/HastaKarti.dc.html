@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-side:hover { background:#f4f2fb !important; }
+  .nf-actbtn:hover { background:#f4f2fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12); outline:none; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9;">
+  <dc-import name="NavHeader" active-page="danisan" hint-size="100%,132px"></dc-import>
+
+  <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:60px; text-align:center; color:#8b87a8; font-size:14px;">Danışan kartı yükleniyor...</div></sc-if>
+  <sc-if value="{{ notFound }}" hint-placeholder-val="{{ false }}"><div style="padding:60px; text-align:center; color:#8b87a8; font-size:14px;">Danışan bulunamadı. <a href="DanisanListesi.dc.html">Danışan listesine dön</a></div></sc-if>
+
+  <sc-if value="{{ found }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1780px; margin:0 auto; padding:20px 28px 50px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:22px 26px; display:flex; align-items:center; gap:20px; margin-bottom:20px;">
+      <div style="width:74px; height:74px; border-radius:50%; background:#eceafb; display:flex; align-items:center; justify-content:center; color:#a99fe0; flex-shrink:0;"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path></svg></div>
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:22px;">{{ flag }}</span><span style="font-size:22px; font-weight:800; color:#241854; text-transform:uppercase;">{{ ad }}</span></div>
+        <div style="margin-top:6px; color:#8b87a8; font-size:13.5px; display:flex; gap:18px; flex-wrap:wrap; align-items:center;">
+          <span>[ # {{ dosyaNo }} ]</span><span>📱 {{ tel }}</span>
+          <span style="{{ tipBadge }}">{{ tip }}</span>
+          <sc-if value="{{ hasBakiye }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px; font-weight:700; color:#dc2626; background:#fee2e2; padding:4px 12px; border-radius:20px;">Açık bakiye: {{ bakiyeLabel }}</span></sc-if>
+        </div>
+      </div>
+      <a href="{{ waHref }}" class="nf-btn" style="display:flex; align-items:center; gap:7px; background:#16a34a; border-radius:10px; padding:11px 18px; color:#fff; font-size:13px; font-weight:600;"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5.1-1.3A10 10 0 1012 2z"></path></svg>WhatsApp</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:230px 1fr; gap:20px; align-items:start;">
+      <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:8px;">
+        <sc-for list="{{ sideItems }}" as="s" hint-placeholder-count="20">
+          <div class="nf-side" onClick="{{ s.pick }}" style="{{ s.style }}"><span style="width:18px; text-align:center;">{{ s.icon }}</span>{{ s.label }}</div>
+        </sc-for>
+      </div>
+
+      <div>
+        <!-- DETAYLAR -->
+        <sc-if value="{{ isDetay }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:1fr 1.05fr 1.05fr; gap:20px; align-items:start;">
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
+              <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:16px;">✦ İşlemler</div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:16px;">
+                <div style="width:90px; height:90px; border-radius:50%; background:#eceafb; display:flex; align-items:center; justify-content:center; color:#a99fe0;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path></svg></div>
+                <span style="font-size:12px; font-weight:600; color:#7c3aed; background:#f1eefc; padding:4px 12px; border-radius:20px;">{{ tip }}</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="{{ waHref }}" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#16a34a;">💬 Whatsapp sohbeti başlat</a>
+                <a href="YeniTeklif.dc.html" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#4b4770;">📝 Yeni Teklif</a>
+                <a href="YeniRandevu.dc.html" class="nf-actbtn" style="border:1px solid #eee7fb; border-radius:9px; padding:10px; text-align:center; font-size:13px; color:#4b4770;">📅 Yeni Randevu</a>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:16px;">
+                <div onClick="{{ goRandevu }}" class="nf-actbtn" style="border:1px solid #f0eef8; border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer;"><div style="font-size:18px;">📅</div><div style="font-size:16px; font-weight:700; color:#241854;">{{ rndCount }}</div><div style="font-size:11px; color:#8b87a8;">Randevu</div></div>
+                <div onClick="{{ goSatis }}" class="nf-actbtn" style="border:1px solid #f0eef8; border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer;"><div style="font-size:18px;">💰</div><div style="font-size:16px; font-weight:700; color:#241854;">{{ satisCount }}</div><div style="font-size:11px; color:#8b87a8;">Satış</div></div>
+                <div onClick="{{ goTeklif }}" class="nf-actbtn" style="border:1px solid #f0eef8; border-radius:10px; padding:12px 8px; text-align:center; cursor:pointer;"><div style="font-size:18px;">📄</div><div style="font-size:16px; font-weight:700; color:#241854;">{{ teklifCount }}</div><div style="font-size:11px; color:#8b87a8;">Teklif</div></div>
+              </div>
+            </div>
+
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
+              <div style="text-align:center; background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; font-size:13px; font-weight:700; padding:9px; border-radius:9px; margin-bottom:14px;">👤 Kişisel Bilgi</div>
+              <sc-for list="{{ kisisel }}" as="f" hint-placeholder-count="4"><div style="display:flex; justify-content:space-between; gap:12px; padding:8px 2px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#8b87a8;">{{ f.label }}</span><span style="color:#241854; font-weight:600; text-align:right;">{{ f.value }}</span></div></sc-for>
+              <div style="text-align:center; background:linear-gradient(135deg,#2563eb,#22d3ee); color:#fff; font-size:13px; font-weight:700; padding:9px; border-radius:9px; margin:16px 0 14px;">📍 Adres Bilgileri</div>
+              <sc-for list="{{ adres }}" as="f" hint-placeholder-count="3"><div style="display:flex; justify-content:space-between; gap:12px; padding:8px 2px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#8b87a8;">{{ f.label }}</span><span style="color:#241854; font-weight:600; text-align:right;">{{ f.value }}</span></div></sc-for>
+              <div style="text-align:center; background:#241854; color:#fff; font-size:13px; font-weight:700; padding:9px; border-radius:9px; margin:16px 0 14px;">🗂 Diğer Bilgiler</div>
+              <sc-for list="{{ diger }}" as="f" hint-placeholder-count="6"><div style="display:flex; justify-content:space-between; gap:12px; padding:8px 2px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#8b87a8;">{{ f.label }}</span><span style="color:#241854; font-weight:600; text-align:right;">{{ f.value }}</span></div></sc-for>
+            </div>
+
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:20px;">
+              <div style="font-size:14px; font-weight:700; color:#241854; margin-bottom:14px;">💬 Notlar</div>
+              <textarea key="{{ noteKey }}" class="nf-f" placeholder="Notunuzu giriniz" onInput="{{ onNote }}" style="width:100%; box-sizing:border-box; min-height:70px; border:1px solid #d9d5ee; border-radius:9px; padding:11px; font-size:13px; color:#241854; resize:vertical; font-family:inherit;"></textarea>
+              <div style="margin-top:10px;"><label style="display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;">Segment (dinamik gün için)</label><select class="nf-f" value="{{ noteSegSel }}" onChange="{{ onNoteSeg }}" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13px; color:#241854; background:#fff;"><sc-for list="{{ segOpts }}" as="s" hint-placeholder-count="8"><option>{{ s.label }}</option></sc-for></select></div>
+              <div class="nf-btn" onClick="{{ saveNote }}" style="margin-top:10px; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:10px; text-align:center; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Notu Kaydet</div>
+              <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px; max-height:360px; overflow-y:auto;">
+                <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4"><div style="display:flex; gap:10px;"><span style="width:16px; height:16px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13px; color:#241854;">{{ n.text }}</div><div style="font-size:11px; color:#9c98b8; margin-top:3px;">🕒 {{ n.ts }} • 👤 {{ n.user }}<sc-if value="{{ n.hasSeg }}" hint-placeholder-val="{{ false }}"> • 🏷 {{ n.seg }}</sc-if></div></div></div></sc-for>
+                <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:#c5c1dc; text-align:center; padding:12px;">Henüz not girilmemiş.</div></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- DÜZENLE -->
+        <sc-if value="{{ isDuzenle }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; padding:13px 22px; font-size:14px; font-weight:700;">✎ Danışan Bilgilerini Düzenle</div>
+            <div style="padding:22px;">
+              <div style="font-size:13px; font-weight:700; color:#4338ca; margin-bottom:12px;">Kişisel Bilgi</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 20px;">
+                <div><label style="{{ lbl }}">Ad Soyad</label><input class="nf-f" data-k="Ad" value="{{ f_ad }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Telefon</label><input class="nf-f" data-k="Telefon" value="{{ f_tel }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">E-Posta</label><input class="nf-f" data-k="E-Posta" value="{{ f_email }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Cinsiyet</label><input class="nf-f" data-k="Cinsiyet" value="{{ f_cinsiyet }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Yaş</label><input class="nf-f" data-k="Yaş" value="{{ f_yas }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Segment</label><input class="nf-f" data-k="Segment" value="{{ f_segment }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+              </div>
+              <div style="font-size:13px; font-weight:700; color:#4338ca; margin:20px 0 12px;">Adres Bilgileri</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 20px;">
+                <div><label style="{{ lbl }}">Ülke</label><input class="nf-f" data-k="Ülke" value="{{ f_ulke }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Şehir</label><input class="nf-f" data-k="Şehir" value="{{ f_sehir }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Dil</label><input class="nf-f" data-k="Dil" value="{{ f_dil }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+              </div>
+              <div style="font-size:13px; font-weight:700; color:#4338ca; margin:20px 0 12px;">Diğer Bilgiler</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 20px;">
+                <div><label style="{{ lbl }}">Satış temsilcisi</label><input class="nf-f" data-k="Satış temsilcisi" value="{{ f_temsilci }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Referans kaynağı</label><input class="nf-f" data-k="Referans kaynağı" value="{{ f_referans }}" onInput="{{ onEdit }}" style="{{ inp }}" /></div>
+                <div><label style="{{ lbl }}">Danışan tipi</label><select class="nf-f" data-k="Danışan tipi" onChange="{{ onEdit }}" style="{{ inp }}"><option>Potansiyel Hasta</option><option>Aktif Hasta</option></select></div>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:22px;">
+                <div class="nf-btn" onClick="{{ goDetay }}" style="padding:12px 22px; border-radius:9px; border:1px solid #d9d5ee; font-size:13.5px; color:#4b4770; font-weight:600; cursor:pointer;">Vazgeç</div>
+                <div class="nf-btn" onClick="{{ saveEdit }}" style="background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:12px 28px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Kaydet</div>
+              </div>
+              <sc-if value="{{ editSaved }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px; background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:13px; border-radius:9px; padding:11px 14px;">✓ Değişiklikler kaydedildi.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- NOTLAR -->
+        <sc-if value="{{ isNotlar }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); padding:22px;">
+            <div style="font-size:15px; font-weight:700; color:#241854; margin-bottom:16px;">💬 Notlar</div>
+            <textarea key="{{ noteKey }}" class="nf-f" placeholder="Notunuzu giriniz" onInput="{{ onNote }}" style="width:100%; box-sizing:border-box; min-height:80px; border:1px solid #d9d5ee; border-radius:9px; padding:11px; font-size:13.5px; color:#241854; resize:vertical; font-family:inherit;"></textarea>
+            <div style="display:flex; gap:12px; align-items:flex-end; margin-top:12px; flex-wrap:wrap;"><div><label style="display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;">Segment (kaydederken güncelle)</label><select class="nf-f" value="{{ noteSegSel }}" onChange="{{ onNoteSeg }}" style="padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; background:#fff; min-width:230px; font-family:inherit;"><sc-for list="{{ segOpts }}" as="s" hint-placeholder-count="12"><option>{{ s.label }}</option></sc-for></select></div></div>
+            <div class="nf-btn" onClick="{{ saveNote }}" style="margin-top:10px; display:inline-block; background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:10px 24px; text-align:center; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Notu Kaydet</div>
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:14px;">
+              <sc-for list="{{ notes }}" as="n" hint-placeholder-count="5"><div style="display:flex; gap:12px; padding-bottom:14px; border-bottom:1px solid #f6f5fb;"><span style="width:18px; height:18px; border-radius:4px; background:{{ n.color }}; flex-shrink:0; margin-top:2px;"></span><div style="flex:1;"><div style="font-size:13.5px; color:#241854;">{{ n.text }}</div><div style="font-size:11.5px; color:#9c98b8; margin-top:4px;">🕒 {{ n.ts }} • 👤 {{ n.user }}<sc-if value="{{ n.hasSeg }}" hint-placeholder-val="{{ false }}"> • 🏷 {{ n.seg }}</sc-if></div></div></div></sc-for>
+              <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px; color:#c5c1dc; text-align:center; padding:20px;">Henüz not girilmemiş.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- TEKLİF -->
+        <sc-if value="{{ isTeklif }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0eef8;"><span style="font-size:15px; font-weight:700; color:#241854;">Teklifler</span><a href="YeniTeklif.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:9px 15px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Teklif</a></div>
+            <sc-if value="{{ hasTeklif }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Hizmet</span><span>Otel</span><span>Tarih</span><span style="text-align:right;">Tutar</span><span style="text-align:center;">Durum</span></div>
+              <sc-for list="{{ teklifler }}" as="t" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#241854; font-weight:600;">{{ t.hizmet }}</span><span style="color:#4b4770;">{{ t.otel }}</span><span style="color:#4b4770;">{{ t.tarih }}</span><span style="text-align:right; font-weight:700; color:#241854;">{{ t.tutar }}</span><span style="display:flex; justify-content:center;"><span style="{{ t.badge }}">{{ t.durum }}</span></span></div></sc-for>
+            </sc-if>
+            <sc-if value="{{ noTeklif }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">🔍 Kayıt bulunamadı. Eğer olduğunu düşünüyorsanız, arama kriterlerini gözden geçirip yeniden deneyin.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- RANDEVU -->
+        <sc-if value="{{ isRandevu }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0eef8;"><span style="font-size:15px; font-weight:700; color:#241854;">Randevular</span><a href="YeniRandevu.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:9px 15px; font-size:13px; font-weight:600; color:#fff;">＋ Yeni Randevu</a></div>
+            <sc-if value="{{ hasRnd }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1fr 0.7fr 1fr 1.1fr 1.3fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Tarih</span><span>Saat</span><span>Tip</span><span>Doktor</span><span style="text-align:center;">Durum</span></div>
+              <sc-for list="{{ randevular }}" as="r" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1fr 0.7fr 1fr 1.1fr 1.3fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#4b4770;">{{ r.tarih }}</span><span style="color:#4b4770;">{{ r.saat }}</span><span style="color:#241854; font-weight:600;">{{ r.tip }}</span><span style="color:#4b4770;">{{ r.doktor }}</span><span style="display:flex; justify-content:center;"><select value="{{ r.durumKey }}" onChange="{{ r.change }}" style="{{ r.badgeSelect }}"><sc-for list="{{ rndStatusOpts }}" as="s" hint-placeholder-count="5"><option value="{{ s.key }}">{{ s.label }}</option></sc-for></select></span></div></sc-for>
+            </sc-if>
+            <sc-if value="{{ noRnd }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">🔍 Kayıt bulunamadı. Eğer olduğunu düşünüyorsanız, arama kriterlerini gözden geçirip yeniden deneyin.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- SATIŞ & TAHSİLAT -->
+        <sc-if value="{{ isSatis }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+              <div style="background:linear-gradient(135deg,#0891b2,#22d3ee); border-radius:14px; padding:20px 24px; color:#fff;"><div style="font-size:13px; opacity:0.9;">🛒 Toplam Tahsilat</div><div style="font-size:24px; font-weight:800; margin-top:8px; text-align:right;">{{ tahsilatLabel }}</div></div>
+              <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:14px; padding:20px 24px; color:#fff;"><div style="font-size:13px; opacity:0.9;">💰 Toplam Satış</div><div style="font-size:24px; font-weight:800; margin-top:8px; text-align:right;">{{ satisTopLabel }}</div></div>
+            </div>
+            <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+              <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Satışlar & Tahsilat</div>
+              <sc-if value="{{ hasSatis }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid; grid-template-columns:1fr 1fr 1.4fr 1fr 1fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Ödeme tarihi</span><span>İşlem tipi</span><span>Bilgi</span><span>Yöntem</span><span style="text-align:right;">Tutar</span></div>
+                <sc-for list="{{ satislar }}" as="s" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1fr 1fr 1.4fr 1fr 1fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#4b4770;">{{ s.tarih }}</span><span><span style="font-size:11px; font-weight:600; color:#16a34a; background:#dcfce7; padding:3px 9px; border-radius:20px;">Para girişi</span></span><span style="color:#241854; font-weight:600;">{{ s.bilgi }}</span><span style="color:#4b4770;">{{ s.yontem }}</span><span style="text-align:right; font-weight:700; color:#16a34a;">{{ s.tutar }}</span></div></sc-for>
+              </sc-if>
+              <sc-if value="{{ noSatis }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">🔍 Kayıt bulunamadı. Eğer olduğunu düşünüyorsanız, arama kriterlerini gözden geçirip yeniden deneyin.</div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- FATURALAR -->
+        <sc-if value="{{ isFatura }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">Faturalar</div>
+            <sc-if value="{{ hasSatis }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1.1fr 1fr 1.4fr 1fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Fatura No</span><span>Tarih</span><span>Hizmet</span><span style="text-align:right;">Tutar</span></div>
+              <sc-for list="{{ faturalar }}" as="f" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1.1fr 1fr 1.4fr 1fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#4338ca; font-weight:600;">{{ f.no }}</span><span style="color:#4b4770;">{{ f.tarih }}</span><span style="color:#241854;">{{ f.hizmet }}</span><span style="text-align:right; font-weight:700; color:#241854;">{{ f.tutar }}</span></div></sc-for>
+            </sc-if>
+            <sc-if value="{{ noSatis }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">🔍 Kayıt bulunamadı. Eğer olduğunu düşünüyorsanız, arama kriterlerini gözden geçirip yeniden deneyin.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- TRANSFER & KONAKLAMA -->
+        <sc-if value="{{ isTransfer }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0eef8;">
+              <span style="font-size:15px; font-weight:700; color:#241854;">Transfer & Konaklama</span>
+              <a href="TransferTakvim.dc.html" class="nf-btn" style="background:#f4f2fb; border-radius:9px; padding:8px 12px; font-size:12px; font-weight:600; color:#4338ca;">Takvime git ›</a>
+            </div>
+            <sc-if value="{{ hasTransfer }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1.2fr 1.2fr 1.3fr 1fr 1fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;"><span>Hizmet</span><span>Otel</span><span>Transfer</span><span>Tarih</span><span style="text-align:center;">Durum</span></div>
+              <sc-for list="{{ transferRows }}" as="t" hint-placeholder-count="3"><div style="display:grid; grid-template-columns:1.2fr 1.2fr 1.3fr 1fr 1fr; align-items:center; padding:12px 22px; border-bottom:1px solid #f6f5fb; font-size:13px;"><span style="color:#241854; font-weight:600;">{{ t.hizmet }}</span><span style="color:#4b4770;">{{ t.otel }}</span><span style="color:#4b4770;">{{ t.transfer }}</span><span style="color:#4b4770;">{{ t.tarih }}</span><span style="display:flex; justify-content:center;"><span style="{{ t.badge }}">{{ t.durum }}</span></span></div></sc-for>
+            </sc-if>
+            <sc-if value="{{ noTransfer }}" hint-placeholder-val="{{ true }}"><div style="{{ emptyBox }}">Bu danışanda otel/transfer bilgisi olan teklif yok. Yeni teklifte Otel ve Transfer alanlarını doldurun.</div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- GENERİK BOŞ SEKME -->
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+            <div style="padding:16px 22px; font-size:15px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">{{ emptyTitle }}</div>
+            <div style="{{ emptyBox }}">🔍 Kayıt bulunamadı. Eğer olduğunu düşünüyorsanız, arama kriterlerini gözden geçirip yeniden deneyin.</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+const FLAGS = { 'Almanya': '🇩🇪', 'Türkiye': '🇹🇷', 'Avusturya': '🇦🇹', 'Hollanda': '🇳🇱', 'İsviçre': '🇨🇭', 'Fransa': '🇫🇷', 'Belçika': '🇧🇪', 'İngiltere': '🇬🇧' };
+const SIDE = [
+  { key: 'detaylar', label: 'Detaylar', icon: 'ⓘ' }, { key: 'duzenle', label: 'Düzenle', icon: '✎' },
+  { key: 'formlar', label: 'Formlar', icon: '📄' }, { key: 'teklif', label: 'Teklif', icon: '📝' },
+  { key: 'randevu', label: 'Randevu', icon: '📅' }, { key: 'notlar', label: 'Notlar', icon: '🗒' },
+  { key: 'islem', label: 'İşlem Kartları', icon: '📋' }, { key: 'dosya', label: 'Dosya & Fotoğraf', icon: '📁' },
+  { key: 'satis', label: 'Satış & Tahsilat', icon: '💳' }, { key: 'faturalar', label: 'Faturalar', icon: '🧾' },
+  { key: 'puan', label: 'Puan', icon: '★' }, { key: 'paket', label: 'Paket Takibi', icon: '📦' },
+  { key: 'iletisim', label: 'İletişim', icon: '💬' }, { key: 'tanilar', label: 'Tanılar', icon: '🩺' },
+  { key: 'transfer', label: 'Transfer & Konaklama', icon: '🚌' }, { key: 'recete', label: 'Reçete', icon: '℞' },
+  { key: 'tibbi', label: 'Tıbbi Raporlar', icon: '📑' }, { key: 'dis', label: 'Diş Tedavisi', icon: '🦷' },
+  { key: 'goz', label: 'Göz Muayeneleri', icon: '👁' }, { key: 'tahliller', label: 'Tahliller', icon: '🧪' },
+  { key: 'sikayet', label: 'Şikayet', icon: '⚠' }
+];
+const EMPTY_TITLES = { formlar: 'Formlar', islem: 'İşlem Kartları', dosya: 'Dosya & Fotoğraf', puan: 'Puan', paket: 'Paket Takibi', iletisim: 'İletişim', tanilar: 'Tanılar', recete: 'Reçete', tibbi: 'Tıbbi Raporlar', dis: 'Diş Tedavisi', goz: 'Göz Muayeneleri', tahliller: 'Tahliller', sikayet: 'Şikayet' };
+function pick(d, pairs) { const out = []; pairs.forEach(([label, key]) => { const v = d[key]; if (v) out.push({ label, value: v }); }); return out; }
+function money(v, k) { return Math.round(Math.abs(parseFloat(v) || 0)).toLocaleString('tr-TR') + ' ' + (k || 'TRY'); }
+class Component extends DCLogic {
+  state = { ready: false, notFound: false, tab: 'detaylar', ver: 0, noteKey: 0, editSaved: false, noteSeg: '' };
+  _note = ''; edit = {};
+  componentDidMount() {
+    const id = window.Nefalix.param('id');
+    window.Nefalix.ready().then(() => { const d = id ? window.Nefalix.getDanisanById(id) : null; this._id = id; this._d = d; this.setState({ ready: true, notFound: !d }); });
+  }
+  renderVals() {
+    if (!this.state.ready) return { loading: true, found: false, notFound: false };
+    if (this.state.notFound) return { loading: false, found: false, notFound: true };
+    const d = this._d, tab = this.state.tab;
+    const tip = d['Danışan tipi'] || 'Potansiyel Hasta';
+    const isAktif = tip === 'Aktif Hasta';
+    const H = window.Nefalix.patientHistory(this._id, d['Ad']);
+    const RS = window.Nefalix.RND_STATUS, TS = window.Nefalix.teklifStatusMeta();
+    const rlabel = {}, rcolor = {}; RS.forEach(s => { rlabel[s.key] = s.label; rcolor[s.key] = s.color; });
+    const tlabel = {}, tcolor = {}; TS.forEach(s => { tlabel[s.key] = s.label; tcolor[s.key] = s.color; });
+    const badge = (c) => ({ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', color: c, background: c + '22', whiteSpace: 'nowrap' });
+    const sideItems = SIDE.map(s => ({ label: s.label, icon: s.icon, pick: () => this.setState({ tab: s.key, editSaved: false }),
+      style: { display: 'flex', alignItems: 'center', gap: '9px', padding: '10px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontWeight: tab === s.key ? 700 : 500, color: tab === s.key ? '#4338ca' : '#4b4770', background: tab === s.key ? '#f1eefc' : 'transparent' } }));
+    const userNotes = window.Nefalix.getNotes(this._id).map(n => ({ text: n.text, user: n.user, ts: n.ts, color: '#22c55e', seg: n.segment || '', hasSeg: !!(n.segment || '').trim() }));
+    const seedNote = d['Son müşteri notu'] ? [{ text: d['Son müşteri notu'], user: d['Oluşturan'] || 'Sistem', ts: d['Değişiklik tarihi'] || d['Kayıt tarihi'] || '', color: '#f59e0b', seg: '', hasSeg: false }] : [];
+    const notes = userNotes.concat(seedNote);
+    const segOpts = (window.Nefalix.getSegments ? window.Nefalix.getSegments() : []).map(s => ({ label: s.label }));
+    if (!segOpts.length) {
+      ['Yeni Lead', 'YENİ DATA', 'Ulaşılamadı Tekrar Aranacak', '2 Gün Sonra Aranacak', 'Teklif Verildi', 'Randevu Verildi', 'Uzun Vadede Düşünecek'].forEach(l => segOpts.push({ label: l }));
+    }
+    const rndStatusOpts = RS.map(s => ({ key: s.key, label: s.label }));
+    const teklifler = H.teklifler.slice(0, 20).map(t => ({ hizmet: t.hizmet, otel: t.hotel || '—', tarih: t.tarih, tutar: money(t.tutar, t.kur), durum: tlabel[t.durum] || t.durum, badge: badge(tcolor[t.durum] || '#888') }));
+    const transferRows = H.teklifler.filter(t => (t.hotel || '').trim() || (t.transfer || '').trim()).slice(0, 20).map(t => ({
+      hizmet: t.hizmet || '—', otel: t.hotel || '—', transfer: t.transfer || '—', tarih: t.tarih || '—',
+      durum: tlabel[t.durum] || t.durum, badge: badge(tcolor[t.durum] || '#888')
+    }));
+    const randevular = H.randevular.slice(0, 20).map(r => {
+      const c = rcolor[r.durum] || '#888';
+      return {
+        tarih: r.tarih, saat: r.saat, tip: r.tip, doktor: r.doktor, durumKey: r.durum,
+        change: (e) => { Promise.resolve(window.Nefalix.setRandevuStatus(r._id, e.target.value)).then(() => this.setState(s => ({ ver: s.ver + 1 }))); },
+        badgeSelect: { border: 'none', borderRadius: '20px', padding: '5px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', color: '#fff', background: c, appearance: 'none', textAlign: 'center' }
+      };
+    });
+    const satislar = H.satislar.slice(0, 20).map(s => ({ tarih: s['Ödeme tarihi'] || '-', bilgi: s['Bilgi'] || 'Satış', yontem: s['Ödeme Yöntemi'] || '-', tutar: money(s['Tutar'], s['Kur']) }));
+    const faturalar = H.satislar.slice(0, 20).map((s, i) => ({ no: 'FTR-' + (2026000 + i), tarih: s['Ödeme tarihi'] || '-', hizmet: s['Bilgi'] || 'Tedavi', tutar: money(s['Tutar'], s['Kur']) }));
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; background:#fff;';
+    const emptyBox = 'margin:20px; background:#fffbeb; border:1px solid #fde68a; color:#92400e; font-size:13.5px; border-radius:10px; padding:18px 20px;';
+    return {
+      loading: false, found: true, notFound: false,
+      flag: FLAGS[d['Ülke']] || '🌍', ad: d['Ad'] || '(İsimsiz)', dosyaNo: d['Dosya no'] || d['Danışan ID'] || '-', tel: d['Telefon'] || '-', tip,
+      tipBadge: { fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '20px', color: isAktif ? '#16a34a' : '#7c3aed', background: isAktif ? '#dcfce7' : '#f1eefc' },
+      waHref: 'WhatsappPanel.dc.html', hasBakiye: H.bakiyeTop > 0, bakiyeLabel: money(H.bakiyeTop, H.bakiyeKur),
+      sideItems,
+      isDetay: tab === 'detaylar', isDuzenle: tab === 'duzenle', isNotlar: tab === 'notlar', isTeklif: tab === 'teklif', isRandevu: tab === 'randevu', isSatis: tab === 'satis', isFatura: tab === 'faturalar',
+      isTransfer: tab === 'transfer',
+      isEmpty: !!EMPTY_TITLES[tab] && ['formlar','islem','dosya','puan','paket','iletisim','tanilar','recete','tibbi','dis','goz','tahliller','sikayet'].includes(tab),
+      emptyTitle: EMPTY_TITLES[tab] || '', emptyBox,
+      kisisel: pick(d, [['E-Posta', 'E-Posta'], ['Telefon', 'Telefon'], ['Cinsiyet', 'Cinsiyet'], ['Yaş', 'Yaş'], ['Doğum tarihi', 'Doğum tarihi'], ['Kayıt tarihi', 'Kayıt tarihi']]),
+      adres: pick(d, [['Ülke', 'Ülke'], ['Şehir', 'Şehir'], ['İlçe', 'İlçe'], ['Dil', 'Dil']]),
+      diger: pick(d, [['Kayıt açan', 'Oluşturan'], ['Segment', 'Segment'], ['Referans kaynağı', 'Referans kaynağı'], ['Satış temsilcisi', 'Satış temsilcisi'], ['Kampanyası', 'Facebook Kampanyası'], ['Reklam seti', 'Facebook Reklam seti'], ['Reklamı', 'Facebook Reklamı'], ['Değişiklik tarihi', 'Değişiklik tarihi']]),
+      notes, noNotes: notes.length === 0, noteKey: this.state.noteKey, segOpts, rndStatusOpts,
+      rndCount: H.randevular.length, satisCount: H.satislar.length, teklifCount: H.teklifler.length,
+      teklifler, hasTeklif: teklifler.length > 0, noTeklif: teklifler.length === 0,
+      transferRows, hasTransfer: transferRows.length > 0, noTransfer: transferRows.length === 0,
+      randevular, hasRnd: randevular.length > 0, noRnd: randevular.length === 0,
+      satislar, hasSatis: satislar.length > 0, noSatis: satislar.length === 0,
+      faturalar, tahsilatLabel: money(H.satisTop, H.satisKur), satisTopLabel: money(H.satisTop, H.satisKur),
+      lbl, inp,
+      f_ad: d['Ad'] || '', f_tel: d['Telefon'] || '', f_email: d['E-Posta'] || '', f_cinsiyet: d['Cinsiyet'] || '', f_yas: d['Yaş'] || '', f_segment: d['Segment'] || '', f_ulke: d['Ülke'] || '', f_sehir: d['Şehir'] || '', f_dil: d['Dil'] || '', f_temsilci: d['Satış temsilcisi'] || '', f_referans: d['Referans kaynağı'] || '',
+      editSaved: this.state.editSaved,
+      noteSegSel: this.state.noteSeg || d['Segment'] || (segOpts[0] && segOpts[0].label) || 'Yeni Lead',
+      onNoteSeg: (e) => this.setState({ noteSeg: e.target.value }),
+      onNote: (e) => { this._note = e.target.value; },
+      saveNote: () => {
+        const t = (this._note || '').trim();
+        const seg = this.state.noteSeg || d['Segment'] || '';
+        const segChanged = seg && seg !== d['Segment'];
+        if (!t && !segChanged) return;
+        // Tek çağrı: not + segment → clinic-note-save gun_offset (dinamik)
+        window.Nefalix.addNote(this._id, t || ('Segment: ' + seg), seg || undefined);
+        this._d = window.Nefalix.getDanisanById(this._id) || this._d;
+        this._note = '';
+        this.setState(s => ({ ver: s.ver + 1, noteKey: s.noteKey + 1 }));
+      },
+      onEdit: (e) => { this.edit[e.target.getAttribute('data-k')] = e.target.value; },
+      saveEdit: () => { if (Object.keys(this.edit).length) { window.Nefalix.updateDanisan(this._id, this.edit); this._d = window.Nefalix.getDanisanById(this._id); this.edit = {}; } this.setState({ editSaved: true }); },
+      goDetay: () => this.setState({ tab: 'detaylar', editSaved: false }),
+      goRandevu: () => this.setState({ tab: 'randevu' }), goSatis: () => this.setState({ tab: 'satis' }), goTeklif: () => this.setState({ tab: 'teklif' })
+    };
+  }
+}
+</script>
+</body>
+</html>

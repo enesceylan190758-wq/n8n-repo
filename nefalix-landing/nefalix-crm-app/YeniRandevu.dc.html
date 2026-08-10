@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+  .nf-sug:hover { background:#f4f2fb !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9;">
+  <dc-import name="NavHeader" active-page="randevu" hint-size="100%,132px"></dc-import>
+  <div style="max-width:900px; margin:0 auto; padding:22px 28px 60px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <a href="RandevuTakvim.dc.html" style="width:34px; height:34px; border-radius:8px; background:#fff; border:1px solid #e6e2f5; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg></a>
+      <span style="font-size:18px; font-weight:700; color:#241854;">Yeni Randevu</span>
+    </div>
+    <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><div style="background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:13.5px; border-radius:10px; padding:13px 16px; margin-bottom:16px;">✓ Randevu oluşturuldu. <a href="RandevuTakvim.dc.html" style="color:#15803d; font-weight:700;">Takvime dön →</a></div></sc-if>
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#7c3aed,#4338ca); color:#fff; padding:13px 22px; font-size:14px; font-weight:700;">📅 Randevu Bilgileri</div>
+      <div style="padding:22px;">
+        <label style="{{ lbl }}">Danışan *</label>
+        <div style="position:relative; margin-bottom:16px;">
+          <input class="nf-f" value="{{ danisanText }}" placeholder="Kurum ara..." onInput="{{ onSearch }}" style="{{ inp }}" />
+          <sc-if value="{{ showSug }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; top:46px; left:0; right:0; background:#fff; border:1px solid #e6e2f5; border-radius:9px; box-shadow:0 12px 30px rgba(15,10,50,0.15); z-index:30; max-height:240px; overflow-y:auto;">
+              <sc-for list="{{ sug }}" as="s" hint-placeholder-count="5"><div class="nf-sug" onClick="{{ s.pick }}" style="padding:10px 14px; font-size:13px; color:#241854; cursor:pointer; border-bottom:1px solid #f6f5fb;">{{ s.ad }} <span style="color:#8b87a8;">· {{ s.tel }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 20px;">
+          <div><label style="{{ lbl }}">Tarih *</label><input class="nf-f" type="date" data-k="tarihISO" onChange="{{ onIn }}" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Saat *</label><input class="nf-f" type="time" data-k="saat" onChange="{{ onIn }}" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Randevu Tipi</label><select class="nf-f" data-k="tip" onChange="{{ onIn }}" style="{{ inp }}"><sc-for list="{{ types }}" as="t" hint-placeholder-count="4"><option>{{ t }}</option></sc-for></select></div>
+          <div><label style="{{ lbl }}">Kim gidecek? *</label><select class="nf-f" data-k="doktor" onChange="{{ onIn }}" style="{{ inp }}"><option>Enes Ceylan</option><option>Abdülkadir Yaşar</option><option>Enes Ceylan + Abdülkadir Yaşar</option></select></div>
+          <div><label style="{{ lbl }}">Oda / Yer</label><select class="nf-f" data-k="oda" onChange="{{ onIn }}" style="{{ inp }}"><option>Saha ziyareti</option><option>Online demo</option><option>Ofis</option></select></div>
+          <div><label style="{{ lbl }}">Durum</label><select class="nf-f" data-k="durum" onChange="{{ onIn }}" style="{{ inp }}"><sc-for list="{{ statusOpts }}" as="s" hint-placeholder-count="5"><option value="{{ s.key }}">{{ s.label }}</option></sc-for></select></div>
+        </div>
+        <div style="margin-top:16px;"><label style="{{ lbl }}">Notlar (Kader notu — mailde gider)</label><textarea class="nf-f" data-k="notlar" onInput="{{ onIn }}" style="{{ inp }} min-height:70px; resize:vertical; font-family:inherit;"></textarea></div>
+        <div style="margin-top:14px; padding:12px 14px; background:#f8f7fc; border-radius:10px; font-size:13px; color:#4b4770;">
+          <b>Müsaitlik:</b> {{ musaitText }}
+        </div>
+      </div>
+      <div style="padding:0 22px 22px; display:flex; justify-content:flex-end; gap:12px;">
+        <a href="RandevuTakvim.dc.html" style="padding:12px 22px; border-radius:9px; border:1px solid #d9d5ee; font-size:13.5px; color:#4b4770; font-weight:600;">Vazgeç</a>
+        <div class="nf-btn" onClick="{{ save }}" style="background:linear-gradient(135deg,#7c3aed,#2563eb); border-radius:9px; padding:12px 28px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Randevu Kaydet</div>
+      </div>
+    </div>
+    <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; font-size:13px; border-radius:9px; padding:11px 14px;">{{ err }}</div></sc-if>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:760}}">
+class Component extends DCLogic {
+  state = { ready: false, saved: false, err: '', danisanText: '', q: '', showSug: false };
+  form = { tip: 'Demo', doktor: 'Enes Ceylan', oda: 'Saha ziyareti', durum: 'bekliyor' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; outline:none; background:#fff; transition:box-shadow .15s,border-color .15s;';
+    const S = window.Nefalix ? window.Nefalix.RND_STATUS : [];
+    let sug = [];
+    if (this.state.ready && this.state.q.length >= 2) sug = window.Nefalix.getDanisan({ q: this.state.q, size: 6 }).rows.map(d => ({ ad: d['Ad'] || '(İsimsiz)', tel: d['Telefon'] || '', pick: () => { this.form.danisanId = d._id; this.form.ad = d['Ad']; this.form.tel = d['Telefon']; this.form.adres = d['Adres'] || d['adres'] || ''; this.setState({ danisanText: d['Ad'] || '', showSug: false }); } }));
+    let musaitText = 'Tarih ve saat seçince Enes / Abdülkadir müsaitliği görünür.';
+    if (this.state.ready && this.form.tarihISO && this.form.saat && window.Nefalix.slotMusait) {
+      const st = window.Nefalix.slotMusait(this.form.tarihISO, this.form.saat);
+      musaitText = st.musait.length ? ('Müsait: ' + st.musait.join(', ')) : 'Bu saatte kimse müsait değil (meşgul işaretlenmiş).';
+    }
+    return {
+      lbl, inp, saved: this.state.saved, err: this.state.err, musaitText,
+      danisanText: this.state.danisanText, showSug: this.state.showSug && sug.length > 0, sug,
+      types: ['Demo', 'Saha ziyareti', 'Online toplantı', 'Teklif sunumu'],
+      statusOpts: S.map(s => ({ key: s.key, label: s.label })),
+      onSearch: (e) => this.setState({ danisanText: e.target.value, q: e.target.value, showSug: true }),
+      onIn: (e) => {
+        const k = e.target.getAttribute('data-k');
+        if (k === 'tarihISO') {
+          const v = e.target.value; this.form.tarihISO = v;
+          if (v) { const p = v.split('-'); this.form.tarih = p[2] + '.' + p[1] + '.' + p[0]; }
+          this.setState({});
+        } else {
+          this.form[k] = e.target.value;
+          if (k === 'saat') this.setState({});
+        }
+      },
+      save: () => {
+        if (!this.form.danisanId) { this.setState({ err: 'Kurum seçiniz.' }); return; }
+        if (!this.form.tarih || !this.form.saat) { this.setState({ err: 'Tarih ve saat zorunludur.' }); return; }
+        if (window.Nefalix.slotMusait && this.form.tarihISO) {
+          const st = window.Nefalix.slotMusait(this.form.tarihISO, this.form.saat);
+          const doc = String(this.form.doktor || '');
+          const needEnes = /enes/i.test(doc);
+          const needAk = /abdül|abdul/i.test(doc);
+          const okEnes = st.musait.some(n => /enes/i.test(n));
+          const okAk = st.musait.some(n => /abdül|abdul/i.test(n));
+          if ((needEnes && !okEnes) || (needAk && !okAk)) {
+            this.setState({ err: 'Seçilen kişi bu saatte müsait değil. Takvimden meşguliyeti kontrol edin.' });
+            return;
+          }
+        }
+        window.Nefalix.addRandevu(this.form);
+        this.setState({ saved: true, err: '' }); window.scrollTo(0, 0);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

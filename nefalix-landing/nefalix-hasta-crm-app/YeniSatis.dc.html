@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-f:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+  .nf-sug:hover { background:#f4f2fb !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9;">
+  <dc-import name="NavHeader" active-page="gelirler" hint-size="100%,132px"></dc-import>
+  <div style="max-width:900px; margin:0 auto; padding:22px 28px 60px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <a href="Kasa.dc.html" style="width:34px; height:34px; border-radius:8px; background:#fff; border:1px solid #e6e2f5; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg></a>
+      <span style="font-size:18px; font-weight:700; color:#241854;">Yeni Satış</span>
+    </div>
+    <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><div style="background:#dcfce7; border:1px solid #86efac; color:#15803d; font-size:13.5px; border-radius:10px; padding:13px 16px; margin-bottom:16px;">✓ Satış kaydedildi ve kasaya işlendi. <a href="Kasa.dc.html" style="color:#15803d; font-weight:700;">Kasaya git →</a></div></sc-if>
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; padding:13px 22px; font-size:14px; font-weight:700;">🛒 Satış Bilgileri</div>
+      <div style="padding:22px;">
+        <label style="{{ lbl }}">Danışan *</label>
+        <div style="position:relative; margin-bottom:16px;">
+          <input class="nf-f" value="{{ danisanText }}" placeholder="Danışan ara..." onInput="{{ onSearch }}" style="{{ inp }}" />
+          <sc-if value="{{ showSug }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; top:46px; left:0; right:0; background:#fff; border:1px solid #e6e2f5; border-radius:9px; box-shadow:0 12px 30px rgba(15,10,50,0.15); z-index:30; max-height:240px; overflow-y:auto;">
+              <sc-for list="{{ sug }}" as="s" hint-placeholder-count="5"><div class="nf-sug" onClick="{{ s.pick }}" style="padding:10px 14px; font-size:13px; color:#241854; cursor:pointer; border-bottom:1px solid #f6f5fb;">{{ s.ad }} <span style="color:#8b87a8;">· {{ s.tel }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 20px;">
+          <div><label style="{{ lbl }}">Hizmet / Paket (Bilgi)</label><select class="nf-f" data-k="Bilgi" onChange="{{ onIn }}" style="{{ inp }}"><option value="">Seçiniz</option><option>İmplant Tedavisi</option><option>Zirkonyum Kaplama</option><option>Gülüş Tasarımı</option><option>Diş Beyazlatma</option><option>Ortodonti</option><option>Kanal Tedavisi</option><option>Dolgu</option><option>Detertraj</option><option>Satış</option></select></div>
+          <div><label style="{{ lbl }}">Tutar *</label><div style="display:flex; gap:8px;"><input class="nf-f" data-k="Tutar" onInput="{{ onIn }}" placeholder="0,00" style="{{ inp }} flex:1;" /><select class="nf-f" data-k="Kur" onChange="{{ onIn }}" style="{{ inp }} width:90px;"><option>EUR</option><option>TRY</option><option>USD</option></select></div></div>
+          <div><label style="{{ lbl }}">Ödeme Yöntemi</label><select class="nf-f" data-k="Ödeme Yöntemi" onChange="{{ onIn }}" style="{{ inp }}"><option>Nakit</option><option>Banka Hesabı</option><option>Kredi Kartı</option><option>Çek</option></select></div>
+          <div><label style="{{ lbl }}">İşlem tipi</label><select class="nf-f" data-k="İşlem tipi" onChange="{{ onIn }}" style="{{ inp }}"><option>Para girişi</option><option>Para çıkışı</option></select></div>
+          <div><label style="{{ lbl }}">Ödeme tarihi</label><input class="nf-f" type="date" data-k="tarihISO" onChange="{{ onIn }}" style="{{ inp }}" /></div>
+          <div><label style="{{ lbl }}">Referans kodu</label><input class="nf-f" data-k="Referans kodu" onInput="{{ onIn }}" placeholder="Boşsa otomatik" style="{{ inp }}" /></div>
+        </div>
+        <div style="margin-top:16px;"><label style="{{ lbl }}">Not / ek bilgi</label><textarea class="nf-f" data-k="Not" onInput="{{ onIn }}" style="{{ inp }} min-height:70px; resize:vertical; font-family:inherit;"></textarea></div>
+      </div>
+      <div style="padding:0 22px 22px; display:flex; justify-content:flex-end; gap:12px;">
+        <a href="Kasa.dc.html" style="padding:12px 22px; border-radius:9px; border:1px solid #d9d5ee; font-size:13.5px; color:#4b4770; font-weight:600;">Vazgeç</a>
+        <div class="nf-btn" onClick="{{ save }}" style="background:linear-gradient(135deg,#16a34a,#22c55e); border-radius:9px; padding:12px 28px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer;">Satışı Kaydet</div>
+      </div>
+    </div>
+    <sc-if value="{{ err }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; font-size:13px; border-radius:9px; padding:11px 14px;">{{ err }}</div></sc-if>
+  </div>
+</div>
+
+
+<template id="__bundler_thumbnail" data-bg-color="#16a34a">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#16a34a"></rect>
+    <circle cx="600" cy="330" r="120" fill="none" stroke="#fff" stroke-width="22"></circle>
+    <path d="M545 330 l40 42 78 -92" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"></path>
+    <text x="600" y="560" font-family="Segoe UI, sans-serif" font-size="70" font-weight="700" fill="#fff" text-anchor="middle">Yeni Satış</text>
+    <text x="600" y="630" font-family="Segoe UI, sans-serif" font-size="40" fill="#d1fae5" text-anchor="middle">Nefalix</text>
+  </svg>
+</template>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:720}}">
+class Component extends DCLogic {
+  state = { ready: false, saved: false, err: '', danisanText: '', q: '', showSug: false };
+  form = { 'İşlem tipi': 'Para girişi', 'Kur': 'EUR', 'Ödeme Yöntemi': 'Nakit', 'Bilgi': 'Satış' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    const lbl = 'display:block; font-size:12px; font-weight:600; color:#4b4770; margin-bottom:6px;';
+    const inp = 'width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d9d5ee; border-radius:9px; font-size:13.5px; color:#241854; outline:none; background:#fff; transition:box-shadow .15s,border-color .15s;';
+    let sug = [];
+    if (this.state.ready && this.state.q.length >= 2) sug = window.Nefalix.getDanisan({ q: this.state.q, size: 6 }).rows.map(d => ({ ad: d['Ad'] || '(İsimsiz)', tel: d['Telefon'] || '', pick: () => { this.form['Danışan / Firma'] = d['Ad']; this.form.danisanId = d._id; this._did = d._id; this.setState({ danisanText: d['Ad'] || '', showSug: false }); } }));
+    return {
+      lbl, inp, saved: this.state.saved, err: this.state.err,
+      danisanText: this.state.danisanText, showSug: this.state.showSug && sug.length > 0, sug,
+      onSearch: (e) => this.setState({ danisanText: e.target.value, q: e.target.value, showSug: true }),
+      onIn: (e) => {
+        const k = e.target.getAttribute('data-k');
+        if (k === 'tarihISO') {
+          const v = e.target.value;
+          if (v) {
+            const p = v.split('-');
+            this.form['Ödeme tarihi'] = p[2] + '.' + p[1] + '.' + p[0];
+            this.form.payment_date = v;
+          }
+        } else this.form[k] = e.target.value;
+      },
+      save: () => {
+        let t = parseFloat(String(this.form['Tutar']).replace(',', '.'));
+        if (!this.form['Danışan / Firma']) { this.setState({ err: 'Danışan seçiniz.' }); return; }
+        if (!t || t <= 0) { this.setState({ err: 'Geçerli bir tutar giriniz.' }); return; }
+        if ((this.form['İşlem tipi'] || '') === 'Para çıkışı') t = -Math.abs(t);
+        else t = Math.abs(t);
+        const ref = (this.form['Referans kodu'] || '').trim() || ('STS-' + Math.floor(10000 + Math.random() * 89999));
+        const bil = this.form['Bilgi'] || 'Satış';
+        const desc = this.form['Not'] ? (bil + ' — ' + this.form['Not']) : bil;
+        window.Nefalix.addKasa(Object.assign({}, this.form, {
+          'Tutar': t,
+          'Referans kodu': ref,
+          'Bilgi': desc,
+          danisanId: this.form.danisanId || this._did,
+          payment_date: this.form.payment_date
+        }));
+        if (this._did && t > 0) window.Nefalix.updateDanisan(this._did, { 'Danışan tipi': 'Aktif Hasta' });
+        this.setState({ saved: true, err: '' }); window.scrollTo(0, 0);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

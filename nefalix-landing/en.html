@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- nefalix-seo-start -->
+<meta name="description" content="Nefalix: patient engagement and growth automation for clinics — WhatsApp, NPS, Google reviews, HBYS integration.">
+<link rel="canonical" href="https://nefalix.com/en">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nefalix">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="Nefalix — Patient Engagement for Clinics">
+<meta property="og:description" content="Nefalix: patient engagement and growth automation for clinics — WhatsApp, NPS, Google reviews, HBYS integration.">
+<meta property="og:url" content="https://nefalix.com/en">
+<meta property="og:image" content="https://nefalix.com/assets/brand/nefalix-logo-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nefalix — Patient Engagement for Clinics">
+<meta name="twitter:description" content="Nefalix: patient engagement and growth automation for clinics — WhatsApp, NPS, Google reviews, HBYS integration.">
+<meta name="twitter:image" content="https://nefalix.com/assets/brand/nefalix-logo-512.png">
+<!-- nefalix-seo-end -->
+    <title>Nefalix AI | Patient Engagement & Growth Platform for Clinics</title>
+    <link rel="icon" href="/assets/brand/favicon-192.png" type="image/png" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            navy: '#0A1128',      /* Premium Navy for clean contrast */
+                            lightBg: '#F8FAFC',   /* ultra clean background */
+                            teal: '#0D9488',      /* Ocean Teal for accents */
+                            tealLight: '#F0FDFA',  /* Very soft teal tint for card backgrounds */
+                            charcoal: '#1E293B',  /* Sharp typography gray */
+                            gold: '#C5A880'       /* Luxury gold accent from the logo details */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Plus Jakarta Sans for UI, Cinzel for Luxury Accents -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FFFFFF;
+            color: #1E293B;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #0A1128 0%, #0D9488 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F8FAFC;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C5A880;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0D9488;
+        }
+    </style>
+
+    <!-- Cal element-click embed code begins -->
+    <script type="text/javascript">
+      (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+      Cal("init", "15min", {origin:"https://app.cal.com"});
+      Cal.config = Cal.config || {};
+      Cal.config.forwardQueryParams = true;
+      Cal.ns["15min"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+    </script>
+    <!-- Cal element-click embed code ends -->
+</head>
+<body class="overflow-x-hidden selection:bg-brand-teal selection:text-white">
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="bg-brand-navy py-2 text-center text-xs text-brand-gold font-semibold tracking-wider px-4">
+        <span class="inline-flex items-all justify-center gap-2">
+            <i class="fa-solid fa-sparkles animate-pulse"></i>
+            WhatsApp-First Engagement Platform for Clinics & Healthcare Centers
+        </span>
+    </div>
+
+    <!-- NAVIGATION -->
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-100 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 sm:h-28 flex items-center justify-between">
+            
+            <!-- Logo Area (Direct Image Placement of /assets/brand/nefalix-logo.png - Unmodified) -->
+            <a href="/en" class="flex items-center group">
+                <img src="/assets/brand/nefalix-logo.png" alt="Nefalix AI" class="h-16 sm:h-20 w-16 sm:w-20 rounded-full object-cover shadow-lg transition-transform duration-300 group-hover:scale-[1.02]">
+            </a>
+
+            <!-- Desktop Nav Menu -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#solutions" class="text-sm font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">Modules</a>
+                <a href="#solutions" class="text-sm font-semibold text-brand-charcoal hover:text-brand-teal transition-colors font-medium">What We Do</a>
+                <a href="#why-tr" class="text-sm font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">Our Edge</a>
+                <a href="#pricing" class="text-sm font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">Pricing</a>
+                <a href="#faq" class="text-sm font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">FAQ</a>
+            </nav>
+            <!-- Language Switcher -->
+            <div class="hidden md:flex items-center">
+            <div class="flex items-center gap-1 text-[11px] font-bold border border-slate-200 rounded-full p-0.5 bg-slate-50 shrink-0">
+                <a href="/" class="lang-link px-2.5 py-1 rounded-full transition-colors text-slate-600 hover:text-brand-teal">TR</a>
+                <a href="/en" class="lang-link px-2.5 py-1 rounded-full transition-colors bg-brand-teal text-white">EN</a>
+                <a href="/ar" class="lang-link px-2.5 py-1 rounded-full transition-colors text-slate-600 hover:text-brand-teal">AR</a>
+            </div>
+            </div>
+
+            <!-- Action Button Linked to Cal.com -->
+            <div class="hidden sm:flex items-center gap-4">
+                <button 
+                    data-cal-link="enes-ceylan/15min" 
+                    data-cal-namespace="15min" 
+                    data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                    class="bg-brand-teal hover:bg-brand-navy text-white font-bold px-6 py-3 rounded-full text-sm shadow-md hover:shadow-lg transition-all duration-200 active:scale-95">
+                    Book Free Demo
+                </button>
+            </div>
+
+            <!-- Mobile Hamburger Menu Button -->
+            <button onclick="toggleMobileMenu()" class="md:hidden text-brand-charcoal hover:text-brand-teal focus:outline-none">
+                <i class="fa-solid fa-bars text-2xl" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-100 px-4 py-6 space-y-4 shadow-inner">
+            <a href="#solutions" onclick="toggleMobileMenu()" class="block text-md font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">Modules</a>
+            <a href="#solutions" onclick="toggleMobileMenu()" class="block text-md font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">What We Do</a>
+            <a href="#why-tr" onclick="toggleMobileMenu()" class="block text-md font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">Our Edge</a>
+            <a href="#how-it-works" onclick="toggleMobileMenu()" class="block text-md font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">How It Works</a>
+            <a href="#pricing" onclick="toggleMobileMenu()" class="block text-md font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">Pricing</a>
+            <a href="#faq" onclick="toggleMobileMenu()" class="block text-md font-semibold text-brand-charcoal hover:text-brand-teal transition-colors">FAQ</a>
+            <div class="flex justify-center pb-2">
+            <div class="flex items-center gap-1 text-[11px] font-bold border border-slate-200 rounded-full p-0.5 bg-slate-50 shrink-0">
+                <a href="/" class="lang-link px-2.5 py-1 rounded-full transition-colors text-slate-600 hover:text-brand-teal">TR</a>
+                <a href="/en" class="lang-link px-2.5 py-1 rounded-full transition-colors bg-brand-teal text-white">EN</a>
+                <a href="/ar" class="lang-link px-2.5 py-1 rounded-full transition-colors text-slate-600 hover:text-brand-teal">AR</a>
+            </div>
+            </div>
+            <div class="pt-4 border-t border-slate-100 flex flex-col gap-3">
+                <button 
+                    data-cal-link="enes-ceylan/15min" 
+                    data-cal-namespace="15min" 
+                    data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                    class="w-full bg-brand-teal hover:bg-brand-navy text-white font-bold py-3 rounded-full text-sm text-center transition-all">
+                    Book Free Demo
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-16 pb-24 md:py-32 bg-gradient-to-b from-brand-lightBg to-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Hero Text -->
+                <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 bg-brand-tealLight border border-brand-teal/20 px-4 py-2 rounded-full text-xs text-brand-teal font-bold uppercase tracking-widest mx-auto lg:mx-0">
+                        <i class="fa-solid fa-stethoscope"></i> WHATSAPP-FIRST · REPUTATION & PATIENT EXPERIENCE
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-brand-navy">
+                        Automate Clinic <br>
+                        <span class="text-gradient">
+                            Growth.
+                        </span>
+                    </h1>
+
+                    <p class="text-slate-600 text-lg sm:text-xl max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
+                        When appointments end, <strong class="text-brand-navy font-semibold">automated WhatsApp review invites</strong> triggered from your EMR/clinic software, NPS surveys, and AI-powered review replies grow your reputation. <strong class="text-brand-navy font-semibold">Nefalix AI</strong> is built for Turkey with KVKK, IYS, and EMR compliance.
+                    </p>
+
+                    <!-- CTAs with Cal.com -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center pt-2">
+                        <button 
+                            data-cal-link="enes-ceylan/15min" 
+                            data-cal-namespace="15min" 
+                            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                            class="w-full sm:w-auto bg-brand-teal hover:bg-brand-navy text-white font-extrabold px-8 py-4 rounded-full text-md shadow-lg hover:shadow-xl transition-all duration-200">
+                            Book Free Demo <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                        </button>
+                        <a href="#solutions" class="w-full sm:w-auto text-center border border-slate-200 hover:border-brand-teal text-slate-700 hover:text-brand-teal px-8 py-4 rounded-full text-md font-bold transition-all duration-200">
+                            How It Works
+                        </a>
+                    </div>
+
+                    <!-- Micro stats -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-slate-100 text-center lg:text-left">
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-extrabold text-brand-teal tracking-tight">%450</span>
+                            <span class="text-xs text-slate-500">Google Review Growth</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-extrabold text-brand-teal tracking-tight">%98</span>
+                            <span class="text-xs text-slate-500">Patient Satisfaction</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-extrabold text-brand-teal tracking-tight">3 kat</span>
+                            <span class="text-xs text-slate-500">More Local Bookings</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Hero: Clean Webchat & Interaction Mockup -->
+                <div class="lg:col-span-5 relative w-full max-w-md mx-auto">
+                    <!-- Blur decoration -->
+                    <div class="absolute inset-0 bg-brand-teal/5 rounded-3xl blur-3xl -z-10"></div>
+                    
+                    <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-2xl flex flex-col h-[520px]">
+                        <!-- Interface Header -->
+                        <div class="bg-brand-navy px-4 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                                    <i class="fa-solid fa-comments text-white text-xs"></i>
+                                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-brand-navy"></span>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-white leading-tight">Nefalix AI Live Chat</p>
+                                    <p class="text-[9px] text-emerald-400 font-medium">Online & Ready</p>
+                                </div>
+                            </div>
+                            <span class="bg-brand-teal text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Auto Capture</span>
+                        </div>
+
+                        <!-- Chat message log -->
+                        <div id="sim-chat-log" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs flex flex-col justify-end bg-slate-50">
+                            <div class="bg-white text-slate-700 p-3.5 rounded-2xl rounded-tl-none border border-slate-100 max-w-[85%] self-start shadow-sm">
+                                <p class="font-bold text-brand-teal mb-1">Nefalix AI ✨</p>
+                                Hello! Welcome to our clinic. Would you like information about implants, smile design, or other treatments? I can also list the best appointment slots for you.
+                            </div>
+                        </div>
+
+                        <!-- Interactive chat scenario buttons -->
+                        <div class="p-3.5 bg-white border-t border-slate-100">
+                            <p class="text-[10px] text-slate-400 font-bold mb-2.5 uppercase tracking-wider text-center">Test the live chat scenario:</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="triggerSimScenario('impland')" id="btn-impland" class="bg-slate-50 hover:bg-brand-teal hover:text-white border border-slate-200 hover:border-brand-teal text-[11px] font-semibold text-slate-700 py-2.5 px-3 rounded-xl transition-all duration-200 text-left">
+                                    🦷 Treatment & pricing?
+                                </button>
+                                <button onclick="triggerSimScenario('tourism')" id="btn-tourism" class="bg-slate-50 hover:bg-brand-teal hover:text-white border border-slate-200 hover:border-brand-teal text-[11px] font-semibold text-slate-700 py-2.5 px-3 rounded-xl transition-all duration-200 text-left">
+                                    📅 Book an appointment
+                                </button>
+                                <button onclick="triggerSimScenario('kvkk')" id="btn-kvkk" class="bg-slate-50 hover:bg-brand-teal hover:text-white border border-slate-200 hover:border-brand-teal text-[11px] font-semibold text-slate-700 py-2.5 px-3 rounded-xl transition-all duration-200 text-left">
+                                    🛡️ Data security & compliance?
+                                </button>
+                                <button onclick="triggerSimScenario('book')" id="btn-book" class="bg-slate-50 hover:bg-brand-teal hover:text-white border border-slate-200 hover:border-brand-teal text-[11px] font-semibold text-slate-700 py-2.5 px-3 rounded-xl transition-all duration-200 text-left">
+                                    📍 Clinic location?
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PLATFORM CAPABILITIES -->
+    <section id="solutions" class="py-24 bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-4 max-w-3xl mx-auto mb-20">
+                <span class="text-brand-teal text-xs font-bold uppercase tracking-widest bg-brand-tealLight px-3 py-1 rounded-full border border-brand-teal/20">WHAT WE DO</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-navy">
+                    What Does Nefalix AI Do?
+                </h2>
+                <p class="text-slate-500 text-sm font-light">
+                    We help you manage every critical patient interaction from one central platform.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                <!-- reviews -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all group duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-tealLight flex items-center justify-center text-brand-teal text-xl font-bold mb-6 group-hover:bg-brand-teal group-hover:text-white transition-all">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-brand-navy mb-3">Nefalix Reputation</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">
+                        Personalized Google review invites via WhatsApp, SMS, or email after visits. EMR integration grows organic review volume without manual work.
+                    </p>
+                </div>
+
+                <!-- surveys -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all group duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-tealLight flex items-center justify-center text-brand-teal text-xl font-bold mb-6 group-hover:bg-brand-teal group-hover:text-white transition-all">
+                        <i class="fa-solid fa-square-poll-horizontal"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-brand-navy mb-3">Nefalix Surveys</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">
+                        Measure satisfaction with 1–10 NPS surveys. Low scores are caught internally before Google redirect; managers get instant alerts.
+                    </p>
+                </div>
+
+                <!-- webchat -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all group duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-tealLight flex items-center justify-center text-brand-teal text-xl font-bold mb-6 group-hover:bg-brand-teal group-hover:text-white transition-all">
+                        <i class="fa-solid fa-message"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-brand-navy mb-3">Nefalix Live Chat</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">
+                        Unify WhatsApp, SMS, and web chat in one inbox. AI drafts replies; your team approves and sends — fewer missed leads.
+                    </p>
+                </div>
+
+                <!-- inside / employee feedback -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all group duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-tealLight flex items-center justify-center text-brand-teal text-xl font-bold mb-6 group-hover:bg-brand-teal group-hover:text-white transition-all">
+                        <i class="fa-solid fa-user-secret"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-brand-navy mb-3">Nefalix Team</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">
+                        Anonymous eNPS pulse surveys measure staff satisfaction. Spot operational issues early with internal feedback reports.
+                    </p>
+                </div>
+
+                <!-- ai review agent -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all group duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-tealLight flex items-center justify-center text-brand-teal text-xl font-bold mb-6 group-hover:bg-brand-teal group-hover:text-white transition-all">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-brand-navy mb-3">Nefalix AI Reply</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">
+                        Reads Google reviews with sentiment analysis and drafts compliant replies. Theme clustering by doctor or location enables root-cause analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TÜRKİYE & SAĞLIK TURİZMİ YERELLEŞTİRME (PDF Bölüm 2) -->
+    <section id="why-tr" class="py-20 bg-brand-lightBg border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-4 max-w-3xl mx-auto mb-14">
+                <span class="text-brand-teal text-xs font-bold uppercase tracking-widest">OUR REGIONAL EDGE</span>
+                <h2 class="text-3xl font-extrabold text-brand-navy">What Global Competitors Can't Do Locally</h2>
+                <p class="text-slate-500 text-sm font-light">WhatsApp-first infrastructure, EMR integration, IYS compliance, and multilingual health tourism support.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 text-center shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-2xl text-brand-teal mb-2"></i>
+                    <p class="text-xs font-bold text-brand-navy">WhatsApp-First</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Invites, surveys & two-way messaging</p>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 text-center shadow-sm">
+                    <i class="fa-solid fa-hospital text-2xl text-brand-teal mb-2"></i>
+                    <p class="text-xs font-bold text-brand-navy">EMR Integration</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Auto-trigger after visit</p>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 text-center shadow-sm">
+                    <i class="fa-solid fa-shield-halved text-2xl text-brand-teal mb-2"></i>
+                    <p class="text-xs font-bold text-brand-navy">KVKK & IYS</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Consent-based messaging & security</p>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 text-center shadow-sm">
+                    <i class="fa-solid fa-globe text-2xl text-brand-teal mb-2"></i>
+                    <p class="text-xs font-bold text-brand-navy">Multilingual</p>
+                    <p class="text-[10px] text-slate-500 mt-1">TR · EN · DE · AR patient comms</p>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 text-center shadow-sm sm:col-span-2 lg:col-span-1">
+                    <i class="fa-solid fa-chart-line text-2xl text-brand-teal mb-2"></i>
+                    <p class="text-xs font-bold text-brand-navy">Multi-Location Dashboard</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Per-branch reputation & anomaly tracking</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE DASHBOARD TABS SECTION -->
+    <section id="how-it-works" class="py-20 bg-brand-lightBg border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-4 max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold text-brand-navy">Explore the Engagement Stack</h2>
+                <p class="text-slate-500 text-xs font-light">Browse tabs to see how the system works inside your clinic.</p>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-3 mb-12">
+                <button onclick="switchTab('tab-reviews')" id="btn-tab-reviews" class="tab-button bg-brand-teal text-white font-bold text-xs uppercase px-6 py-3.5 rounded-full transition-all duration-200 shadow-sm">
+                    <i class="fa-solid fa-star mr-1"></i> Reputation
+                </button>
+                <button onclick="switchTab('tab-surveys')" id="btn-tab-surveys" class="tab-button bg-white text-brand-charcoal border border-slate-200 font-bold text-xs uppercase px-6 py-3.5 rounded-full transition-all duration-200 hover:border-brand-teal">
+                    <i class="fa-solid fa-square-poll-horizontal mr-1"></i> Patient Surveys
+                </button>
+                <button onclick="switchTab('tab-webchat')" id="btn-tab-webchat" class="tab-button bg-white text-brand-charcoal border border-slate-200 font-bold text-xs uppercase px-6 py-3.5 rounded-full transition-all duration-200 hover:border-brand-teal">
+                    <i class="fa-solid fa-message mr-1"></i> Live Chat & Messaging
+                </button>
+                <button onclick="switchTab('tab-ai')" id="btn-tab-ai" class="tab-button bg-white text-brand-charcoal border border-slate-200 font-bold text-xs uppercase px-6 py-3.5 rounded-full transition-all duration-200 hover:border-brand-teal">
+                    <i class="fa-solid fa-robot mr-1"></i> AI Replies
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="bg-white border border-slate-100 rounded-3xl p-6 sm:p-10 shadow-lg relative">
+                
+                <!-- Tab: Reviews -->
+                <div id="tab-reviews" class="tab-content block space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <span class="bg-brand-tealLight text-brand-teal text-xs font-bold px-3 py-1 rounded-full border border-brand-teal/20">SATISFACTION & REPUTATION</span>
+                            <h3 class="text-2xl font-bold text-brand-navy">Collect & Reply to Reviews Automatically</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed font-light">
+                                When your EMR closes an appointment, the system sends a personalized WhatsApp invite — boosting Google Maps ranking.
+                            </p>
+                            <ul class="space-y-2 text-xs text-slate-500">
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> EMR / practice software webhook triggers</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Personalized WhatsApp review invites</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Catch negative feedback before public maps</li>
+                            </ul>
+                        </div>
+                        <div class="bg-brand-lightBg rounded-2xl p-6 border border-slate-100 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                                <span class="font-bold text-xs text-brand-navy">Latest Google Reviews</span>
+                                <span class="text-xs text-brand-teal"><i class="fa-solid fa-star"></i> 4.9 Avg. (248 reviews)</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-bold text-xs text-brand-navy">Hussein K. (Patient)</span>
+                                        <span class="text-[10px] text-slate-400">10 min ago</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-600">"The care and clear explanation of my treatment were excellent. Thank you!"</p>
+                                    <div class="mt-2 bg-brand-tealLight/50 p-2 rounded border-l-2 border-brand-teal text-[10px] text-slate-600">
+                                        <strong>AI Draft Reply:</strong> "Dear Hussein, your satisfaction means everything to us. Wishing you good health!"
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Surveys -->
+                <div id="tab-surveys" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <span class="bg-brand-tealLight text-brand-teal text-xs font-bold px-3 py-1 rounded-full border border-brand-teal/20">PATIENT JOURNEY</span>
+                            <h3 class="text-2xl font-bold text-brand-navy">Track Patient Sentiment at Every Stage</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed font-light">
+                                Post-visit WhatsApp NPS: scores 8–10 go to Google; 1–7 open internal form and alert managers.
+                            </p>
+                            <ul class="space-y-2 text-xs text-slate-500">
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Promoters (8–10) → Google review link</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Detractors (1–7) → crisis handling & internal feedback</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> NPS scores & per-branch reports</li>
+                            </ul>
+                        </div>
+                        <div class="bg-brand-lightBg rounded-2xl p-6 border border-slate-100 space-y-4">
+                            <h4 class="text-xs font-bold text-brand-navy mb-3">NPS Flow (1–10)</h4>
+                            <div class="space-y-3">
+                                <p class="text-[11px] text-slate-600">"Rate your experience from 1–10"</p>
+                                <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center">
+                                        <span class="font-bold text-emerald-700">Score 8–10</span><br>
+                                        <span class="text-emerald-600">→ Google review link</span>
+                                    </div>
+                                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center">
+                                        <span class="font-bold text-amber-700">Score 1–7</span><br>
+                                        <span class="text-amber-600">→ Internal form + manager alert</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Webchat -->
+                <div id="tab-webchat" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <span class="bg-brand-tealLight text-brand-teal text-xs font-bold px-3 py-1 rounded-full border border-brand-teal/20">LIVE VISITOR CAPTURE</span>
+                            <h3 class="text-2xl font-bold text-brand-navy">Route Visitors to WhatsApp/SMS Instantly</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed font-light">
+                                Smart chat widget captures contact info and starts seamless dialogs. Answer questions instantly to minimize missed bookings.
+                            </p>
+                            <ul class="space-y-2 text-xs text-slate-500">
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Seamless mobile & web access</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> WhatsApp ve SMS Entegrasyonu</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Unified inbox (Nefalix Inbox)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-brand-lightBg rounded-2xl p-6 border border-slate-100 space-y-3">
+                            <span class="text-[10px] text-brand-teal font-bold uppercase"><i class="fa-solid fa-comments mr-1"></i> Nefalix Live Chat</span>
+                            <div class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm space-y-2">
+                                <p class="text-[11px] text-slate-600"><strong>Visitor:</strong> "Hello, do you offer dental implants?"</p>
+                                <p class="text-[11px] text-brand-teal font-bold"><strong>Nefalix AI:</strong> "Yes, we offer implants with our specialist team. May we have your number to share details on WhatsApp?"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: AI Review Agent -->
+                <div id="tab-ai" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <span class="bg-brand-tealLight text-brand-teal text-xs font-bold px-3 py-1 rounded-full border border-brand-teal/20">AI REVIEW ASSISTANT</span>
+                            <h3 class="text-2xl font-bold text-brand-navy">Read, Analyze & Approve Replies</h3>
+                            <p class="text-slate-600 text-xs leading-relaxed font-light">
+                                New Google reviews are fetched via API; sentiment and themes are analyzed. Compliant draft replies await one-click approval.
+                            </p>
+                            <ul class="space-y-2 text-xs text-slate-500">
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> On-brand AI reply drafts</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Issue grouping by doctor / location</li>
+                                <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Root-cause: "Why did our Google score drop?"</li>
+                            </ul>
+                        </div>
+                        <div class="bg-brand-lightBg rounded-2xl p-6 border border-slate-100 space-y-3">
+                            <span class="text-[10px] text-brand-teal font-bold uppercase"><i class="fa-solid fa-robot mr-1"></i> Reply Pending Approval</span>
+                            <div class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm space-y-2">
+                                <p class="text-[11px] text-slate-600"><strong>Review:</strong> "Wait time was long but treatment quality was good."</p>
+                                <p class="text-[11px] text-brand-teal"><strong>AI Draft:</strong> "Thank you for your feedback. We shared wait-time concerns with our team. We're glad you were satisfied with treatment."</p>
+                                <button type="button" class="w-full mt-2 bg-brand-teal text-white text-[10px] font-bold py-2 rounded-lg">Approve & Publish in One Click</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PREMIUM PRICING PLANS -->
+    <section id="pricing" class="py-24 bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+            <div class="text-center space-y-4 max-w-3xl mx-auto">
+                <span class="text-brand-teal text-xs font-bold uppercase tracking-widest bg-brand-tealLight px-3 py-1 rounded-full border border-brand-teal/20">TRANSPARENT PRICING</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-navy">
+                    Plans for Every Clinic Size
+                </h2>
+                <p class="text-slate-500 text-xs font-light">
+                    Flexible licensing to sustain your clinic growth.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                <!-- Plan 1: Starter -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-teal/30 hover:shadow-lg transition-all duration-300">
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-brand-navy">Starter (Solo Practice)</h3>
+                            <p class="text-xs text-slate-400 mt-1">Ideal for solo practitioners and small clinics.</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl font-extrabold text-brand-teal">9,000 TL</span>
+                            <span class="text-xs text-slate-500">/ month</span>
+                        </div>
+                        <ul class="space-y-3 text-xs text-slate-600 border-t border-slate-100 pt-4">
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Nefalix Reputation (auto review invites)</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Basic patient surveys</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Google Maps Integration</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> WhatsApp & SMS delivery</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> IYS-compliant consent filter</li>
+                            <li class="text-slate-300 line-through"><i class="fa-solid fa-xmark mr-2"></i> Advanced live chat module</li>
+                            <li class="text-slate-300 line-through"><i class="fa-solid fa-xmark mr-2"></i> Practice software integration</li>
+                        </ul>
+                    </div>
+                    <button 
+                        data-cal-link="enes-ceylan/15min" 
+                        data-cal-namespace="15min" 
+                        data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                        class="w-full mt-8 bg-brand-lightBg hover:bg-brand-teal text-brand-charcoal hover:text-white py-3 rounded-full text-xs font-bold transition-all duration-200">
+                        Get Started
+                    </button>
+                </div>
+
+                <!-- Plan 2: Pro - Highlighted -->
+                <div class="bg-white border-2 border-brand-teal p-8 rounded-3xl flex flex-col justify-between relative shadow-xl scale-105">
+                    <span class="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-brand-teal text-white text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
+                        Most Popular
+                    </span>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-brand-navy">Professional</h3>
+                            <p class="text-xs text-slate-400 mt-1">For clinics ready to fully automate growth and patient comms.</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl font-extrabold text-brand-teal">17,000 TL</span>
+                            <span class="text-xs text-slate-500">/ month</span>
+                        </div>
+                        <ul class="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-4">
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Unlimited Nefalix Reputation automation</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Advanced patient surveys</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Smart live chat & visitor capture</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> AI review reply assistant</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Multilingual (TR · EN · DE · AR)</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> EMR / practice software integration</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Unified inbox (Nefalix Inbox)</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Triage & satisfaction analytics</li>
+                        </ul>
+                    </div>
+                    <button 
+                        data-cal-link="enes-ceylan/15min" 
+                        data-cal-namespace="15min" 
+                        data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                        class="w-full mt-8 bg-brand-teal hover:bg-brand-navy text-white py-3.5 rounded-full text-xs font-bold hover:shadow-lg transition-all duration-200">
+                        Book Free Demo
+                    </button>
+                </div>
+
+                <!-- Plan 3: Enterprise -->
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-teal/30 hover:shadow-lg transition-all duration-300">
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-brand-navy">Enterprise (Custom)</h3>
+                            <p class="text-xs text-slate-400 mt-1">Hospitals, chains, and large centers needing custom integrations.</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl font-extrabold text-brand-teal">Contact Sales</span>
+                        </div>
+                        <ul class="space-y-3 text-xs text-slate-600 border-t border-slate-100 pt-4">
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Private cloud or on-premise support</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Custom integrations with all clinic systems</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Custom staff feedback (Nefalix Team)</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> 24/7 support & dedicated account manager</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> Multi-location performance dashboard</li>
+                            <li><i class="fa-solid fa-check text-brand-teal mr-2"></i> KVKK, GDPR & IYS compliance guidance</li>
+                        </ul>
+                    </div>
+                    <button 
+                        data-cal-link="enes-ceylan/15min" 
+                        data-cal-namespace="15min" 
+                        data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                        class="w-full mt-8 bg-brand-lightBg hover:bg-brand-teal text-brand-charcoal hover:text-white py-3 rounded-full text-xs font-bold transition-all duration-200">
+                        Request Enterprise Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION (Frequently Asked Questions) -->
+    <section id="faq" class="py-24 bg-brand-lightBg border-t border-slate-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="text-center space-y-4">
+                <h2 class="text-3xl font-bold text-brand-navy">Frequently Asked Questions</h2>
+                <p class="text-slate-500 text-xs font-light">Key questions clinic owners and managers ask most.</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300 shadow-sm">
+                    <button onclick="toggleFAQ(1)" class="w-full p-6 text-left flex items-center justify-between text-brand-navy font-bold text-sm sm:text-md focus:outline-none">
+                        <span>Does Nefalix AI provide medical diagnosis? Any legal risk?</span>
+                        <i id="faq-icon-1" class="fa-solid fa-chevron-down text-brand-teal transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq-content-1" class="hidden p-6 pt-0 text-xs text-slate-600 border-t border-slate-50 leading-relaxed font-light">
+                        No. Nefalix AI does not diagnose or prescribe. It answers operational and booking questions within clinic-approved limits (location, transfers, prep rules, slots) to minimize legal risk.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300 shadow-sm">
+                    <button onclick="toggleFAQ(2)" class="w-full p-6 text-left flex items-center justify-between text-brand-navy font-bold text-sm sm:text-md focus:outline-none">
+                        <span>Can it connect to our clinic or booking software?</span>
+                        <i id="faq-icon-2" class="fa-solid fa-chevron-down text-brand-teal transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq-content-2" class="hidden p-6 pt-0 text-xs text-slate-600 border-t border-slate-50 leading-relaxed font-light">
+                        Yes. Two-way API sync with popular practice systems. Appointments from live chat flow instantly into your front-desk panel.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300 shadow-sm">
+                    <button onclick="toggleFAQ(3)" class="w-full p-6 text-left flex items-center justify-between text-brand-navy font-bold text-sm sm:text-md focus:outline-none">
+                        <span>Is it compliant with KVKK and healthcare regulations?</span>
+                        <i id="faq-icon-3" class="fa-solid fa-chevron-down text-brand-teal transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq-content-3" class="hidden p-6 pt-0 text-xs text-slate-600 border-t border-slate-50 leading-relaxed font-light">
+                        Yes. KVKK and international health data standards. Transparent, non-misleading informational comms aligned with medical advertising rules.
+                    </div>
+                </div>
+                <!-- FAQ Item 4 -->
+                <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300 shadow-sm">
+                    <button onclick="toggleFAQ(4)" class="w-full p-6 text-left flex items-center justify-between text-brand-navy font-bold text-sm sm:text-md focus:outline-none">
+                        <span>Is it IYS-compliant? Does it send without consent?</span>
+                        <i id="faq-icon-4" class="fa-solid fa-chevron-down text-brand-teal transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq-content-4" class="hidden p-6 pt-0 text-xs text-slate-600 border-t border-slate-50 leading-relaxed font-light">
+                        No. IYS integration ensures messages only go to patients with consent. No unsolicited commercial messages.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ONBOARDING CALL TO ACTION (CTA) -->
+    <section class="py-24 relative overflow-hidden bg-gradient-to-b from-brand-navy to-brand-navy text-white border-t border-slate-100">
+        <div class="absolute inset-0 bg-brand-teal/5 blur-[120px] rounded-full pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 relative">
+            <div class="h-32 mx-auto flex justify-center items-center">
+                <!-- Direct Unmodified Placement of /assets/brand/nefalix-logo.png inside a clean rounded badge on dark banner -->
+                <div class="bg-white p-4 rounded-2xl shadow-xl flex items-center justify-center">
+                    <img src="/assets/brand/nefalix-logo.png" alt="Nefalix AI Logo" class="h-20 sm:h-24 w-20 sm:w-24 rounded-full object-cover shadow-lg">
+                </div>
+            </div>
+            
+            <h2 class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight text-white">
+                Take Your Clinic to the <br>Digital Engagement League.
+            </h2>
+            <p class="text-slate-300 text-sm max-w-2xl mx-auto leading-relaxed font-light">
+                Manage bookings, patient experience, and map reputation from one platform — start growing autonomously today.
+            </p>
+
+            <div class="pt-4">
+                <button 
+                    data-cal-link="enes-ceylan/15min" 
+                    data-cal-namespace="15min" 
+                    data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                    class="bg-brand-teal hover:bg-brand-gold text-white font-extrabold px-10 py-5 rounded-full text-md shadow-2xl transition-all duration-200">
+                    Book Your Free Demo Now
+                </button>
+                <span class="block text-xs text-slate-400 mt-3">End-to-end setup and integration support from our team.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER AREA (Clean Layout with Actual Unmodified Logo Image) -->
+    <footer class="bg-white border-t border-slate-100 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <!-- Brand Column -->
+            <div class="space-y-4 font-light">
+                <div class="flex items-center">
+                    <!-- Footer Direct Unmodified Logo Placement -->
+                    <img src="/assets/brand/nefalix-logo.png" alt="Nefalix AI Logo" class="h-16 sm:h-20 w-16 sm:w-20 rounded-full object-cover shadow-lg">
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Vertical engagement software for clinics: booking automation, review collection, and patient experience management.
+                </p>
+            </div>
+
+            <!-- Solutions Links -->
+            <div class="space-y-3 font-light">
+                <h4 class="text-xs font-bold text-brand-navy uppercase tracking-wider">Modules</h4>
+                <ul class="space-y-2 text-xs text-slate-600">
+                    <li><a href="#how-it-works" class="hover:text-brand-teal transition-colors">Nefalix Reputation</a></li>
+                    <li><a href="#how-it-works" class="hover:text-brand-teal transition-colors">Nefalix Surveys</a></li>
+                    <li><a href="#how-it-works" class="hover:text-brand-teal transition-colors">Nefalix Live Chat</a></li>
+                    <li><a href="#how-it-works" class="hover:text-brand-teal transition-colors">Nefalix AI Reply</a></li>
+                    <li><a href="#why-tr" class="hover:text-brand-teal transition-colors">Our Regional Edge</a></li>
+                </ul>
+            </div>
+
+            <!-- Ecosystem -->
+            <div class="space-y-3 font-light">
+                <h4 class="text-xs font-bold text-brand-navy uppercase tracking-wider">Platform</h4>
+                <ul class="space-y-2 text-xs text-slate-600">
+                    <li><a href="#pricing" class="hover:text-brand-teal transition-colors">Pricing</a></li>
+                    <li><a href="#faq" class="hover:text-brand-teal transition-colors">Frequently Asked Questions</a></li>
+                    <li><button 
+                        data-cal-link="enes-ceylan/15min" 
+                        data-cal-namespace="15min" 
+                        data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                        class="hover:text-brand-teal text-left transition-colors">Schedule a Demo</button></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="space-y-3 font-light">
+                <h4 class="text-xs font-bold text-brand-navy uppercase tracking-wider">Contact & Support</h4>
+                <p class="text-xs text-slate-500">Reach our team anytime at info@nefalix.com</p>
+                <div class="flex items-center gap-4 text-slate-400 pt-2">
+                    <a href="https://www.linkedin.com/company/nefalixai/" target="_blank" rel="noopener noreferrer" class="hover:text-brand-teal transition-colors text-sm" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="https://wa.me/905491190819" target="_blank" rel="noopener noreferrer" class="hover:text-brand-teal transition-colors text-sm" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/nefalixai/" target="_blank" rel="noopener noreferrer" class="hover:text-brand-teal transition-colors text-sm" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
+            <p class="text-[11px] text-slate-400 font-light">&copy; 2026 Nefalix AI Platform. nefalix.com All rights reserved.</p>
+            <div class="flex items-center gap-6 text-[10px] text-slate-400 font-light">
+                <a href="/gizlilik-politikasi" class="hover:text-brand-teal">Privacy Policy</a>
+                <a href="/kvkk" class="hover:text-brand-teal">KVKK Notice</a>
+                <a href="/kullanici-sozlesmesi" class="hover:text-brand-teal">Terms of Use</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CORE INTERACTIVE JAVASCRIPT FUNCTIONS -->
+    <script>
+        // Interactive Webchat Simulator Script
+        const chatLog = document.getElementById('sim-chat-log');
+        let currentScenario = '';
+
+        function triggerSimScenario(scenario) {
+            currentScenario = scenario;
+            
+            // Clean active states of scenario buttons
+            const buttons = ['impland', 'tourism', 'kvkk', 'book'];
+            buttons.forEach(btn => {
+                const element = document.getElementById(`btn-${btn}`);
+                if (element) {
+                    element.classList.remove('bg-brand-teal', 'text-white');
+                    element.classList.add('bg-slate-50', 'text-slate-700');
+                }
+            });
+
+            // Activate current button
+            const activeElement = document.getElementById(`btn-${scenario}`);
+            if (activeElement) {
+                activeElement.classList.remove('bg-slate-50', 'text-slate-700');
+                activeElement.classList.add('bg-brand-teal', 'text-white');
+            }
+
+            // Append mock user message
+            let userMsgText = '';
+            if (scenario === 'impland') userMsgText = "🦷 How long do treatments take and what do they cost?";
+            if (scenario === 'tourism') userMsgText = "📅 I'd like to book a consultation or appointment.";
+            if (scenario === 'kvkk') userMsgText = "🛡️ Is my health data secure and compliant?";
+            if (scenario === 'book') userMsgText = "📍 How do I get to the clinic? Can you share location?";
+
+            appendChatMessage('Patient', userMsgText, false);
+
+            // Append typing effect simulation and subsequent AI answer
+            setTimeout(() => {
+                appendChatTypingIndicator();
+                setTimeout(() => {
+                    removeChatTypingIndicator();
+                    let aiResponseText = '';
+                    
+                    if (scenario === 'impland') {
+                        aiResponseText = "<strong>Nefalix AI:</strong> Implant and smile design timelines are confirmed after an initial exam. With suitable bone structure, we can place temporary teeth the same day. May we have your phone number for more details?";
+                    } else if (scenario === 'tourism') {
+                        aiResponseText = "<strong>Nefalix AI:</strong> Great! I'm here to match you with the right doctor and schedule. Share your contact info or preferred time — our team will reach you on WhatsApp right away.";
+                    } else if (scenario === 'kvkk') {
+                        aiResponseText = "<strong>Nefalix AI:</strong> Absolutely secure. Nefalix stores all health data on end-to-end encrypted servers compliant with KVKK and international standards. Only your doctor and clinic team can access your information.";
+                    } else if (scenario === 'book') {
+                        aiResponseText = "<strong>Nefalix AI:</strong> Our clinic is centrally located with easy transit access. Share your number and we'll send the map pin and directions on WhatsApp instantly.";
+                    }
+
+                    appendChatMessage('Nefalix AI', aiResponseText, true);
+                }, 1200);
+            }, 400);
+        }
+
+        function appendChatMessage(sender, text, isAI) {
+            const bubble = document.createElement('div');
+            if (isAI) {
+                bubble.className = "bg-white text-slate-700 p-3.5 rounded-2xl rounded-tl-none border border-slate-100 max-w-[85%] self-start shadow-sm animate-fade-in";
+                bubble.innerHTML = `<p class="font-bold text-brand-teal mb-1">Nefalix AI ✨</p>${text}`;
+            } else {
+                bubble.className = "bg-brand-teal text-white p-3.5 rounded-2xl rounded-tr-none max-w-[85%] self-end font-medium shadow-sm animate-fade-in";
+                bubble.innerHTML = text;
+            }
+            chatLog.appendChild(bubble);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function appendChatTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'sim-typing';
+            indicator.className = "bg-white text-slate-400 p-3 rounded-2xl rounded-tl-none border border-slate-100 max-w-[30%] self-start flex items-center justify-center gap-1 shadow-sm";
+            indicator.innerHTML = `<span class="w-2 h-2 bg-brand-teal rounded-full animate-bounce"></span><span class="w-2 h-2 bg-brand-teal rounded-full animate-bounce delay-100"></span><span class="w-2 h-2 bg-brand-teal rounded-full animate-bounce delay-200"></span>`;
+            chatLog.appendChild(indicator);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function removeChatTypingIndicator() {
+            const indicator = document.getElementById('sim-typing');
+            if (indicator) indicator.remove();
+        }
+
+        // Feature tabs switcher
+        function switchTab(tabId) {
+            // Hide all contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.add('hidden'));
+
+            // Show active content
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Reset buttons style
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-brand-teal', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-white', 'text-brand-charcoal', 'border', 'border-slate-200');
+            });
+
+            // Set active button style
+            let activeBtnId = 'btn-tab-reviews';
+            if (tabId === 'tab-surveys') activeBtnId = 'btn-tab-surveys';
+            if (tabId === 'tab-webchat') activeBtnId = 'btn-tab-webchat';
+            if (tabId === 'tab-ai') activeBtnId = 'btn-tab-ai';
+            
+            const activeBtn = document.getElementById(activeBtnId);
+            activeBtn.classList.remove('bg-white', 'text-brand-charcoal', 'border', 'border-slate-200');
+            activeBtn.classList.add('bg-brand-teal', 'text-white', 'shadow-sm');
+        }
+
+        // Toggle SSS / FAQ items smoothly
+        function toggleFAQ(id) {
+            const content = document.getElementById(`faq-content-${id}`);
+            const icon = document.getElementById(`faq-icon-${id}`);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // Mobile Menu Toggler
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+
+            if (menu.classList.contains('hidden')) {
+                menu.className = "block md:hidden bg-white border-b border-slate-100 px-4 py-6 space-y-4 shadow-inner";
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                menu.className = "hidden md:hidden bg-white border-b border-slate-100 px-4 py-6 space-y-4 shadow-inner";
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        }
+    </script>
+
+    <!-- Nefalix AI — canlı chatbot (n8n + OpenAI) -->
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <link href="/nefalix-chat.css" rel="stylesheet" />
+    <script type="module" src="/nefalix-chat.js"></script>
+</body>
+</html>

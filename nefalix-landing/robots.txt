@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /login.html
+Disallow: /demo-entry.html
+Disallow: /setup-password.html
+
+Sitemap: https://nefalix.com/sitemap.xml
+Sitemap: https://nefalix.com/blog-sitemap.xml
+Sitemap: https://nefalix.com/geo-sitemap.xml

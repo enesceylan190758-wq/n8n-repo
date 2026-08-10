@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nefalix · Toplu Mail</title>
+<link rel="icon" href="/assets/brand/favicon-192.png" type="image/png">
+<style>
+  :root{
+    --ink:#241854; --muted:#8b87a8; --line:#ece9f7; --bg:#f2f2f9;
+    --violet:#7c3aed; --blue:#2563eb; --ok:#15803d; --err:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',ui-sans-serif,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .top{background:linear-gradient(135deg,#7c3aed,#4338ca);color:#fff;padding:14px 22px 10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .top > a.back{color:#fff;text-decoration:none;opacity:.9;font-size:13px;font-weight:600}
+  .top h1{margin:0;font-size:18px;font-weight:700;flex:1;min-width:140px}
+  .top .nav{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
+  .top .nav-item{
+    position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    color:#fff;text-decoration:none;padding:6px 12px 8px;border-radius:10px;min-width:78px;
+    background:rgba(255,255,255,.08);border:1px solid transparent;transition:background .15s,border-color .15s;
+  }
+  .top .nav-item:hover,.top .nav-item:focus-visible{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);outline:none}
+  .top .nav-item .nav-label{font-size:13px;font-weight:700;line-height:1.2}
+  .top .nav-item .nav-tip{
+    margin-top:4px;font-size:10px;font-weight:500;line-height:1.25;opacity:0;max-height:0;overflow:hidden;
+    text-align:center;color:rgba(255,255,255,.92);transition:opacity .15s,max-height .15s;
+  }
+  .top .nav-item:hover .nav-tip,.top .nav-item:focus-visible .nav-tip{opacity:.95;max-height:40px}
+  .top .user-pill{font-size:12.5px;opacity:.95;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:20px;font-weight:600}
+  .wrap{max-width:1100px;margin:0 auto;padding:22px 18px 60px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 10px rgba(20,20,60,.06);padding:18px 20px;margin-bottom:16px}
+  .flow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .flow span{font-size:12px;font-weight:600;color:#5b5678;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .flow span.on{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
+  .flow .flow-sep{color:var(--muted);font-size:12px;font-weight:600;padding:0 2px;background:none;border:none}
+  .inbox-strip{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px}
+  .inbox-strip p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.4;flex:1;min-width:200px}
+  .inbox-strip a.link{font-size:13px;font-weight:700;color:var(--violet);text-decoration:none}
+  .inbox-strip a.link:hover{text-decoration:underline}
+  .card h2{margin:0 0 4px;font-size:15px}
+  .card .sub{margin:0 0 12px;font-size:12.5px;color:var(--muted);line-height:1.45}
+  @media(max-width:640px){
+    .top .nav-item{min-width:0;flex:1 1 auto;padding:6px 8px 8px}
+    .top .nav-item .nav-tip{white-space:normal;max-width:110px}
+  }
+  .req{color:#b45309;font-weight:700}
+  .field-help{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.4}
+  details.more{margin-top:10px;border-top:1px solid #f0eef8;padding-top:10px}
+  details.more > summary{cursor:pointer;font-size:12.5px;font-weight:700;color:#5b5678;list-style:none}
+  details.more > summary::-webkit-details-marker{display:none}
+  details.more[open] > summary{margin-bottom:8px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  label.lbl{font-size:12px;font-weight:600;color:#4b4770;display:block;margin-bottom:6px}
+  select,input[type=text],input[type=search],input[type=email]{width:100%;padding:10px 12px;border:1px solid #d9d5ee;border-radius:9px;font-size:13.5px;color:var(--ink);background:#fff}
+  select:focus,input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+  .btn{border:none;border-radius:9px;padding:11px 18px;font-weight:700;font-size:13px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7c3aed,#2563eb)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid #d9d5ee}
+  .btn.danger{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+  .hint{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .list{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  .item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-bottom:1px solid #f6f5fb;font-size:13px}
+  .item:last-child{border-bottom:none}
+  .item .meta{color:var(--muted);font-size:12px;margin-top:2px}
+  .item .email-in{margin-top:6px;padding:8px 10px;font-size:13px}
+  .item.no-mail .email-in{border-color:#f59e0b;background:#fffbeb}
+  .preview{white-space:pre-wrap;background:#f8f7fc;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.5;max-height:220px;overflow:auto;color:#4b4770}
+  .sig-preview{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;max-height:220px}
+  textarea#draftBody,textarea#manualEmails{width:100%;padding:10px 12px;border:1px solid #d9d5ee;border-radius:9px;font-size:13.5px;resize:vertical;font-family:inherit;color:var(--ink);background:#fff;line-height:1.5}
+  textarea#draftBody{min-height:220px}
+  textarea#draftBody:focus,textarea#manualEmails:focus,input#draftSubject:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+  input#draftSubject{width:100%;padding:10px 12px;border:1px solid #d9d5ee;border-radius:9px;font-size:13.5px;color:var(--ink);background:#fff}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px}
+  .badge.ok{background:#dcfce7;color:var(--ok)}
+  .badge.skip{background:#fef3c7;color:#b45309}
+  .badge.err{background:#fee2e2;color:var(--err)}
+  .login{max-width:420px;margin:80px auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:0 2px 10px rgba(20,20,60,.06)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#241854;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;display:none;z-index:50}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:8px 10px;border-bottom:1px solid #f0eef8;text-align:left}
+  th{color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+const API = '/api/blog';
+
+async function api(action, opts = {}) {
+  const method = opts.method || (opts.body ? 'POST' : 'GET');
+  const res = await fetch(API + '?action=' + encodeURIComponent(action), {
+    method,
+    credentials: 'include',
+    headers: opts.body ? { 'Content-Type': 'application/json' } : undefined,
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || data.message || ('HTTP ' + res.status));
+  return data;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { el.style.display = 'none'; }, 3200);
+}
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function collectKurum(data) {
+  const rows = [];
+  const seen = new Set();
+  const push = (d) => {
+    if (!d || typeof d !== 'object') return;
+    const id = d._id || d.id || d['Kurum ID'] || d['Ad'];
+    if (!id || seen.has(String(id))) return;
+    seen.add(String(id));
+    rows.push({
+      id: String(id),
+      ad: d['Ad'] || d.ad || '(İsimsiz)',
+      yetkili: d['Yetkili'] || d.yetkili || '',
+      email: String(d['E-Posta'] || d.email || d.Email || '').trim(),
+      tel: d['Telefon'] || d.tel || '',
+    });
+  };
+  (data.seedKurum || []).forEach(push);
+  const bag = data.bag || {};
+  const add = bag.nfx_danisan_add || bag['nfx_danisan_add'] || [];
+  if (Array.isArray(add)) add.forEach(push);
+  // also over maps
+  const over = bag.nfx_danisan_over || {};
+  if (over && typeof over === 'object' && !Array.isArray(over)) {
+    Object.values(over).forEach(push);
+  }
+  rows.sort((a, b) => a.ad.localeCompare(b.ad, 'tr'));
+  return rows;
+}
+
+const state = {
+  user: null,
+  templates: [],
+  senders: {},
+  kurum: [],
+  selected: new Set(),
+  templateId: 't2',
+  senderKey: 'kadir',
+  q: '',
+  onlyWithEmail: true,
+  showKurumList: false,
+  draftSubject: '',
+  draftBody: '',
+  includeSignature: true,
+  mailStyle: 'personal',
+  defaultName: '',
+  defaultFirm: '',
+  hitap: 'unknown',
+  preview: null,
+  manualEmails: '',
+  results: null,
+  sending: false,
+  loginKod: '',
+};
+
+const PREF_KEYS = {
+  senderKey: 'nfx_mail_senderKey',
+  mailStyle: 'nfx_mail_mailStyle',
+  includeSignature: 'nfx_mail_includeSignature',
+  hitap: 'nfx_mail_hitap',
+  defaultName: 'nfx_mail_defaultName',
+  defaultFirm: 'nfx_mail_defaultFirm',
+};
+
+function loadPrefs() {
+  try {
+    const sk = localStorage.getItem(PREF_KEYS.senderKey);
+    if (sk === 'enes' || sk === 'kadir' || sk === 'kader') state.senderKey = sk;
+    const ms = localStorage.getItem(PREF_KEYS.mailStyle);
+    if (ms === 'personal' || ms === 'branded') state.mailStyle = ms;
+    const sig = localStorage.getItem(PREF_KEYS.includeSignature);
+    if (sig === '0' || sig === '1') state.includeSignature = sig === '1';
+    const hitap = localStorage.getItem(PREF_KEYS.hitap);
+    if (hitap === 'unknown' || hitap === 'bey' || hitap === 'hanim') state.hitap = hitap;
+    const dn = localStorage.getItem(PREF_KEYS.defaultName);
+    if (dn != null) state.defaultName = dn;
+    const df = localStorage.getItem(PREF_KEYS.defaultFirm);
+    if (df != null) state.defaultFirm = df;
+  } catch (_) {}
+}
+
+function savePrefs() {
+  try {
+    localStorage.setItem(PREF_KEYS.senderKey, state.senderKey);
+    localStorage.setItem(PREF_KEYS.mailStyle, state.mailStyle);
+    localStorage.setItem(PREF_KEYS.includeSignature, state.includeSignature ? '1' : '0');
+    localStorage.setItem(PREF_KEYS.hitap, state.hitap);
+    localStorage.setItem(PREF_KEYS.defaultName, state.defaultName || '');
+    localStorage.setItem(PREF_KEYS.defaultFirm, state.defaultFirm || '');
+  } catch (_) {}
+}
+
+function displayFromEmail() {
+  const sender = state.senders?.[state.senderKey] || {};
+  return sender.email || 'abdulkadir@nefalix.com';
+}
+
+function loadDraftFromTemplate() {
+  const tpl = state.templates.find((t) => t.id === state.templateId);
+  state.draftSubject = tpl?.subject || '';
+  state.draftBody = tpl?.body || tpl?.bodyPreview || '';
+}
+
+function readDraftFromDom() {
+  const s = document.getElementById('draftSubject');
+  const b = document.getElementById('draftBody');
+  if (s) state.draftSubject = s.value;
+  if (b) state.draftBody = b.value;
+}
+
+async function boot() {
+  try {
+    const me = await api('crm-me');
+    if (!me.ok) {
+      state.user = null;
+      render();
+      return;
+    }
+    state.user = me;
+    const kod = String(state.user.kod || state.user.id || '').toLowerCase();
+    state.senderKey = kod.includes('enes') ? 'enes' : kod.includes('kader') ? 'kader' : 'kadir';
+    if (state.senderKey === 'kader' && !localStorage.getItem(PREF_KEYS.mailStyle)) {
+      state.mailStyle = 'branded';
+    }
+    loadPrefs();
+  } catch {
+    state.user = null;
+    render();
+    return;
+  }
+  const [tpl, crm] = await Promise.all([
+    api('crm-outreach-templates'),
+    api('nfx-crm-get'),
+  ]);
+  state.templates = tpl.templates || [];
+  state.senders = tpl.senders || {};
+  if (state.templates.length && !state.templates.find((t) => t.id === state.templateId)) {
+    state.templateId = state.templates[0].id;
+  }
+  state.kurum = collectKurum(crm.data || {});
+  loadDraftFromTemplate();
+  render();
+  refreshPreview();
+}
+
+async function doLogin() {
+  const kod = state.loginKod.trim().toLowerCase();
+  if (!kod) return toast('Kullanıcı kodu yazın (enes / abdulkadir / kader)');
+  try {
+    await api('crm-login', { body: { kod } });
+    toast('Giriş OK');
+    await boot();
+  } catch (e) {
+    toast(e.message || 'Giriş başarısız');
+  }
+}
+
+function filteredKurum() {
+  const q = state.q.trim().toLowerCase();
+  return state.kurum.filter((k) => {
+    if (state.onlyWithEmail && !k.email) return false;
+    if (!q) return true;
+    return (k.ad + ' ' + k.yetkili + ' ' + k.email).toLowerCase().includes(q);
+  });
+}
+
+function effectiveEmail(k) {
+  return String(k?.email || '').trim().toLowerCase();
+}
+
+function buildRecipients() {
+  const defName = String(state.defaultName || '').trim();
+  const defFirm = String(state.defaultFirm || '').trim();
+  const fromKurum = [...state.selected]
+    .map((id) => state.kurum.find((k) => k.id === id))
+    .filter((k) => k && effectiveEmail(k))
+    .map((k) => ({
+      email: effectiveEmail(k),
+      name: String(k.yetkili || defName || '').trim(),
+      firm: String(k.ad || defFirm || '').trim(),
+      hitap: state.hitap || 'unknown',
+    }));
+  const manual = String(state.manualEmails || '')
+    .split(/[\n,;]+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((email) => ({
+      email: email.toLowerCase(),
+      name: defName,
+      firm: defFirm,
+      hitap: state.hitap || 'unknown',
+    }));
+  const seen = new Set();
+  const out = [];
+  [...fromKurum, ...manual].forEach((r) => {
+    if (!r.email || seen.has(r.email)) return;
+    seen.add(r.email);
+    out.push(r);
+  });
+  return out;
+}
+
+function validateRecipients(recipients) {
+  if (!recipients.length) return 'En az bir e-posta yazın veya seçin';
+  const missing = recipients.filter((r) => !r.name || !r.firm);
+  if (missing.length) {
+    return 'Her alıcı için yetkili adı ve firma zorunlu. Üstteki kutuları doldur veya kurumda yetkili yaz.';
+  }
+  return '';
+}
+
+function toggleAll(on) {
+  const list = filteredKurum();
+  list.forEach((k) => {
+    if (on) state.selected.add(k.id);
+    else state.selected.delete(k.id);
+  });
+  updateSelectedCount();
+  refreshPreview();
+}
+
+function updateSelectedCount() {
+  const el = document.getElementById('selCount');
+  if (!el) return;
+  const n = buildRecipients().length;
+  el.textContent = String(n);
+  const btn = document.getElementById('btnSend');
+  if (btn && !state.sending) btn.textContent = 'Seçilenlere gönder (' + n + ')';
+}
+
+async function refreshPreview() {
+  readDraftFromDom();
+  const tpl = state.templates.find((t) => t.id === state.templateId);
+  if (!tpl && !state.draftBody) { state.preview = null; paintPreview(); return; }
+  const recipients = buildRecipients();
+  const sample = recipients[0] || {
+    email: 'ornek@firma.com',
+    name: state.defaultName || 'Ahmet Yılmaz',
+    firm: state.defaultFirm || 'Örnek Klinik',
+    hitap: state.hitap || 'unknown',
+  };
+  try {
+    const r = await api('crm-outreach', {
+      body: {
+        preview: true,
+        templateId: state.templateId,
+        senderKey: state.senderKey,
+        recipients: [sample],
+        customSubject: state.draftSubject,
+        customBody: state.draftBody,
+        includeSignature: state.includeSignature,
+        mailStyle: state.mailStyle || 'personal',
+      },
+    });
+    state.preview = r;
+  } catch (e) {
+    state.preview = { subject: state.draftSubject, body: state.draftBody, error: e.message };
+  }
+  paintPreview();
+  updateSelectedCount();
+}
+
+function paintPreview() {
+  const el = document.getElementById('filledPreview');
+  if (el) {
+    if (state.preview?.error) el.textContent = state.preview.error;
+    else {
+      el.textContent =
+        'Konu: ' + (state.preview?.subject || '—') +
+        '\n\n' +
+        (state.preview?.body || '…');
+    }
+  }
+  const sig = document.getElementById('sigPreview');
+  if (sig) {
+    if (state.includeSignature && state.preview?.signatureHtml) {
+      sig.innerHTML = state.preview.signatureHtml;
+      sig.style.display = 'block';
+    } else {
+      sig.innerHTML = state.includeSignature
+        ? '<span class="hint">İmza yükleniyor…</span>'
+        : '<span class="hint">HTML imza kapalı</span>';
+    }
+  }
+  const imzaLink = document.getElementById('imzaLink');
+  if (imzaLink) imzaLink.href = '/iletisim/imza?kart=' + encodeURIComponent(state.senderKey);
+}
+
+async function pollJob(jobId) {
+  const started = Date.now();
+  let lastStatus = 'queued';
+  while (Date.now() - started < 300000) {
+    const res = await fetch(API + '?action=crm-outreach-status&jobId=' + encodeURIComponent(jobId), {
+      credentials: 'include',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'status hatası');
+    lastStatus = String(data.status || lastStatus);
+    const btn = document.getElementById('btnSend');
+    if (btn) {
+      const label =
+        lastStatus === 'running' ? 'Gönderiliyor…' :
+        lastStatus === 'queued' ? 'Kuyrukta…' :
+        lastStatus === 'done' ? 'Tamamlandı…' : ('Durum: ' + lastStatus);
+      btn.textContent = label;
+    }
+    if (data.status === 'done') {
+      const mail = data.mail || data.result || data;
+      if (!mail || (mail.sent == null && !mail.results)) {
+        throw new Error('Job bitti ama sonuç boş');
+      }
+      return mail;
+    }
+    if (data.status === 'error') throw new Error(data.error || 'job error');
+    await new Promise((r) => setTimeout(r, 1200));
+  }
+  throw new Error('Zaman aşımı — son durum: ' + lastStatus + ' (jobId: ' + jobId + ')');
+}
+
+async function sendSelected() {
+  readDraftFromDom();
+  const nameEl = document.getElementById('defaultName');
+  const firmEl = document.getElementById('defaultFirm');
+  if (nameEl) state.defaultName = nameEl.value.trim();
+  if (firmEl) state.defaultFirm = firmEl.value.trim();
+  const recipients = buildRecipients();
+  const bad = validateRecipients(recipients);
+  if (bad) return toast(bad);
+  if (recipients.length > 50) return toast('En fazla 50 alıcı');
+  if (!String(state.draftSubject || '').trim()) return toast('Konu yazın');
+  if (!String(state.draftBody || '').trim()) return toast('Mail metnini yazın');
+  if (!confirm(recipients.length + ' adrese mail gönderilsin mi?\nFrom: ' + displayFromEmail() + '\nLimit: saatte ~20')) return;
+  state.sending = true;
+  state.results = null;
+  render();
+  try {
+    const r = await api('crm-outreach', {
+      body: {
+        templateId: state.templateId,
+        senderKey: state.senderKey,
+        recipients,
+        customSubject: state.draftSubject,
+        customBody: state.draftBody,
+        includeSignature: state.includeSignature,
+        mailStyle: state.mailStyle || 'personal',
+        delaySec: 1,
+        maxPerHour: 20,
+      },
+    });
+    if (r.jobId) {
+      toast('Gönderim başladı (' + recipients.length + ' alıcı)…');
+      state.results = await pollJob(r.jobId);
+    } else {
+      state.results = r.mail || r;
+    }
+    const sent = Number(state.results.sent || 0);
+    const err = Number(state.results.errors || 0);
+    const skip = Number(state.results.skipped || 0);
+    if (sent > 0 && err === 0) {
+      toast('Gönderildi: ' + sent + ' · Tanıtımlar / Spam klasörüne bak');
+    } else {
+      toast('Bitti — gönderilen ' + sent + ', atlanan ' + skip + ', hata ' + err);
+    }
+  } catch (e) {
+    toast(e.message || 'Gönderim hatası');
+  } finally {
+    state.sending = false;
+    render();
+  }
+}
+
+function renderLogin() {
+  document.getElementById('app').innerHTML = `
+    <div class="login">
+      <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px">Nefalix CRM</div>
+      <h2 style="margin:0 0 8px;font-size:20px">Toplu Mail</h2>
+      <p class="hint" style="margin-bottom:16px">CRM oturumu gerekli. Aynı giriş kodunu kullanın.</p>
+      <label class="lbl">Kullanıcı kodu</label>
+      <input type="text" id="loginKod" placeholder="enes / abdulkadir / kader" value="${esc(state.loginKod)}" />
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button class="btn" id="btnLogin">Giriş</button>
+        <a class="btn ghost" href="/crm" style="display:inline-flex;align-items:center;text-decoration:none">Saha CRM’e git</a>
+      </div>
+    </div>`;
+  document.getElementById('loginKod').oninput = (e) => { state.loginKod = e.target.value; };
+  document.getElementById('btnLogin').onclick = doLogin;
+}
+
+function syncEmailFromInput(inp) {
+  const id = inp.getAttribute('data-id');
+  const k = state.kurum.find((x) => x.id === id);
+  if (!k) return;
+  k.email = String(inp.value || '').trim();
+  const row = inp.closest('.item');
+  if (row) row.classList.toggle('no-mail', !effectiveEmail(k));
+  if (effectiveEmail(k)) {
+    state.selected.add(id);
+    const box = row && row.querySelector('input[type=checkbox]');
+    if (box) box.checked = true;
+  }
+  updateSelectedCount();
+}
+
+function renderKurumList() {
+  const wrap = document.getElementById('kurumListWrap');
+  const el = document.getElementById('kurumList');
+  const btn = document.getElementById('btnToggleKurum');
+  if (!el) return;
+
+  if (!state.showKurumList) {
+    if (wrap) wrap.style.display = 'none';
+    if (btn) {
+      const n = state.kurum.filter((k) => effectiveEmail(k)).length;
+      btn.textContent = 'E-postası kayıtlı firmaları göster (' + n + ')';
+    }
+    return;
+  }
+  if (wrap) wrap.style.display = 'block';
+  if (btn) btn.textContent = 'Firma listesini gizle';
+
+  const list = filteredKurum();
+  const active = document.activeElement;
+  const keepId = active && active.classList && active.classList.contains('email-in')
+    ? active.getAttribute('data-id')
+    : null;
+  const keepPos = keepId && typeof active.selectionStart === 'number' ? active.selectionStart : null;
+
+  el.innerHTML = list.map((k) => {
+    const hasMail = !!effectiveEmail(k);
+    const checked = state.selected.has(k.id);
+    return `<div class="item ${hasMail ? '' : 'no-mail'}">
+      <input type="checkbox" data-id="${esc(k.id)}" ${checked ? 'checked' : ''}/>
+      <div style="flex:1;min-width:0">
+        <div><b>${esc(k.ad)}</b></div>
+        <div class="meta">${esc(k.yetkili || '—')}${hasMail ? ' · ' + esc(k.email) : ''}</div>
+        ${hasMail
+          ? `<input type="text" class="email-in" data-id="${esc(k.id)}" inputmode="email" autocomplete="off" spellcheck="false" value="${esc(k.email || '')}"/>`
+          : `<input type="text" class="email-in" data-id="${esc(k.id)}" inputmode="email" autocomplete="off" spellcheck="false" placeholder="e-posta yaz" value=""/>`}
+      </div>
+    </div>`;
+  }).join('') || '<div class="item hint">E-postası kayıtlı kurum yok</div>';
+
+  if (!el._bound) {
+    el._bound = true;
+    el.addEventListener('change', (e) => {
+      const t = e.target;
+      if (t && t.matches('input[type=checkbox][data-id]')) {
+        const id = t.getAttribute('data-id');
+        if (t.checked) state.selected.add(id);
+        else state.selected.delete(id);
+        updateSelectedCount();
+        refreshPreview();
+      }
+    });
+    el.addEventListener('input', (e) => {
+      const t = e.target;
+      if (t && t.classList.contains('email-in')) syncEmailFromInput(t);
+    });
+    el.addEventListener('change', (e) => {
+      const t = e.target;
+      if (t && t.classList.contains('email-in')) {
+        syncEmailFromInput(t);
+        refreshPreview();
+      }
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.target && e.target.classList.contains('email-in')) e.stopPropagation();
+    });
+  }
+
+  if (keepId) {
+    const again = el.querySelector(`input.email-in[data-id="${CSS.escape(keepId)}"]`);
+    if (again) {
+      again.focus();
+      if (keepPos != null) {
+        try { again.setSelectionRange(keepPos, keepPos); } catch (_) {}
+      }
+    }
+  }
+}
+
+function render() {
+  if (!state.user) return renderLogin();
+  const list = filteredKurum();
+  const withMail = list.filter((k) => effectiveEmail(k)).length;
+  const recipientCount = buildRecipients().length;
+  const hasRecipients = recipientCount > 0;
+  const hasDraft = !!(String(state.draftSubject || '').trim() || String(state.draftBody || '').trim());
+  const readySend = hasRecipients && hasDraft && !state.sending;
+
+  document.getElementById('app').innerHTML = `
+    <div class="top">
+      <a class="back" href="/crm">← Saha CRM</a>
+      <h1>Toplu Mail · Hostinger</h1>
+      <div class="nav">
+        <a class="nav-item" href="/mail#kaliplar">
+          <span class="nav-label">Kalıplar</span>
+          <span class="nav-tip">Hazır mesaj şablonları</span>
+        </a>
+        <a class="nav-item" href="/mail#ayarlar">
+          <span class="nav-label">Ayarlar</span>
+          <span class="nav-tip">Gönderici ve SMTP ayarları</span>
+        </a>
+        <a class="nav-item" href="/iletisim/imza?kart=${esc(state.senderKey)}" id="imzaLink">
+          <span class="nav-label">İmza</span>
+          <span class="nav-tip">HTML imza düzenle / kopyala</span>
+        </a>
+        <a class="nav-item" href="https://webmail.hostinger.com/" target="_blank" rel="noopener">
+          <span class="nav-label">Gelen kutusu</span>
+          <span class="nav-tip">Hostinger webmail — yanıtlar buraya</span>
+        </a>
+      </div>
+      <span class="user-pill">${esc(state.user.ad || state.user.kod || '')}</span>
+    </div>
+    <div class="wrap">
+      <div class="flow" aria-hidden="true">
+        <span class="${hasRecipients ? 'on' : ''}">1 Alıcılar</span>
+        <span class="flow-sep">·</span>
+        <span class="${hasDraft ? 'on' : ''}">2 Metin</span>
+        <span class="flow-sep">·</span>
+        <span class="${readySend ? 'on' : ''}">3 Gönder</span>
+      </div>
+      <div class="card" style="padding:12px 16px">
+        <p class="hint" style="margin:0">Gönderen: <b>enes@</b> · <b>abdulkadir@</b> · kurumsal <b>info@</b> (Kader). Her profil kendi SMTP hesabından gider. CRM oturumu şart. Batch max 50.</p>
+      </div>
+      <div class="card inbox-strip">
+        <p>Yanıtlar CRM’de değil — Hostinger webmail. Enes → <b>enes@</b> · Kadir → <b>abdulkadir@</b> · Kader → <b>info@</b></p>
+        <a class="link" href="https://webmail.hostinger.com/" target="_blank" rel="noopener">Gelen kutusunu aç →</a>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>1 · Alıcılar</h2>
+          <p class="sub"><span id="selCount">${recipientCount}</span> e-posta hazır · ${withMail} kayıtlı adres. Yetkili + firma her gönderimde zorunlu.</p>
+          <div class="row">
+            <div style="flex:1;min-width:160px">
+              <label class="lbl">Yetkili adı (zorunlu)</label>
+              <input type="text" id="defaultName" placeholder="Ahmet Yılmaz" value="${esc(state.defaultName)}" autocomplete="off"/>
+            </div>
+            <div style="flex:1;min-width:160px">
+              <label class="lbl">Firma adı (zorunlu)</label>
+              <input type="text" id="defaultFirm" placeholder="Örnek Klinik" value="${esc(state.defaultFirm)}" autocomplete="off"/>
+            </div>
+            <div style="flex:1;min-width:140px">
+              <label class="lbl">Hitap</label>
+              <select id="hitap">
+                <option value="unknown" ${state.hitap==='unknown'?'selected':''}>Bilinmiyor (sadece isim)</option>
+                <option value="bey" ${state.hitap==='bey'?'selected':''}>Erkek — Bey</option>
+                <option value="hanim" ${state.hitap==='hanim'?'selected':''}>Kadın — Hanım</option>
+              </select>
+            </div>
+          </div>
+          <p class="hint" style="margin:0 0 12px">Bilinmiyor: <b>Merhaba Ahmet Yılmaz,</b> · Erkek/Kadın: Bey veya Hanım eklenir. <b>[İsim]</b> / <b>[Firma]</b> bu alanlarla dolar.</p>
+          <label class="lbl">E-posta yaz veya yapıştır</label>
+          <textarea id="manualEmails" rows="3" placeholder="ornek@klinik.com&#10;ikinci@firma.com">${esc(state.manualEmails || '')}</textarea>
+          <p class="hint" style="margin:8px 0 14px">Birden fazla adres: her satıra bir tane. Önce yukarıdaki yetkili + firma doldur.</p>
+          <div class="row">
+            <button class="btn ghost" id="btnToggleKurum" type="button">E-postası kayıtlı firmaları göster</button>
+          </div>
+          <div id="kurumListWrap" style="display:none">
+            <div class="row">
+              <div style="flex:1;min-width:180px">
+                <input type="search" id="q" placeholder="Kurum ara (ad / yetkili / e-posta)" value="${esc(state.q)}" />
+              </div>
+              <label style="font-size:12.5px;display:flex;gap:6px;align-items:center;color:#4b4770">
+                <input type="checkbox" id="onlyMail" ${state.onlyWithEmail ? 'checked' : ''}/> Sadece e-postası olanlar
+              </label>
+            </div>
+            <div class="row">
+              <button class="btn ghost" id="selAll" type="button">Görünenleri seç</button>
+              <button class="btn ghost" id="selNone" type="button">Seçimi temizle</button>
+            </div>
+            <div class="list" id="kurumList"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h2>2 · Metin</h2>
+            <p class="sub">Şablon seç, konu ve gövdeyi düzenle. Önizleme ilk alıcıyla dolar.</p>
+            <label class="lbl">Şablon</label>
+            <select id="tpl">${state.templates.map((t) => `<option value="${esc(t.id)}" ${t.id===state.templateId?'selected':''}>${esc(t.title)} (${esc(t.stage)})</option>`).join('')}</select>
+            <div style="height:12px"></div>
+            <label class="lbl">Gönderen profil (From + yanıt adresi)</label>
+            <select id="sender">
+              <option value="kadir" ${state.senderKey==='kadir'?'selected':''}>Abdülkadir Yaşar — abdulkadir@nefalix.com</option>
+              <option value="enes" ${state.senderKey==='enes'?'selected':''}>Enes Ceylan — enes@nefalix.com</option>
+              <option value="kader" ${state.senderKey==='kader'?'selected':''}>Kader Hanım — info@nefalix.com (kurumsal)</option>
+            </select>
+            <p class="hint" style="margin:6px 0 0">Kişisel stilde mail bu adresten gider; yanıtlar aynı kutuya düşer → <a href="https://webmail.hostinger.com/" target="_blank" rel="noopener">Hostinger Gelen kutusu</a></p>
+            <div style="height:12px"></div>
+            <label class="lbl">Görünüm (Gmail klasörü)</label>
+            <select id="mailStyle">
+              <option value="personal" ${state.mailStyle==='personal'?'selected':''}>Kişisel — Birincil'e daha yakın</option>
+              <option value="branded" ${state.mailStyle==='branded'?'selected':''}>Markalı kart — Tanıtımlar riski yüksek</option>
+            </select>
+            <p class="hint" style="margin:6px 0 12px">Görünüm sadece HTML kartını etkiler. From adresi seçilen profile göre: <b id="fromHint">${esc(displayFromEmail())}</b></p>
+            <label style="font-size:12.5px;display:flex;gap:8px;align-items:center;color:#4b4770">
+              <input type="checkbox" id="includeSig" ${state.includeSignature ? 'checked' : ''}/> HTML imza ekle
+            </label>
+            <p class="hint" style="margin:6px 0 0">Açıksa metindeki kişi satırları kırpılır; sadece “Saygılarımla,” + HTML imza kalır.</p>
+            <div style="height:14px"></div>
+            <label class="lbl">Konu</label>
+            <input type="text" id="draftSubject" value="${esc(state.draftSubject)}" autocomplete="off"/>
+            <div style="height:12px"></div>
+            <label class="lbl">Mail metni (düzenlenebilir)</label>
+            <textarea id="draftBody" rows="12">${esc(state.draftBody)}</textarea>
+            <p class="hint" style="margin:8px 0 0">Yer tutucular gönderimde dolar: <b>[İsim]</b> <b>[Firma]</b> <b>{name}</b> <b>{title}</b> <b>{email}</b> <b>{phone}</b> <b>{calUrl}</b></p>
+            <div class="row" style="margin-top:10px">
+              <button class="btn ghost" id="btnResetDraft" type="button">Şablonu sıfırla</button>
+              <button class="btn ghost" id="btnRefreshPreview" type="button">Örnek doldur</button>
+            </div>
+            <label class="lbl" style="margin-top:8px">Örnek metin (ilk alıcı)</label>
+            <div class="preview" id="filledPreview">${esc(state.preview ? (('Konu: ' + (state.preview.subject || '—')) + '\n\n' + (state.preview.body || state.preview.error || '…')) : '…')}</div>
+            <label class="lbl" style="margin-top:10px">İmza önizleme</label>
+            <div class="sig-preview" id="sigPreview">${state.includeSignature && state.preview?.signatureHtml ? state.preview.signatureHtml : '<span class="hint">…</span>'}</div>
+            <h2 style="margin-top:18px">3 · Gönder</h2>
+            <p class="sub">Seçilen alıcılara batch gönder (max 50). Gönderim sonrası sonuç tablosu aşağıda açılır.</p>
+            <div class="row" style="margin-top:4px">
+              <button class="btn" id="btnSend" ${state.sending?'disabled':''}>${state.sending ? 'Gönderiliyor…' : ('Seçilenlere gönder (' + recipientCount + ')')}</button>
+            </div>
+          </div>
+          ${state.results ? `
+          <div class="card">
+            <h2>Sonuç · gönderilen ${esc(state.results.sent)} · atlanan ${esc(state.results.skipped)} · hata ${esc(state.results.errors)}</h2>
+            <table>
+              <thead><tr><th>Durum</th><th>Firma</th><th>E-posta</th><th>Not</th></tr></thead>
+              <tbody>
+                ${(state.results.results||[]).map((r) => {
+                  const cls = r.status==='ok'?'ok':(r.status==='skipped'?'skip':'err');
+                  return `<tr><td><span class="badge ${cls}">${esc(r.status)}</span></td><td>${esc(r.firm)}</td><td>${esc(r.email)}</td><td>${esc(r.reason||r.subject||'')}</td></tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  renderKurumList();
+  document.getElementById('btnToggleKurum').onclick = () => {
+    state.showKurumList = !state.showKurumList;
+    if (state.showKurumList) state.onlyWithEmail = true;
+    const only = document.getElementById('onlyMail');
+    if (only) only.checked = state.onlyWithEmail;
+    renderKurumList();
+  };
+  let qTimer = null;
+  const qEl = document.getElementById('q');
+  if (qEl) {
+    qEl.oninput = (e) => {
+      state.q = e.target.value;
+      clearTimeout(qTimer);
+      qTimer = setTimeout(() => renderKurumList(), 180);
+    };
+  }
+  const onlyMail = document.getElementById('onlyMail');
+  if (onlyMail) {
+    onlyMail.onchange = (e) => { state.onlyWithEmail = e.target.checked; renderKurumList(); };
+  }
+  const selAll = document.getElementById('selAll');
+  const selNone = document.getElementById('selNone');
+  if (selAll) selAll.onclick = () => { toggleAll(true); renderKurumList(); };
+  if (selNone) selNone.onclick = () => { toggleAll(false); renderKurumList(); };
+  document.getElementById('tpl').onchange = (e) => {
+    readDraftFromDom();
+    state.templateId = e.target.value;
+    loadDraftFromTemplate();
+    const s = document.getElementById('draftSubject');
+    const b = document.getElementById('draftBody');
+    if (s) s.value = state.draftSubject;
+    if (b) b.value = state.draftBody;
+    refreshPreview();
+  };
+  document.getElementById('sender').onchange = (e) => {
+    state.senderKey = e.target.value;
+    savePrefs();
+    const hint = document.getElementById('fromHint');
+    if (hint) hint.textContent = displayFromEmail();
+    refreshPreview();
+  };
+  document.getElementById('includeSig').onchange = (e) => {
+    state.includeSignature = e.target.checked;
+    savePrefs();
+    refreshPreview();
+  };
+  document.getElementById('mailStyle').onchange = (e) => {
+    state.mailStyle = e.target.value;
+    savePrefs();
+    const hint = document.getElementById('fromHint');
+    if (hint) hint.textContent = displayFromEmail();
+    refreshPreview();
+  };
+  document.getElementById('btnResetDraft').onclick = () => {
+    loadDraftFromTemplate();
+    const s = document.getElementById('draftSubject');
+    const b = document.getElementById('draftBody');
+    if (s) s.value = state.draftSubject;
+    if (b) b.value = state.draftBody;
+    refreshPreview();
+  };
+  document.getElementById('btnRefreshPreview').onclick = () => refreshPreview();
+  document.getElementById('btnSend').onclick = sendSelected;
+  const draftSubject = document.getElementById('draftSubject');
+  const draftBody = document.getElementById('draftBody');
+  draftSubject.oninput = () => { state.draftSubject = draftSubject.value; };
+  draftBody.oninput = () => { state.draftBody = draftBody.value; };
+  draftSubject.onkeydown = (e) => e.stopPropagation();
+  draftBody.onkeydown = (e) => e.stopPropagation();
+  const defName = document.getElementById('defaultName');
+  const defFirm = document.getElementById('defaultFirm');
+  const hitapEl = document.getElementById('hitap');
+  defName.oninput = () => { state.defaultName = defName.value; savePrefs(); updateSelectedCount(); };
+  defFirm.oninput = () => { state.defaultFirm = defFirm.value; savePrefs(); updateSelectedCount(); };
+  hitapEl.onchange = () => { state.hitap = hitapEl.value; savePrefs(); refreshPreview(); };
+  defName.onchange = () => { savePrefs(); refreshPreview(); };
+  defFirm.onchange = () => { savePrefs(); refreshPreview(); };
+  const manual = document.getElementById('manualEmails');
+  manual.oninput = (e) => {
+    state.manualEmails = e.target.value;
+    updateSelectedCount();
+  };
+  manual.onchange = () => refreshPreview();
+  manual.onkeydown = (e) => e.stopPropagation();
+}
+
+boot().catch((e) => {
+  console.error(e);
+  toast(e.message || 'Yükleme hatası');
+  render();
+});
+</script>
+</body>
+</html>

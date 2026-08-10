@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-chip:hover { filter:brightness(0.96); }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="randevu" hint-size="100%,132px"></dc-import>
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px;">
+      <div style="{{ card1 }}"><div style="font-size:12px; opacity:0.9;">Otel / konaklama</div><div style="font-size:26px; font-weight:800; margin-top:6px;">{{ nHotel }}</div></div>
+      <div style="{{ card2 }}"><div style="font-size:12px; opacity:0.9;">Transfer notu</div><div style="font-size:26px; font-weight:800; margin-top:6px;">{{ nTransfer }}</div></div>
+      <div style="{{ card3 }}"><div style="font-size:12px; opacity:0.9;">Transfer randevu</div><div style="font-size:26px; font-weight:800; margin-top:6px;">{{ nRnd }}</div></div>
+    </div>
+
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden; margin-bottom:18px;">
+      <div style="padding:16px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-size:17px; font-weight:700; color:#241854;">Transfer Takvimi</div>
+          <div style="font-size:12px; color:#8b87a8; margin-top:3px;">Teklif otel/transfer alanları + tip=Transfer randevular</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <div style="display:flex; gap:6px;">
+            <div class="nf-chip" onClick="{{ filtAll }}" style="{{ chipAll }}">Tümü</div>
+            <div class="nf-chip" onClick="{{ filtHotel }}" style="{{ chipHotel }}">Otel</div>
+            <div class="nf-chip" onClick="{{ filtTransfer }}" style="{{ chipTransfer }}">Transfer</div>
+            <div class="nf-chip" onClick="{{ filtRnd }}" style="{{ chipRnd }}">Randevu</div>
+          </div>
+          <a href="YeniTeklif.dc.html" class="nf-btn" style="background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:9px 14px; font-size:12.5px; font-weight:600; color:#fff;">＋ Teklif</a>
+        </div>
+      </div>
+      <div style="padding:12px 22px; border-bottom:1px solid #f0eef8;">
+        <input class="nf-input" placeholder="Danışan / otel / transfer ara..." onInput="{{ onQ }}" style="width:100%; max-width:360px; box-sizing:border-box; border:1px solid #d9d5ee; border-radius:9px; padding:9px 12px; font-size:13.5px; color:#241854;" />
+      </div>
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="padding:50px; text-align:center; color:#8b87a8;">Yükleniyor...</div></sc-if>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:1fr 1.3fr 1.2fr 1.3fr 1fr 0.9fr; padding:12px 22px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+          <span>Tarih</span><span>Danışan</span><span>Otel</span><span>Transfer</span><span>Kaynak</span><span style="text-align:right;">Durum</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+          <div class="nf-row" style="{{ r.style }}">
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.tarih }}</span>
+            <a href="{{ r.href }}" style="font-weight:600; color:#241854; font-size:13px;">{{ r.ad }}</a>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.hotel }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.transfer }}</span>
+            <span style="{{ r.srcStyle }}">{{ r.src }}</span>
+            <span style="text-align:right; font-size:12px; font-weight:600; color:#4b4770;">{{ r.durum }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 22px; font-size:13px; color:#8b87a8;">{{ countLabel }}</div>
+      </sc-if>
+    </div>
+  </div>
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;"><span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span><span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:900}}">
+const ST = { beklemede: 'Beklemede', gonderildi: 'Gönderildi', kabul: 'Kabul', red: 'Red', bekliyor: 'Bekliyor', geldi: 'Geldi', iptal: 'İptal' };
+class Component extends DCLogic {
+  state = { ready: false, q: '', filt: 'all' };
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  chip(active) {
+    return {
+      padding: '7px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+      background: active ? '#4338ca' : '#f4f2fb', color: active ? '#fff' : '#4338ca'
+    };
+  }
+  renderVals() {
+    const card = (c1, c2) => ({ background: 'linear-gradient(135deg,' + c1 + ',' + c2 + ')', borderRadius: '14px', padding: '16px 18px', color: '#fff' });
+    if (!this.state.ready) return { loading: true, ready: false, card1: card('#7c3aed','#4338ca'), card2: card('#2563eb','#0891b2'), card3: card('#0f766e','#115e59'), nHotel: '…', nTransfer: '…', nRnd: '…' };
+    const N = window.Nefalix;
+    const q = (this.state.q || '').toLowerCase().trim();
+    const filt = this.state.filt;
+    const offers = N.getTeklif().filter(t => (t.hotel || '').trim() || (t.transfer || '').trim());
+    const rnds = N.getRandevu().filter(r => String(r.tip || '').toLowerCase().includes('transfer'));
+    let rows = [];
+    offers.forEach(t => {
+      rows.push({
+        kind: (t.hotel || '').trim() ? 'hotel' : 'transfer',
+        tarih: t.tarih || '—',
+        ad: t.ad || '(İsimsiz)',
+        hotel: t.hotel || '—',
+        transfer: t.transfer || '—',
+        src: 'Teklif',
+        durum: ST[t.durum] || t.durum || '—',
+        href: t.danisanId ? ('HastaKarti.dc.html?id=' + encodeURIComponent(t.danisanId)) : (N.hrefForName(t.ad) || '#'),
+        _ts: (N.parseDate(t.tarih) || new Date(0)).getTime()
+      });
+    });
+    rnds.forEach(r => {
+      rows.push({
+        kind: 'rnd',
+        tarih: (r.tarih || '—') + (r.saat ? ' ' + r.saat : ''),
+        ad: r.ad || '(İsimsiz)',
+        hotel: '—',
+        transfer: r.tip || 'Transfer',
+        src: 'Randevu',
+        durum: ST[r.durum] || r.durum || '—',
+        href: r.danisanId ? ('HastaKarti.dc.html?id=' + encodeURIComponent(r.danisanId)) : (N.hrefForName(r.ad) || '#'),
+        _ts: (N.parseDate(r.tarih) || new Date(0)).getTime()
+      });
+    });
+    if (filt === 'hotel') rows = rows.filter(r => r.kind === 'hotel' || (r.hotel && r.hotel !== '—'));
+    if (filt === 'transfer') rows = rows.filter(r => r.kind === 'transfer' || (r.transfer && r.transfer !== '—' && r.kind !== 'rnd'));
+    if (filt === 'rnd') rows = rows.filter(r => r.kind === 'rnd');
+    if (q) rows = rows.filter(r => (r.ad + ' ' + r.hotel + ' ' + r.transfer).toLowerCase().includes(q));
+    rows.sort((a, b) => b._ts - a._ts);
+    const mapped = rows.slice(0, 200).map((r, i) => Object.assign({}, r, {
+      srcStyle: { fontSize: '11px', fontWeight: 600, padding: '3px 9px', borderRadius: '20px', justifySelf: 'start', color: r.src === 'Teklif' ? '#7c3aed' : '#0f766e', background: r.src === 'Teklif' ? '#f1eefc' : '#ccfbf1' },
+      style: { display: 'grid', gridTemplateColumns: '1fr 1.3fr 1.2fr 1.3fr 1fr 0.9fr', alignItems: 'center', padding: '12px 22px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+    }));
+    return {
+      ready: true, loading: false,
+      card1: card('#7c3aed', '#4338ca'), card2: card('#2563eb', '#0891b2'), card3: card('#0f766e', '#115e59'),
+      nHotel: String(offers.filter(t => (t.hotel || '').trim()).length),
+      nTransfer: String(offers.filter(t => (t.transfer || '').trim()).length),
+      nRnd: String(rnds.length),
+      rows: mapped,
+      countLabel: mapped.length + ' kayıt · teklif otel/transfer + transfer randevu',
+      chipAll: this.chip(filt === 'all'), chipHotel: this.chip(filt === 'hotel'), chipTransfer: this.chip(filt === 'transfer'), chipRnd: this.chip(filt === 'rnd'),
+      filtAll: () => this.setState({ filt: 'all' }),
+      filtHotel: () => this.setState({ filt: 'hotel' }),
+      filtTransfer: () => this.setState({ filt: 'transfer' }),
+      filtRnd: () => this.setState({ filt: 'rnd' }),
+      onQ: (e) => this.setState({ q: e.target.value })
+    };
+  }
+}
+</script>
+</body>
+</html>

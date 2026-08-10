@@ -11,6 +11,7 @@
 | Kaynak | Ne |
 |--------|----|
 | Canlı site | Mac `~/nefalix-landing` (tam proje) — **sadece CLI** `vercel --prod` |
+| `n8n-repo/nefalix-landing/` | Tam site kaynağı (Arif / git) — **Git deploy yok** |
 | `n8n-repo/landing-kit/` | Patch kit (kartvizit vb.) — **deploy etme** |
 | Bozan şey | Vercel ↔ GitHub bağlantısı + Root Directory eski `nefalix-landing` |
 

@@ -1,0 +1,566 @@
+{
+  "outputDirectory": ".",
+  "functions": {
+    "api/blog.js": {
+      "includeFiles": "{iletisim,iletisim-imza,iletisim-kilavuz,iletisim-mail-onizleme,toplu-mail,blog,geo}.html"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/landing",
+      "destination": "/landing.html"
+    },
+    {
+      "source": "/urunler",
+      "destination": "/urunler.html"
+    },
+    {
+      "source": "/sektorler",
+      "destination": "/sektorler.html"
+    },
+    {
+      "source": "/platformlar",
+      "destination": "/platformlar.html"
+    },
+    {
+      "source": "/ai-ajaniniz",
+      "destination": "/ai-ajaniniz.html"
+    },
+    {
+      "source": "/fiyatlar",
+      "destination": "/fiyatlar.html"
+    },
+    {
+      "source": "/basvuru",
+      "destination": "/basvuru.html"
+    },
+    {
+      "source": "/kaynaklar",
+      "destination": "/kaynaklar.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/api/blog?action=blog-index"
+    },
+    {
+      "source": "/geo",
+      "destination": "/api/blog?action=geo-index"
+    },
+    {
+      "source": "/hakkimizda",
+      "destination": "/hakkimizda.html"
+    },
+    {
+      "source": "/anasayfa-detayi",
+      "destination": "/anasayfa-detayi.html"
+    },
+    {
+      "source": "/kullanici-sozlesmesi",
+      "destination": "/kullanici-sozlesmesi.html"
+    },
+    {
+      "source": "/gizlilik-politikasi",
+      "destination": "/gizlilik-politikasi.html"
+    },
+    {
+      "source": "/kvkk",
+      "destination": "/kvkk.html"
+    },
+    {
+      "source": "/veri-guvenligi",
+      "destination": "/veri-guvenligi.html"
+    },
+    {
+      "source": "/iys-izin",
+      "destination": "/iys-izin.html"
+    },
+    {
+      "source": "/hbys-entegrasyon",
+      "destination": "/hbys-entegrasyon.html"
+    },
+    {
+      "source": "/guvenlik-standartlari",
+      "destination": "/guvenlik-standartlari.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "/ar.html"
+    },
+    {
+      "source": "/dashboard/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/dashboard/demo",
+      "destination": "/demo-entry.html"
+    },
+    {
+      "source": "/dashboard/setup",
+      "destination": "/setup-password.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/api/blog/list",
+      "destination": "/api/blog?action=list"
+    },
+    {
+      "source": "/api/youtube/list",
+      "destination": "/api/blog?action=youtube-list"
+    },
+    {
+      "source": "/blog-sitemap.xml",
+      "destination": "/api/blog?action=sitemap"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/api/blog?action=render&slug=:slug"
+    },
+    {
+      "source": "/api/geo/list",
+      "destination": "/api/blog?action=geo-list"
+    },
+    {
+      "source": "/geo-sitemap.xml",
+      "destination": "/api/blog?action=geo-sitemap"
+    },
+    {
+      "source": "/geo/klinik-itibar-yonetimi-yazilimi",
+      "destination": "/geo-pillars/klinik-itibar-yonetimi-yazilimi.html"
+    },
+    {
+      "source": "/geo/hbys-entegrasyonu-whatsapp",
+      "destination": "/geo-pillars/hbys-entegrasyonu-whatsapp.html"
+    },
+    {
+      "source": "/geo/hasta-recall-kayip-hasta-geri-kazanimi",
+      "destination": "/geo-pillars/hasta-recall-kayip-hasta-geri-kazanimi.html"
+    },
+    {
+      "source": "/geo/nps-yazilimi-saglik-sektoru",
+      "destination": "/geo-pillars/nps-yazilimi-saglik-sektoru.html"
+    },
+    {
+      "source": "/geo/olumsuz-yorum-kriz-yonetimi",
+      "destination": "/geo-pillars/olumsuz-yorum-kriz-yonetimi.html"
+    },
+    {
+      "source": "/geo/en-iyi-klinik-itibar-yonetimi-yazilimlari-2026",
+      "destination": "/geo-pillars/en-iyi-klinik-itibar-yonetimi-yazilimlari-2026.html"
+    },
+    {
+      "source": "/geo/:date(\\d{4}-\\d{2}-\\d{2})",
+      "destination": "/api/blog?action=geo-render&date=:date"
+    },
+    {
+      "source": "/k/abdulkadir",
+      "destination": "/k/abdulkadir-yasar.html"
+    },
+    {
+      "source": "/k/enes",
+      "destination": "/k/enes-ceylan.html"
+    },
+    {
+      "source": "/iletisim",
+      "destination": "/api/blog?action=crm-page&page=iletisim"
+    },
+    {
+      "source": "/iletisim/imza",
+      "destination": "/api/blog?action=crm-page&page=imza"
+    },
+    {
+      "source": "/iletisim/kilavuz",
+      "destination": "/api/blog?action=crm-page&page=kilavuz"
+    },
+    {
+      "source": "/iletisim/onizleme",
+      "destination": "/api/blog?action=crm-page&page=onizleme"
+    },
+    {
+      "source": "/mail",
+      "destination": "/api/blog?action=crm-page&page=iletisim"
+    },
+    {
+      "source": "/iletisim.html",
+      "destination": "/api/blog?action=crm-page&page=iletisim"
+    },
+    {
+      "source": "/iletisim-imza.html",
+      "destination": "/api/blog?action=crm-page&page=imza"
+    },
+    {
+      "source": "/toplu-mail.html",
+      "destination": "/api/blog?action=crm-page&page=toplu-mail"
+    },
+    {
+      "source": "/nefalix-crm",
+      "destination": "/nefalix-crm.html"
+    },
+    {
+      "source": "/crm-wa",
+      "destination": "/nefalix-crm.html"
+    },
+    {
+      "source": "/hasta-crm",
+      "destination": "/nefalix-hasta-crm.html"
+    },
+    {
+      "source": "/api/firma-basvuru",
+      "destination": "/api/blog?action=firma-basvuru"
+    },
+    {
+      "source": "/crm",
+      "destination": "/crm.html"
+    },
+    {
+      "source": "/saha",
+      "destination": "/crm.html"
+    },
+    {
+      "source": "/klinik-crm",
+      "destination": "/klinik-crm.html"
+    },
+    {
+      "source": "/api/clinic/login",
+      "destination": "/api/blog?action=clinic-login"
+    },
+    {
+      "source": "/api/clinic/logout",
+      "destination": "/api/blog?action=clinic-logout"
+    },
+    {
+      "source": "/api/clinic/bootstrap",
+      "destination": "/api/blog?action=clinic-bootstrap"
+    },
+    {
+      "source": "/api/clinic/leads",
+      "destination": "/api/blog?action=clinic-leads"
+    },
+    {
+      "source": "/api/clinic/assign",
+      "destination": "/api/blog?action=clinic-assign"
+    },
+    {
+      "source": "/api/clinic/dynamic",
+      "destination": "/api/blog?action=clinic-dynamic"
+    },
+    {
+      "source": "/api/clinic/note-save",
+      "destination": "/api/blog?action=clinic-note-save"
+    },
+    {
+      "source": "/api/clinic/contact",
+      "destination": "/api/blog?action=clinic-contact"
+    },
+    {
+      "source": "/api/clinic/appointments",
+      "destination": "/api/blog?action=clinic-appointments"
+    },
+    {
+      "source": "/api/clinic/lead-intake",
+      "destination": "/api/blog?action=clinic-lead-intake"
+    },
+    {
+      "source": "/api/clinic/me",
+      "destination": "/api/blog?action=clinic-me"
+    },
+    {
+      "source": "/api/clinic/offers",
+      "destination": "/api/blog?action=clinic-offers"
+    },
+    {
+      "source": "/api/clinic/payments",
+      "destination": "/api/blog?action=clinic-payments"
+    },
+    {
+      "source": "/api/clinic/reports",
+      "destination": "/api/blog?action=clinic-reports"
+    },
+    {
+      "source": "/api/crm/login",
+      "destination": "/api/blog?action=crm-login"
+    },
+    {
+      "source": "/api/crm/logout",
+      "destination": "/api/blog?action=crm-logout"
+    },
+    {
+      "source": "/api/crm/state",
+      "destination": "/api/blog?action=crm-get"
+    },
+    {
+      "source": "/api/crm/save",
+      "destination": "/api/blog?action=crm-save"
+    },
+    {
+      "source": "/api/crm/notify-randevu",
+      "destination": "/api/blog?action=crm-notify-randevu"
+    },
+    {
+      "source": "/api/crm/outreach",
+      "destination": "/api/blog?action=crm-outreach"
+    },
+    {
+      "source": "/api/crm/outreach-templates",
+      "destination": "/api/blog?action=crm-outreach-templates"
+    },
+    {
+      "source": "/api/crm/outreach-status",
+      "destination": "/api/blog?action=crm-outreach-status"
+    },
+    {
+      "source": "/api/crm/whatsapp",
+      "destination": "/api/blog?action=crm-whatsapp"
+    },
+    {
+      "source": "/toplu-mail",
+      "destination": "/api/blog?action=crm-page&page=toplu-mail"
+    },
+    {
+      "source": "/api/social/approve",
+      "destination": "/api/blog?action=social-approve"
+    },
+    {
+      "source": "/api/social/reject",
+      "destination": "/api/blog?action=social-reject"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "nefalixai.com"
+        }
+      ],
+      "destination": "https://nefalix.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.nefalixai.com"
+        }
+      ],
+      "destination": "https://nefalix.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.nefalix.com"
+        }
+      ],
+      "destination": "https://nefalix.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/urunler.html",
+      "destination": "/urunler",
+      "permanent": true
+    },
+    {
+      "source": "/sektorler.html",
+      "destination": "/sektorler",
+      "permanent": true
+    },
+    {
+      "source": "/platformlar.html",
+      "destination": "/platformlar",
+      "permanent": true
+    },
+    {
+      "source": "/ai-ajaniniz.html",
+      "destination": "/ai-ajaniniz",
+      "permanent": true
+    },
+    {
+      "source": "/fiyatlar.html",
+      "destination": "/fiyatlar",
+      "permanent": true
+    },
+    {
+      "source": "/kaynaklar.html",
+      "destination": "/kaynaklar",
+      "permanent": true
+    },
+    {
+      "source": "/geo.html",
+      "destination": "/geo",
+      "permanent": true
+    },
+    {
+      "source": "/blog.html",
+      "destination": "/blog",
+      "permanent": true
+    },
+    {
+      "source": "/hakkimizda.html",
+      "destination": "/hakkimizda",
+      "permanent": true
+    },
+    {
+      "source": "/anasayfa-detayi.html",
+      "destination": "/anasayfa-detayi",
+      "permanent": true
+    },
+    {
+      "source": "/kullanici-sozlesmesi.html",
+      "destination": "/kullanici-sozlesmesi",
+      "permanent": true
+    },
+    {
+      "source": "/gizlilik-politikasi.html",
+      "destination": "/gizlilik-politikasi",
+      "permanent": true
+    },
+    {
+      "source": "/kvkk.html",
+      "destination": "/kvkk",
+      "permanent": true
+    },
+    {
+      "source": "/veri-guvenligi.html",
+      "destination": "/veri-guvenligi",
+      "permanent": true
+    },
+    {
+      "source": "/iys-izin.html",
+      "destination": "/iys-izin",
+      "permanent": true
+    },
+    {
+      "source": "/hbys-entegrasyon.html",
+      "destination": "/hbys-entegrasyon",
+      "permanent": true
+    },
+    {
+      "source": "/guvenlik-standartlari.html",
+      "destination": "/guvenlik-standartlari",
+      "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/nefalixai-logo.png",
+      "destination": "/assets/brand/nefalix-logo.png",
+      "permanent": true
+    },
+    {
+      "source": "/logo.svg",
+      "destination": "/assets/brand/nefalix-logo.png",
+      "permanent": true
+    },
+    {
+      "source": "/logo-wordmark.svg",
+      "destination": "/assets/brand/nefalix-wordmark.png",
+      "permanent": true
+    },
+    {
+      "source": "/public/logo.svg",
+      "destination": "/assets/brand/nefalix-logo.png",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/nefalix-crm",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, max-age=0"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/nefalix-crm.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, max-age=0"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/hasta-crm",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, max-age=0"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/nefalix-hasta-crm.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, max-age=0"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/k/(.*).vcf",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/vcard; charset=utf-8"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment"
+        }
+      ]
+    }
+  ],
+  "git": {
+    "deploymentEnabled": false
+  }
+}

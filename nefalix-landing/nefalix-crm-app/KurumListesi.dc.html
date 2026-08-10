@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="store.js"></script>
+<style>
+  body { margin:0; background:#f2f2f9; }
+  a { color:#4338ca; text-decoration:none; }
+  a:hover { color:#2b2280; }
+  .nf-row:hover { background:#f3f1fb !important; }
+  .nf-page:hover { background:#ece9f9 !important; }
+  .nf-btn:hover { filter:brightness(1.07); }
+  .nf-ic:hover { background:#ece9f9 !important; }
+  .nf-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px rgba(124,58,237,0.12) !important; }
+</style>
+</helmet>
+<div style="font-family:'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif; min-height:100vh; background:#f2f2f9; display:flex; flex-direction:column;">
+  <dc-import name="NavHeader" active-page="kurum" hint-size="100%,132px"></dc-import>
+
+  <div style="flex:1; padding:22px 28px 30px;">
+    <div style="background:#fff; border-radius:14px; border:1px solid #ece9f7; box-shadow:0 2px 10px rgba(20,20,60,0.06); overflow:hidden;">
+      <div style="padding:18px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0eef8;">
+        <div style="font-size:17px; font-weight:700; color:#241854;">Kurum Listesi <span style="font-size:13px; font-weight:500; color:#9c98b8;">— müşteri klinik & kurumlar</span></div>
+        <div style="display:flex; gap:8px;">
+        <div class="nf-btn" onClick="{{ doExcel }}" style="display:flex; align-items:center; gap:6px; background:#16a34a; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ Excel</div>
+        <div class="nf-btn" onClick="{{ doPdf }}" style="display:flex; align-items:center; gap:6px; background:#dc2626; border-radius:9px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#fff; cursor:pointer;">⬇ PDF</div>
+        <a href="YeniKurum.dc.html" class="nf-btn" style="display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,#7c3aed,#4338ca); border-radius:9px; padding:10px 16px; font-size:13px; font-weight:600; color:#fff;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Yeni Kurum
+        </a>
+        </div>
+      </div>
+
+      <div style="padding:16px 24px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; border-bottom:1px solid #f0eef8;">
+        <div style="display:flex; align-items:center; gap:8px; border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; flex:1; min-width:240px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b87a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input class="nf-input" placeholder="Kurum adı, yetkili, şehir, temsilci ara..." onInput="{{ onQ }}" onKeyDown="{{ onKey }}" style="border:none; outline:none; font-size:13.5px; color:#241854; width:100%; background:transparent;" />
+        </div>
+        <select onChange="{{ onSeg }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; font-size:13px; color:#4b4770; background:#fff; cursor:pointer;">
+          <option value="">Tüm aşamalar</option>
+          <option value="Yeni Lead">Yeni Lead</option>
+          <option value="İlk Görüşme">İlk Görüşme</option>
+          <option value="Demo">Demo</option>
+          <option value="Teklif">Teklif</option>
+          <option value="Sözleşme">Sözleşme</option>
+          <option value="Aktif Müşteri">Aktif Müşteri</option>
+        </select>
+        <select onChange="{{ onTip }}" style="border:1px solid #d9d5ee; border-radius:9px; padding:9px 13px; font-size:13px; color:#4b4770; background:#fff; cursor:pointer;">
+          <option value="">Tüm kurum tipleri</option>
+          <option value="Diş Kliniği">Diş Kliniği</option>
+          <option value="Estetik / Güzellik Merkezi">Estetik / Güzellik Merkezi</option>
+          <option value="Saç Ekim Merkezi">Saç Ekim Merkezi</option>
+          <option value="Hastane">Hastane</option>
+          <option value="Göz Merkezi">Göz Merkezi</option>
+          <option value="Poliklinik">Poliklinik</option>
+          <option value="Fizik Tedavi / Rehabilitasyon">Fizik Tedavi / Rehabilitasyon</option>
+        </select>
+        <div class="nf-btn" onClick="{{ doSearch }}" style="background:linear-gradient(135deg,#2563eb,#22d3ee); border-radius:9px; padding:10px 20px; font-size:13px; font-weight:600; color:#fff; cursor:pointer; display:flex; align-items:center; gap:7px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>Ara
+        </div>
+      </div>
+
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:60px; text-align:center; color:#8b87a8; font-size:14px;">Kurumlar yükleniyor...</div>
+      </sc-if>
+      <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:90px 1.7fr 1.3fr 1fr 1.3fr 1.1fr 92px; padding:13px 24px; background:#fbfaff; font-size:12px; font-weight:700; color:#241854; border-bottom:1px solid #f0eef8;">
+          <span>Kurum ID</span><span>Kurum</span><span>Tip</span><span>Şehir</span><span>Aşama</span><span>Temsilci</span><span style="text-align:right;">İşlemler</span>
+        </div>
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:50px; text-align:center; color:#9c98b8; font-size:14px;">🔍 Kayıt bulunamadı. Arama/filtreyi değiştirip tekrar deneyin ya da <a href="YeniKurum.dc.html">yeni kurum ekleyin</a>.</div>
+        </sc-if>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+          <div class="nf-row" style="{{ r.rowStyle }}">
+            <span style="color:#8b87a8; font-size:12.5px;">{{ r.dosyaNo }}</span>
+            <a href="{{ r.href }}" style="display:flex; align-items:center; gap:9px; font-weight:600; color:#241854; font-size:13px;"><span style="width:30px; height:30px; border-radius:8px; background:#f1eefc; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"></path></svg></span>{{ r.ad }}</a>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.tip }}</span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.sehir }}</span>
+            <span style="display:flex; align-items:center; gap:7px; font-size:12px;"><span style="{{ r.segDot }}"></span><span style="{{ r.segStyle }}">{{ r.segment }}</span></span>
+            <span style="color:#4b4770; font-size:12.5px;">{{ r.temsilci }}</span>
+            <div style="display:flex; gap:6px; justify-content:flex-end;">
+              <a href="{{ r.href }}" class="nf-ic" style="width:28px; height:28px; border-radius:7px; background:#f4f2fb; display:flex; align-items:center; justify-content:center;" title="Detay">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </a>
+              <div class="nf-ic" style="width:28px; height:28px; border-radius:7px; background:#f0fdf9; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="WhatsApp">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#16a34a"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5.1-1.3A10 10 0 1012 2z"></path></svg>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px;">
+          <span style="font-size:13px; color:#8b87a8;">{{ countLabel }}</span>
+          <div style="display:flex; gap:6px;">
+            <span class="nf-page" onClick="{{ prev }}" style="min-width:32px; height:32px; padding:0 8px; border-radius:7px; background:#f4f2fb; color:#4338ca; display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer;">‹ Önceki</span>
+            <span style="min-width:32px; height:32px; padding:0 12px; border-radius:7px; background:#4338ca; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600;">{{ pageLabel }}</span>
+            <span class="nf-page" onClick="{{ next }}" style="min-width:32px; height:32px; padding:0 8px; border-radius:7px; background:#f4f2fb; color:#4338ca; display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer;">Sonraki ›</span>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="padding:16px 28px; display:flex; justify-content:space-between; font-size:12px; color:#9c98b8;">
+    <span>Nefalix 2026 © <strong style="color:#6b6785;">v160726_01</strong></span>
+    <span>Benzersiz müşteri kodunuz : <strong style="color:#6b6785;">NFX5</strong></span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+function segColor(s) {
+  s = (s || '').toLowerCase();
+  if (s.includes('yeni lead')) return '#9ca3af';
+  if (s.includes('görüşme')) return '#2563eb';
+  if (s.includes('demo')) return '#7c3aed';
+  if (s.includes('teklif')) return '#f59e0b';
+  if (s.includes('sözleşme')) return '#0891b2';
+  if (s.includes('aktif')) return '#16a34a';
+  if (s.includes('kaybedildi') || s.includes('olumsuz')) return '#ef4444';
+  return '#9ca3af';
+}
+class Component extends DCLogic {
+  state = { ready: false, page: 1, q: '', tip: '', seg: '' };
+  _q = '';
+  componentDidMount() { window.Nefalix.ready().then(() => this.setState({ ready: true })); }
+  renderVals() {
+    if (!this.state.ready) return { loading: true, ready: false };
+    const res = window.Nefalix.getKurum({ q: this.state.q, tip: this.state.tip, segment: this.state.seg, page: this.state.page, size: 30 });
+    const rows = res.rows.map((d, i) => {
+      const c = segColor(d['Segment']);
+      return {
+        dosyaNo: d['Kurum ID'] || '-',
+        ad: d['Ad'] || '(İsimsiz)',
+        tip: d['Kurum tipi'] || '-',
+        sehir: d['Şehir'] || '-',
+        segment: d['Segment'] || '-',
+        segDot: { width: '9px', height: '9px', borderRadius: '50%', background: c, flexShrink: 0, display: 'inline-block' },
+        segStyle: { color: c, fontWeight: 600 },
+        temsilci: d['Satış temsilcisi'] || '-',
+        href: 'KurumKarti.dc.html?id=' + encodeURIComponent(d._id),
+        rowStyle: { display: 'grid', gridTemplateColumns: '90px 1.7fr 1.3fr 1fr 1.3fr 1.1fr 92px', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid #f6f5fb', background: i % 2 === 0 ? '#fff' : '#fbfaff' }
+      };
+    });
+    return {
+      ready: true, loading: false, rows, isEmpty: res.total === 0,
+      countLabel: res.total.toLocaleString('tr-TR') + ' kurumdan ' + (res.total ? ((res.page - 1) * res.size + 1) : 0) + ' - ' + Math.min(res.page * res.size, res.total) + ' arası',
+      pageLabel: res.page + ' / ' + res.pages,
+      onQ: (e) => { this._q = e.target.value; },
+      onKey: (e) => { if (e.key === 'Enter') this.doSearch(); },
+      onTip: (e) => this.setState({ tip: e.target.value, page: 1 }),
+      onSeg: (e) => this.setState({ seg: e.target.value, page: 1 }),
+      doSearch: () => this.setState({ q: this._q, page: 1 }),
+      prev: () => this.setState(s => ({ page: Math.max(1, s.page - 1) })),
+      next: () => this.setState(s => ({ page: Math.min(res.pages, s.page + 1) })),
+      doExcel: () => this.exportAll('excel'),
+      doPdf: () => this.exportAll('pdf')
+    };
+  }
+  exportAll(kind) {
+    const full = window.Nefalix.getKurum({ q: this.state.q, tip: this.state.tip, segment: this.state.seg, size: 100000 }).rows;
+    const headers = ['Kurum ID', 'Kurum', 'Tip', 'Yetkili', 'Telefon', 'Şehir', 'Aşama', 'Temsilci', 'Kayıt tarihi'];
+    const rows = full.map(d => [d['Kurum ID'] || '', d['Ad'] || '', d['Kurum tipi'] || '', d['Yetkili'] || '', d['Telefon'] || '', d['Şehir'] || '', d['Segment'] || '', d['Satış temsilcisi'] || '', d['Kayıt tarihi'] || '']);
+    if (kind === 'excel') window.Nefalix.exportExcel('kurum-listesi', headers, rows);
+    else window.Nefalix.exportPDF('Kurum Listesi', headers, rows);
+  }
+  doSearch() { this.setState({ q: this._q, page: 1 }); }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Nefalix Klinik CRM</title>
+<link rel="icon" href="/assets/brand/favicon-192.png" type="image/png">
+<style>
+  :root{
+    --nx-navy:#0e2a47;
+    --nx-navy-2:#123a63;
+    --nx-blue:#1f6feb;
+    --nx-gold:#c9a24b;
+    --nx-bg:#f4f6f9;
+    --nx-card:#ffffff;
+    --nx-border:#e3e8ef;
+    --nx-text:#1c2733;
+    --nx-muted:#6b7a8c;
+    --nx-green:#1a9c6b;
+    --nx-red:#d64545;
+    --nx-orange:#e08a2e;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--nx-bg);color:var(--nx-text);font-size:14px}
+  a{color:var(--nx-blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ===== Login ===== */
+  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,var(--nx-navy) 0%,var(--nx-navy-2) 60%,#1a4a7a 100%)}
+  .login-card{background:#fff;border-radius:14px;padding:34px 30px;width:100%;max-width:380px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+  .login-card .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;margin-bottom:6px}
+  .login-card .brand .dot{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--nx-blue),var(--nx-gold))}
+  .login-card p{color:var(--nx-muted);font-size:13px;margin-bottom:20px}
+  .login-card label{font-size:12px;font-weight:700;color:var(--nx-muted);display:block;margin-bottom:6px}
+  .login-card input{width:100%;padding:11px 12px;border:1px solid var(--nx-border);border-radius:8px;font-size:15px;margin-bottom:14px}
+  .login-card input:focus{outline:none;border-color:var(--nx-blue);box-shadow:0 0 0 3px rgba(31,111,235,.15)}
+  .login-err{color:var(--nx-red);font-size:13px;font-weight:600;margin-bottom:10px;display:none}
+
+  /* ===== Top bar ===== */
+  #app{display:none}
+  .topbar{background:var(--nx-navy);color:#fff;display:flex;align-items:center;gap:16px;padding:10px 20px;flex-wrap:wrap}
+  .topbar .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;white-space:nowrap}
+  .topbar .brand .dot{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--nx-blue),var(--nx-gold));display:inline-block}
+  .topbar .search{flex:1;max-width:520px;margin:0 auto;min-width:180px}
+  .topbar .search input{width:100%;padding:8px 14px;border-radius:20px;border:none;background:rgba(255,255,255,.14);color:#fff;outline:none}
+  .topbar .search input::placeholder{color:rgba(255,255,255,.65)}
+  .topbar .who{display:flex;gap:12px;align-items:center;font-size:13px}
+  .topbar .who .u{font-weight:600}
+  .topbar .who button{background:rgba(255,255,255,.14);border:none;color:#fff;padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer}
+
+  /* ===== Main nav ===== */
+  nav.mainnav{background:var(--nx-navy-2);display:flex;padding:0 12px;flex-wrap:wrap}
+  nav.mainnav .navitem{position:relative}
+  nav.mainnav .navitem>button{background:none;border:none;color:#d6e2f0;padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.4px}
+  nav.mainnav .navitem>button:hover,nav.mainnav .navitem.active>button{background:rgba(255,255,255,.1);color:#fff}
+  nav.mainnav .navitem.active>button{box-shadow:inset 0 -3px 0 var(--nx-gold)}
+  nav.mainnav .dropdown{display:none;position:absolute;top:100%;left:0;background:#fff;min-width:230px;box-shadow:0 8px 24px rgba(14,42,71,.18);border-radius:0 0 8px 8px;z-index:60;padding:6px 0}
+  nav.mainnav .navitem:hover .dropdown{display:block}
+  nav.mainnav .dropdown a{display:block;padding:9px 16px;color:var(--nx-text);font-size:13px}
+  nav.mainnav .dropdown a:hover{background:var(--nx-bg);text-decoration:none}
+  nav.mainnav .dropdown a.disabled{color:#b6c1cd;pointer-events:none}
+
+  /* ===== Layout ===== */
+  main{padding:18px;max-width:1400px;margin:0 auto}
+  .view{display:none}
+  .view.active{display:block}
+  .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+  .page-head h1{font-size:18px;font-weight:700}
+  .card{background:var(--nx-card);border:1px solid var(--nx-border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .toolbar .spacer{flex:1}
+  .toolbar input[type=text],.toolbar input[type=search]{border:1px solid var(--nx-border);border-radius:7px;padding:7px 10px;font-size:13px;min-width:200px}
+  .toolbar select{border:1px solid var(--nx-border);border-radius:7px;padding:7px 10px;font-size:13px;background:#fff}
+
+  .btn{border:1px solid var(--nx-border);background:#fff;color:var(--nx-text);padding:7px 14px;border-radius:7px;font-size:13px;cursor:pointer;font-weight:500}
+  .btn:hover{border-color:#c6d0dc}
+  .btn.primary{background:var(--nx-blue);border-color:var(--nx-blue);color:#fff}
+  .btn.primary:hover{background:#1a5fd0}
+  .btn.success{background:var(--nx-green);border-color:var(--nx-green);color:#fff}
+  .btn.danger-outline{color:var(--nx-red);border-color:#f0c4c4}
+  .btn.sm{padding:4px 10px;font-size:12px}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+
+  table.grid{width:100%;border-collapse:collapse;background:#fff}
+  table.grid th{font-size:12px;color:var(--nx-muted);font-weight:600;text-align:left;padding:10px 10px;border-bottom:2px solid var(--nx-border);white-space:nowrap}
+  table.grid td{padding:10px;border-bottom:1px solid var(--nx-border);vertical-align:middle;white-space:nowrap}
+  table.grid tr:hover td{background:#f7fafd}
+  .row-actions{display:flex;gap:6px}
+  .icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--nx-border);background:#fff;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+  .icon-btn.green{background:var(--nx-green);border-color:var(--nx-green);color:#fff}
+  .empty-note{color:#b6c1cd;text-align:center;padding:30px;font-size:13px}
+
+  .seg{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:14px;font-size:12px;font-weight:600;background:#eef2f7;color:var(--nx-text)}
+  .seg.dynamic{background:#e7f0fd;color:#1a5fd0}
+  .seg.closed{background:#eee;color:#777}
+  .seg.hot{background:#fdeee2;color:#c46a12}
+  .seg.sold{background:#e3f6ed;color:#15804f}
+  .seg.unreached{background:#fdeaea;color:#b23a3a}
+  .badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .badge.potansiyel{background:#fff4dd;color:#a97d18;border:1px solid #ecd9a6}
+  .badge.lead{background:#e7f0fd;color:#1a5fd0}
+
+  .sum-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+  @media(max-width:700px){.sum-cards{grid-template-columns:1fr}}
+  .sum-card{background:#fff;border:1px solid var(--nx-border);border-radius:var(--radius);padding:16px;text-align:center}
+  .sum-card .t{font-size:13px;color:var(--nx-muted);font-weight:600}
+  .sum-card .v{font-size:22px;font-weight:800;margin-top:6px}
+  .sum-card .v2{font-size:13px;color:var(--nx-muted);margin-top:2px}
+
+  /* ===== Client card ===== */
+  .client-header{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--nx-border);border-radius:var(--radius);padding:16px;margin-bottom:16px;flex-wrap:wrap}
+  .avatar{width:56px;height:56px;border-radius:50%;background:#dde5ee;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .client-header .who h2{font-size:18px;display:flex;align-items:center;gap:8px}
+  .client-header .who .meta{color:var(--nx-muted);font-size:13px;margin-top:2px}
+  .client-header .quick{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .client-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:14px;align-items:start}
+  @media(max-width:900px){.client-grid{grid-template-columns:1fr}}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--nx-border);font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--nx-muted)}
+  .kv .v{font-weight:600;text-align:right}
+  .section-title{background:var(--nx-bg);border-radius:6px;padding:7px 12px;font-size:12px;font-weight:700;color:var(--nx-muted);margin:12px 0 6px;text-align:center}
+  .section-title:first-child{margin-top:0}
+
+  .note-form textarea{width:100%;min-height:70px;border:1px solid var(--nx-border);border-radius:7px;padding:8px;font-family:inherit;font-size:13px;resize:vertical}
+  .note-form .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .note-form input[type=date],.note-form select{flex:1;min-width:140px;border:1px solid var(--nx-border);border-radius:7px;padding:7px;font-size:13px;background:#fff}
+  .note-item{border-left:3px solid var(--nx-gold);background:#fbfcfe;border-radius:0 8px 8px 0;padding:10px 12px;margin-top:10px;font-size:12.5px;white-space:pre-wrap}
+  .note-item .meta{color:var(--nx-muted);font-size:11.5px;margin-top:6px;display:flex;gap:10px;flex-wrap:wrap}
+
+  /* ===== Calendar ===== */
+  .cal-chrome{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .cal-chrome .month{flex:1;text-align:center;font-weight:700;font-size:16px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--nx-border);border-radius:var(--radius);overflow:hidden;background:#fff}
+  .cal-grid .dow{background:var(--nx-bg);padding:8px;text-align:center;font-size:12px;font-weight:700;color:var(--nx-muted);border-bottom:1px solid var(--nx-border)}
+  .cal-cell{min-height:96px;border-right:1px solid var(--nx-border);border-bottom:1px solid var(--nx-border);padding:6px;font-size:12px}
+  .cal-cell:nth-child(7n){border-right:none}
+  .cal-cell .day{color:var(--nx-muted);font-weight:600}
+  .cal-cell.today{background:#fdf9ee}
+  .cal-cell.other{background:#fafbfc}
+  .appt{display:block;margin-top:4px;padding:3px 6px;border-radius:4px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .appt.tamamlandi,.appt.geldi{background:var(--nx-green)}
+  .appt.beklemede{background:var(--nx-orange)}
+  .appt.iptal,.appt.gelmedi{background:#9aa7b5;text-decoration:line-through}
+
+  /* ===== Modal ===== */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(14,42,71,.45);display:none;align-items:flex-start;justify-content:center;padding:60px 16px;z-index:100;overflow-y:auto}
+  .modal-backdrop.open{display:flex}
+  .modal{background:#fff;border-radius:12px;max-width:540px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+  .modal .m-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--nx-border)}
+  .modal .m-head h3{font-size:15px;flex:1}
+  .modal .m-head select{border:1px solid var(--nx-border);border-radius:7px;padding:6px 10px;font-size:13px}
+  .modal .m-body{padding:16px}
+  .modal .m-foot{padding:12px 16px;border-top:1px solid var(--nx-border);display:flex;gap:8px;justify-content:flex-end}
+  .form-grid{display:grid;grid-template-columns:130px 1fr;gap:10px 12px;align-items:center}
+  .form-grid label{font-size:13px;color:var(--nx-muted);font-weight:600}
+  .form-grid input,.form-grid select,.form-grid textarea{width:100%;border:1px solid var(--nx-border);border-radius:7px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff}
+  .form-grid textarea{min-height:60px;resize:vertical}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--nx-navy);color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .toast.err{background:var(--nx-red)}
+  .muted{color:var(--nx-muted)}
+  footer{padding:16px 20px;color:var(--nx-muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-screen">
+  <form class="login-card" onsubmit="doLogin(event)">
+    <div class="brand"><span class="dot"></span> Nefalix Klinik CRM</div>
+    <p>Medident İstanbul — iç ekip girişi</p>
+    <label>Kullanıcı adı</label>
+    <input type="text" id="login-kod" placeholder="enes / abdulkadir / kader" autocomplete="username" autofocus>
+    <div class="login-err" id="login-err"></div>
+    <button class="btn primary" style="width:100%;padding:11px" type="submit">Giriş yap</button>
+  </form>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Nefalix Klinik CRM</div>
+  <div class="search"><input type="text" id="global-search" placeholder="Danışan ara (ad / telefon) — Enter" onkeydown="if(event.key==='Enter')globalSearch()"></div>
+  <div class="who">
+    <span class="u" id="who-name"></span>
+    <button onclick="doLogout()">Çıkış</button>
+  </div>
+</div>
+
+<nav class="mainnav" id="mainnav">
+  <div class="navitem" data-view="home"><button onclick="go('home')">🏠</button></div>
+  <div class="navitem" data-view="crm">
+    <button onclick="go('dynamic')">CRM ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="openNewLead();return false">Yeni Lead</a>
+      <a href="#" onclick="go('leads');return false">Lead Listesi</a>
+      <a href="#" onclick="go('dynamic');return false"><b>Dinamik Arama</b></a>
+      <a href="#" onclick="go('dynamicPool');return false">Dinamik Arama – Havuz</a>
+      <a href="#" class="disabled">Salesline</a>
+      <a href="#" class="disabled">Lead Dönüşüm Geçmişi</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="clients">
+    <button onclick="go('clients')">DANIŞAN ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="openNewLead('danisan');return false">Yeni Danışan</a>
+      <a href="#" onclick="go('clients');return false">Danışan Listesi</a>
+      <a href="#" class="disabled">Teklifler</a>
+      <a href="#" class="disabled">Şikayetler</a>
+    </div>
+  </div>
+  <div class="navitem" data-view="calendar">
+    <button onclick="go('calendar')">RANDEVU ▾</button>
+    <div class="dropdown">
+      <a href="#" onclick="openApptForm();return false">Yeni Randevu</a>
+      <a href="#" onclick="go('calendar');return false"><b>Takvim</b></a>
+      <a href="#" class="disabled">Etkinlikler</a>
+    </div>
+  </div>
+  <div class="navitem"><button class="disabled" style="color:#7f93a8;cursor:default">GELİRLER</button></div>
+  <div class="navitem"><button class="disabled" style="color:#7f93a8;cursor:default">GİDERLER</button></div>
+  <div class="navitem"><button class="disabled" style="color:#7f93a8;cursor:default">WHATSAPP</button></div>
+  <div class="navitem"><button class="disabled" style="color:#7f93a8;cursor:default">RAPOR</button></div>
+</nav>
+
+<main>
+
+<!-- HOME -->
+<section class="view" id="view-home">
+  <div class="page-head"><h1>Ana Sayfa — Özet</h1></div>
+  <div class="sum-cards">
+    <div class="sum-card"><div class="t">Bugünkü Dinamik Arama</div><div class="v" id="home-dynamic">–</div><div class="v2">arama sırası sende</div></div>
+    <div class="sum-card"><div class="t">Atanmamış Lead (Havuz)</div><div class="v" id="home-pool">–</div><div class="v2">temsilci bekliyor</div></div>
+    <div class="sum-card"><div class="t">Bugünkü Randevu</div><div class="v" id="home-appt">–</div><div class="v2">takvimden detay</div></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;font-size:14px">Hızlı erişim</h3>
+    <div class="toolbar">
+      <button class="btn primary" onclick="go('dynamic')">Dinamik Arama</button>
+      <button class="btn" onclick="go('leads')">Lead Listesi</button>
+      <button class="btn" onclick="go('clients')">Danışan Listesi</button>
+      <button class="btn" onclick="go('calendar')">Takvim</button>
+      <button class="btn success" onclick="openNewLead()">＋ Yeni Lead</button>
+    </div>
+  </div>
+</section>
+
+<!-- DINAMIK ARAMA -->
+<section class="view" id="view-dynamic">
+  <div class="page-head">
+    <h1 id="dynamic-title">Dinamik Arama</h1>
+    <span class="muted" id="dynamic-date"></span>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <span class="muted" id="dynamic-count"></span>
+      <div class="spacer"></div>
+      <label id="dynamic-all-wrap" style="display:none;font-size:13px"><input type="checkbox" id="dynamic-all" onchange="loadDynamic()"> Tüm temsilciler</label>
+      <button class="btn primary" onclick="loadDynamic()">⟳ Yenile</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Dosya no</th><th>Danışan</th><th>Telefon</th><th>Segment</th>
+            <th>Satış temsilcisi</th><th>Kaynak</th><th>Arama tarihi</th><th>Değişiklik</th><th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody id="dynamic-tbody"></tbody>
+      </table>
+      <div class="empty-note" id="dynamic-empty" style="display:none">Bugün aranacak kayıt yok 🎉</div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAD LISTESI -->
+<section class="view" id="view-leads">
+  <div class="page-head">
+    <h1>Leadler</h1>
+    <button class="btn success" onclick="openNewLead()">＋ Yeni Lead</button>
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <input type="search" id="leads-q" placeholder="Ad / telefon ara" onkeydown="if(event.key==='Enter')loadLeads()">
+      <button class="btn primary" onclick="loadLeads()">🔍 Ara</button>
+      <div class="spacer"></div>
+      <span class="muted" id="leads-count"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr><th>Kayıt tarihi</th><th>Lead</th><th>Telefon</th><th>Kaynak</th><th>Temsilciye ata</th><th>İşlemler</th></tr>
+        </thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+      <div class="empty-note" id="leads-empty" style="display:none">Atanmamış lead yok.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DANISAN LISTESI -->
+<section class="view" id="view-clients">
+  <div class="page-head"><h1>Danışanlar</h1></div>
+  <div class="card">
+    <div class="toolbar">
+      <input type="search" id="clients-q" placeholder="Ad / telefon ara" onkeydown="if(event.key==='Enter')loadClients()">
+      <button class="btn primary" onclick="loadClients()">🔍 Ara</button>
+      <div class="spacer"></div>
+      <span class="muted" id="clients-count"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>ID</th><th>Ad</th><th>Telefon</th><th>Segment</th>
+            <th>Satış temsilcisi</th><th>Kaynak</th><th>Sonraki arama</th><th>Kayıt tarihi</th><th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody id="clients-tbody"></tbody>
+      </table>
+      <div class="empty-note" id="clients-empty" style="display:none">Kayıt bulunamadı.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DANISAN KARTI -->
+<section class="view" id="view-client">
+  <div class="client-header">
+    <div class="avatar">👤</div>
+    <div class="who">
+      <h2 id="cc-name">—</h2>
+      <div class="meta" id="cc-meta"></div>
+    </div>
+    <div class="quick">
+      <button class="btn primary" onclick="openApptForm(currentContact&&currentContact.id)">📅 Yeni Randevu</button>
+      <button class="btn" id="cc-wa-btn" onclick="openWhatsApp()">💬 WhatsApp</button>
+      <button class="btn" onclick="editContact()">✏️ Düzenle</button>
+    </div>
+  </div>
+
+  <div class="client-grid">
+    <div class="card" style="margin-bottom:0">
+      <div class="section-title">📋 Bilgiler</div>
+      <div id="cc-info"></div>
+      <div class="section-title">📅 Randevular</div>
+      <div id="cc-appts"><div class="empty-note">Randevu yok</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <h3 style="font-size:14px;margin-bottom:12px">💬 Notlar</h3>
+      <div class="note-form">
+        <label style="font-size:12px;color:var(--nx-muted);font-weight:600">Hızlı Not</label>
+        <textarea id="note-body" placeholder="Notunuzu giriniz"></textarea>
+        <div class="row">
+          <input type="date" id="note-date" title="Opsiyonel: aranacak tarih tabanı">
+          <select id="note-segment"></select>
+          <button class="btn success" onclick="saveNote()" id="note-save-btn">💾 Kaydet</button>
+        </div>
+        <div class="muted" style="font-size:12px;margin-top:6px" id="note-hint"></div>
+      </div>
+      <div id="note-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TAKVIM -->
+<section class="view" id="view-calendar">
+  <div class="page-head">
+    <h1>Randevu Takvimi</h1>
+    <button class="btn success" onclick="openApptForm()">＋ Yeni Randevu</button>
+  </div>
+  <div class="card">
+    <div class="cal-chrome">
+      <button class="btn sm" onclick="calShift(-1)">‹</button>
+      <button class="btn sm" onclick="calToday()">Bugün</button>
+      <button class="btn sm" onclick="calShift(1)">›</button>
+      <div class="month" id="cal-month">—</div>
+      <select class="btn" id="cal-status-filter" onchange="renderCalendar()">
+        <option value="">Tüm durumlar</option>
+        <option value="beklemede">Beklemede</option>
+        <option value="geldi">Geldi</option>
+        <option value="tamamlandi">Tamamlandı</option>
+        <option value="iptal">İptal</option>
+        <option value="gelmedi">Gelmedi</option>
+      </select>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>Nefalix Klinik CRM · Medident İstanbul pilotu · Veri: Supabase (TR)</footer>
+</div><!-- /app -->
+
+<!-- RANDEVU DETAY MODAL -->
+<div class="modal-backdrop" id="appt-modal">
+  <div class="modal">
+    <div class="m-head">
+      <select id="appt-status-sel"></select>
+      <div style="flex:1"></div>
+      <button class="btn sm primary" onclick="saveApptStatus()">Kaydet</button>
+      <button class="btn sm" onclick="closeApptModal()">✕</button>
+    </div>
+    <div class="m-body" id="appt-modal-body"></div>
+    <div class="m-foot"><button class="btn success" onclick="closeApptModal()">Kapat</button></div>
+  </div>
+</div>
+
+<!-- YENI RANDEVU MODAL -->
+<div class="modal-backdrop" id="appt-form-modal">
+  <div class="modal">
+    <div class="m-head"><h3>Yeni Randevu</h3><button class="btn sm" onclick="closeModal('appt-form-modal')">✕</button></div>
+    <div class="m-body">
+      <div class="form-grid">
+        <label>Danışan</label>
+        <div>
+          <input type="search" id="af-contact-q" placeholder="Ad / telefon yaz, Enter" onkeydown="if(event.key==='Enter'){searchApptContact();event.preventDefault()}">
+          <select id="af-contact" style="width:100%;margin-top:6px;border:1px solid var(--nx-border);border-radius:7px;padding:8px 10px;font-size:13px"></select>
+        </div>
+        <label>Tarih</label><input type="date" id="af-date">
+        <label>Başlangıç</label><input type="time" id="af-start" value="10:00">
+        <label>Bitiş</label><input type="time" id="af-end" value="11:00">
+        <label>Hizmet</label><input type="text" id="af-service" placeholder="örn. İMPLANT NEO">
+        <label>Personel</label><input type="text" id="af-staff">
+        <label>Oda</label><input type="text" id="af-room" placeholder="örn. DENTALZONE">
+        <label>Randevu tipi</label><input type="text" id="af-type" placeholder="örn. 2. Aşama Hastası">
+        <label>Not</label><textarea id="af-note"></textarea>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn" onclick="closeModal('appt-form-modal')">Vazgeç</button>
+      <button class="btn success" onclick="saveAppt()" id="af-save-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- YENI LEAD MODAL -->
+<div class="modal-backdrop" id="lead-form-modal">
+  <div class="modal">
+    <div class="m-head"><h3 id="lf-title">Yeni Lead</h3><button class="btn sm" onclick="closeModal('lead-form-modal')">✕</button></div>
+    <div class="m-body">
+      <div class="form-grid">
+        <label>Ad Soyad</label><input type="text" id="lf-ad">
+        <label>Telefon</label><input type="text" id="lf-tel" placeholder="+90…">
+        <label>Ülke</label><input type="text" id="lf-ulke" placeholder="örn. Almanya">
+        <label>Kaynak</label>
+        <select id="lf-kaynak">
+          <option value="">Seçiniz…</option>
+          <option>WHATSAPP TR-medident</option>
+          <option>Web Formu</option>
+          <option>Instagram</option>
+          <option>Hasta Referansı</option>
+          <option>Telefon</option>
+          <option>Diğer</option>
+        </select>
+        <label>Kampanya</label><input type="text" id="lf-kampanya" placeholder="opsiyonel">
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn" onclick="closeModal('lead-form-modal')">Vazgeç</button>
+      <button class="btn success" onclick="saveLead()" id="lf-save-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- DUZENLE MODAL -->
+<div class="modal-backdrop" id="edit-modal">
+  <div class="modal">
+    <div class="m-head"><h3>Danışanı Düzenle</h3><button class="btn sm" onclick="closeModal('edit-modal')">✕</button></div>
+    <div class="m-body">
+      <div class="form-grid">
+        <label>Ad Soyad</label><input type="text" id="ef-ad">
+        <label>Telefon</label><input type="text" id="ef-tel">
+        <label>Ülke</label><input type="text" id="ef-ulke">
+        <label>Kaynak</label><input type="text" id="ef-kaynak">
+        <label>Durum</label>
+        <select id="ef-status"><option value="aktif">Aktif</option><option value="arsiv">Arşiv</option></select>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn" onclick="closeModal('edit-modal')">Vazgeç</button>
+      <button class="btn success" onclick="saveContactEdit()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+let ME = null;
+let SEGMENTS = [];
+let USERS = [];
+let currentContact = null;
+let currentAppt = null;
+let calYear = 0, calMonth = 0; // month: 0-11
+let calAppts = [];
+let leadsCache = [];
+
+const API = '/api/clinic';
+
+/* ================= HELPERS ================= */
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { showLogin(); throw new Error(data.error || 'Oturum gerekli'); }
+  if (!res.ok) throw new Error(data.error || data.detail || `HTTP ${res.status}`);
+  return data;
+}
+
+function toast(msg, isErr) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (isErr ? ' err' : '');
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.display = 'none'; }, 3200);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function fmtDT(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch { return iso; }
+}
+function fmtD(iso) {
+  if (!iso) return '';
+  try { return new Date(iso.length === 10 ? iso + 'T12:00:00' : iso).toLocaleDateString('tr-TR'); } catch { return iso; }
+}
+function fmtT(iso) {
+  try { return new Date(iso).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); } catch { return ''; }
+}
+
+function segCls(code) {
+  if (code === 'ulasilamadi') return 'unreached';
+  if (code === 'satildi' || code === 'otel_satis') return 'sold';
+  if (code === 'sicak' || code === 'tekrar_gelen') return 'hot';
+  const s = SEGMENTS.find(x => x.code === code);
+  if (s && !s.show_in_dynamic) return 'closed';
+  return 'dynamic';
+}
+function segHtml(code) {
+  if (!code) return '';
+  const s = SEGMENTS.find(x => x.code === code);
+  const label = s ? s.label : code;
+  return `<span class="seg ${segCls(code)}">${esc(label)}</span>`;
+}
+function userName(id) {
+  const u = USERS.find(x => x.id === id);
+  return u ? u.ad : '';
+}
+const DURUM_LABELS = { beklemede: 'Beklemede', geldi: 'Geldi', tamamlandi: 'Tamamlandı', iptal: 'İptal', gelmedi: 'Gelmedi' };
+
+/* ================= AUTH ================= */
+function showLogin() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+async function doLogin(ev) {
+  ev.preventDefault();
+  const kod = document.getElementById('login-kod').value.trim();
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+  if (!kod) return;
+  try {
+    await api('/login', { method: 'POST', body: { kod } });
+    await boot();
+  } catch (e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+  }
+}
+
+async function doLogout() {
+  try { await api('/logout', { method: 'POST' }); } catch {}
+  ME = null;
+  showLogin();
+}
+
+async function boot() {
+  const data = await api('/bootstrap');
+  ME = data.user;
+  SEGMENTS = data.segments || [];
+  USERS = data.users || [];
+  document.getElementById('who-name').textContent = `${ME.ad} (${ME.rol === 'yonetici' ? 'Yönetici' : 'Temsilci'})`;
+  document.getElementById('dynamic-all-wrap').style.display = ME.rol === 'yonetici' ? 'inline-block' : 'none';
+  renderNoteSegmentSelect();
+  showApp();
+  go('dynamic');
+  loadHome();
+}
+
+/* ================= NAV ================= */
+function go(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const map = { dynamicPool: 'dynamic' };
+  const target = map[view] || view;
+  const el = document.getElementById('view-' + target);
+  if (el) el.classList.add('active');
+  document.getElementById('dynamic-title').textContent = view === 'dynamicPool' ? 'Dinamik Arama — Havuz' : 'Dinamik Arama';
+  document.querySelectorAll('#mainnav .navitem').forEach(n => n.classList.remove('active'));
+  const navKey = { home: 'home', dynamic: 'crm', dynamicPool: 'crm', leads: 'crm', clients: 'clients', client: 'clients', calendar: 'calendar' }[view];
+  const navEl = document.querySelector(`#mainnav .navitem[data-view="${navKey}"]`);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (view === 'dynamic') loadDynamic(false);
+  if (view === 'dynamicPool') loadDynamic(true);
+  if (view === 'leads') loadLeads();
+  if (view === 'clients') loadClients();
+  if (view === 'calendar') loadCalendar();
+  if (view === 'home') loadHome();
+}
+
+async function globalSearch() {
+  const q = document.getElementById('global-search').value.trim();
+  if (!q) return;
+  document.getElementById('clients-q').value = q;
+  go('clients');
+}
+
+/* ================= HOME ================= */
+async function loadHome() {
+  try {
+    const [dyn, pool] = await Promise.all([api('/dynamic'), api('/dynamic?pool=1')]);
+    document.getElementById('home-dynamic').textContent = (dyn.contacts || []).length;
+    document.getElementById('home-pool').textContent = (pool.contacts || []).length;
+    const today = new Date();
+    const iso = today.toISOString().slice(0, 10);
+    const appts = await api(`/appointments?from=${iso}&to=${iso}`);
+    document.getElementById('home-appt').textContent = (appts.appointments || []).length;
+  } catch (e) { /* home istatistikleri kritik değil */ }
+}
+
+/* ================= DINAMIK ================= */
+let dynamicPoolMode = false;
+async function loadDynamic(pool) {
+  if (pool !== undefined) dynamicPoolMode = pool;
+  const all = document.getElementById('dynamic-all').checked;
+  try {
+    const data = await api(`/dynamic?${dynamicPoolMode ? 'pool=1' : ''}${all ? '&all=1' : ''}`);
+    const rows = data.contacts || [];
+    document.getElementById('dynamic-date').textContent = 'Bugün: ' + fmtD(data.today);
+    document.getElementById('dynamic-count').textContent = rows.length + ' kayıt';
+    document.getElementById('dynamic-empty').style.display = rows.length ? 'none' : 'block';
+    document.getElementById('dynamic-tbody').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.file_no || ''}</td>
+        <td><a href="#" onclick="openContact('${r.id}');return false">${esc(r.ad)}</a></td>
+        <td>${r.telefon ? `<a href="tel:${esc(r.telefon)}">${esc(r.telefon)}</a>` : ''}</td>
+        <td>${segHtml(r.segment_code)}</td>
+        <td>${esc(userName(r.assigned_to))}</td>
+        <td>${esc(r.kaynak || '')}</td>
+        <td>${fmtD(r.next_call_date)}</td>
+        <td>${fmtDT(r.updated_at)}</td>
+        <td class="row-actions">
+          <button class="icon-btn green" title="Kartı aç" onclick="openContact('${r.id}')">➜</button>
+          ${r.telefon ? `<button class="icon-btn" title="WhatsApp" onclick="waOpen('${esc(r.telefon)}')">💬</button>` : ''}
+        </td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ================= LEADS ================= */
+async function loadLeads() {
+  const q = document.getElementById('leads-q').value.trim();
+  try {
+    const data = await api(`/leads?stage=lead${q ? '&q=' + encodeURIComponent(q) : ''}`);
+    leadsCache = data.contacts || [];
+    document.getElementById('leads-count').textContent = leadsCache.length + ' kayıt';
+    document.getElementById('leads-empty').style.display = leadsCache.length ? 'none' : 'block';
+    const userOpts = USERS.map(u => `<option value="${u.id}">${esc(u.ad)}</option>`).join('');
+    document.getElementById('leads-tbody').innerHTML = leadsCache.map(r => `
+      <tr>
+        <td>${fmtDT(r.created_at)}</td>
+        <td><a href="#" onclick="openContact('${r.id}');return false">${esc(r.ad)}</a></td>
+        <td>${esc(r.telefon || '')}</td>
+        <td>${esc(r.kaynak || '')}</td>
+        <td>
+          <select id="assign-sel-${r.id}" class="btn sm"><option value="">Temsilci seç…</option>${userOpts}</select>
+        </td>
+        <td class="row-actions">
+          <button class="icon-btn green" title="Ata" onclick="assignLead('${r.id}')">➜</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, true); }
+}
+
+async function assignLead(contactId) {
+  const sel = document.getElementById('assign-sel-' + contactId);
+  const userId = sel && sel.value;
+  if (!userId) { toast('Önce temsilci seç', true); return; }
+  try {
+    await api('/assign', { method: 'POST', body: { contact_id: contactId, user_id: userId } });
+    toast('Lead atandı — bugünkü dinamik listeye düştü');
+    loadLeads();
+  } catch (e) { toast(e.message, true); }
+}
+
+function openNewLead(stage) {
+  document.getElementById('lf-title').textContent = stage === 'danisan' ? 'Yeni Danışan' : 'Yeni Lead';
+  document.getElementById('lead-form-modal').dataset.stage = stage || 'lead';
+  ['lf-ad', 'lf-tel', 'lf-ulke', 'lf-kampanya'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('lf-kaynak').value = '';
+  document.getElementById('lead-form-modal').classList.add('open');
+}
+
+async function saveLead() {
+  const ad = document.getElementById('lf-ad').value.trim();
+  if (!ad) { toast('Ad gerekli', true); return; }
+  const btn = document.getElementById('lf-save-btn');
+  btn.disabled = true;
+  try {
+    const body = {
+      ad,
+      telefon: document.getElementById('lf-tel').value.trim(),
+      ulke: document.getElementById('lf-ulke').value.trim(),
+      kaynak: document.getElementById('lf-kaynak').value,
+      kampanya: document.getElementById('lf-kampanya').value.trim(),
+    };
+    const data = await api('/leads', { method: 'POST', body });
+    closeModal('lead-form-modal');
+    toast('Kayıt oluşturuldu');
+    if (document.getElementById('lead-form-modal').dataset.stage === 'danisan' && data.contact) {
+      // Yeni danışan: doğrudan kartını aç
+      openContact(data.contact.id);
+    } else {
+      go('leads');
+    }
+  } catch (e) { toast(e.message, true); }
+  btn.disabled = false;
+}
+
+/* ================= DANISANLAR ================= */
+async function loadClients() {
+  const q = document.getElementById('clients-q').value.trim();
+  try {
+    const data = await api(`/leads?stage=danisan${q ? '&q=' + encodeURIComponent(q) : ''}`);
+    const rows = data.contacts || [];
+    document.getElementById('clients-count').textContent = rows.length + ' kayıt';
+    document.getElementById('clients-empty').style.display = rows.length ? 'none' : 'block';
+    document.getElementById('clients-tbody').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.file_no || ''}</td>
+        <td><a href="#" onclick="openContact('${r.id}');return false">${esc(r.ad)}</a></td>
+        <td>${esc(r.telefon || '')}</td>
+        <td>${segHtml(r.segment_code)}</td>
+        <td>${esc(userName(r.assigned_to))}</td>
+        <td>${esc(r.kaynak || '')}</td>
+        <td>${fmtD(r.next_call_date)}</td>
+        <td>${fmtDT(r.created_at)}</td>
+        <td class="row-actions">
+          ${r.telefon ? `<button class="icon-btn" title="WhatsApp" onclick="waOpen('${esc(r.telefon)}')">💬</button>` : ''}
+          <button class="icon-btn green" title="Aç" onclick="openContact('${r.id}')">➜</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ================= DANISAN KARTI ================= */
+async function openContact(id) {
+  try {
+    const data = await api('/contact?id=' + encodeURIComponent(id));
+    currentContact = data.contact;
+    renderContact(data);
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-client').classList.add('active');
+    window.scrollTo(0, 0);
+  } catch (e) { toast(e.message, true); }
+}
+
+function renderContact(data) {
+  const c = data.contact;
+  document.getElementById('cc-name').innerHTML =
+    esc(c.ad) + (c.stage === 'lead' ? ' <span class="badge lead">Lead</span>' : ' <span class="badge potansiyel">Danışan</span>');
+  document.getElementById('cc-meta').textContent = `[ # ${c.file_no || '—'} ] · ${c.telefon || 'telefon yok'}`;
+  document.getElementById('cc-wa-btn').style.display = c.telefon ? 'inline-block' : 'none';
+
+  document.getElementById('cc-info').innerHTML = `
+    <div class="kv"><span class="k">Kayıt tarihi</span><span class="v">${fmtDT(c.created_at)}</span></div>
+    <div class="kv"><span class="k">Ülke</span><span class="v">${esc(c.ulke || '—')}</span></div>
+    <div class="kv"><span class="k">Segment</span><span class="v">${segHtml(c.segment_code) || '—'}</span></div>
+    <div class="kv"><span class="k">Referans kaynağı</span><span class="v">${esc(c.kaynak || '—')}</span></div>
+    <div class="kv"><span class="k">Kampanya</span><span class="v">${esc(c.kampanya || '—')}</span></div>
+    <div class="kv"><span class="k">Satış temsilcisi</span><span class="v">${esc(userName(c.assigned_to) || '—')}</span></div>
+    <div class="kv"><span class="k">Sonraki arama</span><span class="v">${fmtD(c.next_call_date) || '—'}</span></div>
+    <div class="kv"><span class="k">Durum</span><span class="v">${c.status === 'arsiv' ? 'Arşiv' : 'Aktif'}</span></div>
+    <div class="kv"><span class="k">Değişiklik</span><span class="v">${fmtDT(c.updated_at)}</span></div>`;
+
+  const appts = data.appointments || [];
+  document.getElementById('cc-appts').innerHTML = appts.length
+    ? appts.map(a => `
+      <div class="kv">
+        <span class="k">${fmtDT(a.start_at)}</span>
+        <span class="v">${esc(a.hizmet || 'Randevu')} · <span class="seg ${a.durum === 'tamamlandi' ? 'sold' : a.durum === 'iptal' ? 'closed' : 'dynamic'}">${DURUM_LABELS[a.durum] || a.durum}</span></span>
+      </div>`).join('')
+    : '<div class="empty-note">Randevu yok</div>';
+
+  renderNotes(data.notes || []);
+  document.getElementById('note-body').value = '';
+  document.getElementById('note-date').value = '';
+  updateNoteHint();
+}
+
+function renderNotes(notes) {
+  document.getElementById('note-list').innerHTML = notes.length
+    ? notes.map(n => `
+      <div class="note-item">${esc(n.body)}
+        <div class="meta">
+          <span>🕘 ${fmtDT(n.created_at)}</span>
+          <span>👤 ${esc(userName(n.created_by))}</span>
+          ${n.segment_code ? `<span>${segHtml(n.segment_code)}</span>` : ''}
+        </div>
+      </div>`).join('')
+    : '<div class="empty-note">Henüz not yok</div>';
+}
+
+function renderNoteSegmentSelect() {
+  document.getElementById('note-segment').innerHTML =
+    '<option value="">Segment seç…</option>' +
+    SEGMENTS.map(s => `<option value="${s.code}">${esc(s.label)}</option>`).join('');
+  document.getElementById('note-segment').onchange = updateNoteHint;
+  document.getElementById('note-date').onchange = updateNoteHint;
+}
+
+function updateNoteHint() {
+  const code = document.getElementById('note-segment').value;
+  const hint = document.getElementById('note-hint');
+  const s = SEGMENTS.find(x => x.code === code);
+  if (!s) { hint.textContent = ''; return; }
+  if (s.show_in_dynamic) {
+    const base = document.getElementById('note-date').value || new Date().toISOString().slice(0, 10);
+    const d = new Date(base + 'T12:00:00');
+    d.setDate(d.getDate() + Math.max(1, s.gun_offset));
+    hint.textContent = `→ ${d.toLocaleDateString('tr-TR')} tarihinde Dinamik Arama listesine düşer`;
+  } else {
+    hint.textContent = '→ Kapanış segmenti: dinamik listeden çıkar';
+  }
+}
+
+async function saveNote() {
+  if (!currentContact) return;
+  const body = document.getElementById('note-body').value.trim();
+  const segment = document.getElementById('note-segment').value;
+  const noteDate = document.getElementById('note-date').value;
+  if (!body) { toast('Not giriniz', true); return; }
+  const btn = document.getElementById('note-save-btn');
+  btn.disabled = true;
+  try {
+    await api('/note-save', {
+      method: 'POST',
+      body: { contact_id: currentContact.id, body, segment_code: segment, note_date: noteDate || undefined },
+    });
+    toast('Not kaydedildi');
+    openContact(currentContact.id);
+  } catch (e) { toast(e.message, true); }
+  btn.disabled = false;
+}
+
+function editContact() {
+  if (!currentContact) return;
+  document.getElementById('ef-ad').value = currentContact.ad || '';
+  document.getElementById('ef-tel').value = currentContact.telefon || '';
+  document.getElementById('ef-ulke').value = currentContact.ulke || '';
+  document.getElementById('ef-kaynak').value = currentContact.kaynak || '';
+  document.getElementById('ef-status').value = currentContact.status || 'aktif';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+async function saveContactEdit() {
+  if (!currentContact) return;
+  try {
+    await api('/contact', {
+      method: 'POST',
+      body: {
+        id: currentContact.id,
+        ad: document.getElementById('ef-ad').value.trim(),
+        telefon: document.getElementById('ef-tel').value.trim(),
+        ulke: document.getElementById('ef-ulke').value.trim(),
+        kaynak: document.getElementById('ef-kaynak').value.trim(),
+        status: document.getElementById('ef-status').value,
+      },
+    });
+    closeModal('edit-modal');
+    toast('Güncellendi');
+    openContact(currentContact.id);
+  } catch (e) { toast(e.message, true); }
+}
+
+function waOpen(tel) {
+  const clean = String(tel).replace(/[^\d+]/g, '').replace(/^\+/, '');
+  window.open('https://wa.me/' + clean, '_blank');
+}
+function openWhatsApp() {
+  if (currentContact && currentContact.telefon) waOpen(currentContact.telefon);
+}
+
+/* ================= TAKVIM ================= */
+function calToday() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  loadCalendar();
+}
+function calShift(n) {
+  calMonth += n;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  loadCalendar();
+}
+
+async function loadCalendar() {
+  if (!calYear) { const now = new Date(); calYear = now.getFullYear(); calMonth = now.getMonth(); }
+  const from = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-01`;
+  const lastDay = new Date(calYear, calMonth + 1, 0).getDate();
+  const to = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+  try {
+    const data = await api(`/appointments?from=${from}&to=${to}`);
+    calAppts = data.appointments || [];
+    renderCalendar();
+  } catch (e) { toast(e.message, true); }
+}
+
+function renderCalendar() {
+  const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  document.getElementById('cal-month').textContent = `${monthNames[calMonth]} ${calYear}`;
+  const statusFilter = document.getElementById('cal-status-filter').value;
+  const appts = statusFilter ? calAppts.filter(a => a.durum === statusFilter) : calAppts;
+
+  const grid = document.getElementById('cal-grid');
+  const dows = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  let html = dows.map(d => `<div class="dow">${d}</div>`).join('');
+  const first = new Date(calYear, calMonth, 1);
+  const firstDow = (first.getDay() + 6) % 7; // Pazartesi=0
+  const days = new Date(calYear, calMonth + 1, 0).getDate();
+  const now = new Date();
+  const isThisMonth = now.getFullYear() === calYear && now.getMonth() === calMonth;
+
+  const prevDays = new Date(calYear, calMonth, 0).getDate();
+  for (let i = 0; i < firstDow; i++) {
+    html += `<div class="cal-cell other"><span class="day">${prevDays - firstDow + 1 + i}</span></div>`;
+  }
+  for (let d = 1; d <= days; d++) {
+    const dayAppts = appts.filter(a => {
+      const dt = new Date(a.start_at);
+      return dt.getDate() === d && dt.getMonth() === calMonth && dt.getFullYear() === calYear;
+    }).sort((a, b) => a.start_at.localeCompare(b.start_at));
+    const items = dayAppts.map(a => {
+      const idx = calAppts.indexOf(a);
+      const nm = a.contact ? a.contact.ad : '';
+      return `<span class="appt ${a.durum}" onclick="openApptModal(${idx})">${fmtT(a.start_at)} ${esc(nm)}</span>`;
+    }).join('');
+    html += `<div class="cal-cell ${isThisMonth && d === now.getDate() ? 'today' : ''}"><span class="day">${d}</span>${items}</div>`;
+  }
+  const used = firstDow + days;
+  const rest = (7 - (used % 7)) % 7;
+  for (let i = 1; i <= rest; i++) html += `<div class="cal-cell other"><span class="day">${i}</span></div>`;
+  grid.innerHTML = html;
+}
+
+/* ---- Randevu detay modal ---- */
+function openApptModal(idx) {
+  const a = calAppts[idx];
+  if (!a) return;
+  currentAppt = a;
+  document.getElementById('appt-status-sel').innerHTML =
+    Object.entries(DURUM_LABELS).map(([v, l]) => `<option value="${v}" ${a.durum === v ? 'selected' : ''}>${l}</option>`).join('');
+  const c = a.contact || {};
+  document.getElementById('appt-modal-body').innerHTML = `
+    <div class="kv"><span class="k">Ad Soyad</span><span class="v"><a href="#" onclick="closeApptModal();openContact('${c.id}');return false">${esc(c.ad || '—')}</a></span></div>
+    <div class="kv"><span class="k">Dosya no</span><span class="v">${c.file_no || '—'}</span></div>
+    <div class="kv"><span class="k">Telefon</span><span class="v">${esc(c.telefon || '—')}</span></div>
+    <div class="kv"><span class="k">Saat</span><span class="v">${fmtT(a.start_at)}${a.end_at ? ' – ' + fmtT(a.end_at) : ''}</span></div>
+    <div class="kv"><span class="k">Hizmet</span><span class="v">${esc(a.hizmet || '—')}</span></div>
+    <div class="kv"><span class="k">Personel</span><span class="v">${esc(a.personel || '—')}</span></div>
+    <div class="kv"><span class="k">Oda</span><span class="v">${esc(a.oda || '—')}</span></div>
+    <div class="kv"><span class="k">Randevu tipi</span><span class="v">${esc(a.tip || '—')}</span></div>
+    <div class="kv"><span class="k">Not</span><span class="v" style="font-weight:400;max-width:300px;white-space:normal">${esc(a.not_text || '—')}</span></div>
+    <div class="kv"><span class="k">Kayıt tarihi</span><span class="v">${fmtDT(a.created_at)}</span></div>
+    <div class="kv"><span class="k">Oluşturan</span><span class="v">${esc(userName(a.created_by) || '—')}</span></div>
+    <div class="kv"><span class="k">Değişiklik</span><span class="v">${fmtDT(a.updated_at)}</span></div>`;
+  document.getElementById('appt-modal').classList.add('open');
+}
+function closeApptModal() { document.getElementById('appt-modal').classList.remove('open'); }
+
+async function saveApptStatus() {
+  if (!currentAppt) return;
+  const durum = document.getElementById('appt-status-sel').value;
+  try {
+    await api('/appointments', { method: 'POST', body: { id: currentAppt.id, durum } });
+    toast('Randevu durumu güncellendi');
+    closeApptModal();
+    loadCalendar();
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ---- Yeni randevu ---- */
+async function openApptForm(contactId) {
+  document.getElementById('af-date').value = new Date().toISOString().slice(0, 10);
+  ['af-service', 'af-staff', 'af-room', 'af-type', 'af-note', 'af-contact-q'].forEach(id => document.getElementById(id).value = '');
+  const sel = document.getElementById('af-contact');
+  if (contactId && currentContact && currentContact.id === contactId) {
+    sel.innerHTML = `<option value="${contactId}">${esc(currentContact.ad)}</option>`;
+  } else {
+    sel.innerHTML = '<option value="">Önce danışan ara…</option>';
+  }
+  document.getElementById('appt-form-modal').classList.add('open');
+}
+
+async function searchApptContact() {
+  const q = document.getElementById('af-contact-q').value.trim();
+  if (!q) return;
+  try {
+    const data = await api('/leads?stage=all&q=' + encodeURIComponent(q));
+    const rows = data.contacts || [];
+    document.getElementById('af-contact').innerHTML = rows.length
+      ? rows.map(r => `<option value="${r.id}">${esc(r.ad)} ${r.telefon ? '· ' + esc(r.telefon) : ''}</option>`).join('')
+      : '<option value="">Sonuç yok</option>';
+  } catch (e) { toast(e.message, true); }
+}
+
+async function saveAppt() {
+  const contactId = document.getElementById('af-contact').value;
+  const date = document.getElementById('af-date').value;
+  const start = document.getElementById('af-start').value;
+  const end = document.getElementById('af-end').value;
+  if (!contactId) { toast('Danışan seç', true); return; }
+  if (!date || !start) { toast('Tarih ve saat gerekli', true); return; }
+  const btn = document.getElementById('af-save-btn');
+  btn.disabled = true;
+  try {
+    await api('/appointments', {
+      method: 'POST',
+      body: {
+        contact_id: contactId,
+        start_at: `${date}T${start}:00+03:00`,
+        end_at: end ? `${date}T${end}:00+03:00` : null,
+        hizmet: document.getElementById('af-service').value.trim(),
+        personel: document.getElementById('af-staff').value.trim(),
+        oda: document.getElementById('af-room').value.trim(),
+        tip: document.getElementById('af-type').value.trim(),
+        not_text: document.getElementById('af-note').value.trim(),
+      },
+    });
+    closeModal('appt-form-modal');
+    toast('Randevu oluşturuldu');
+    if (currentContact && currentContact.id === contactId && document.getElementById('view-client').classList.contains('active')) {
+      openContact(contactId);
+    } else {
+      go('calendar');
+    }
+  } catch (e) { toast(e.message, true); }
+  btn.disabled = false;
+}
+
+/* ================= MODAL GENEL ================= */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
+});
+
+/* ================= INIT ================= */
+(async function init() {
+  try {
+    await boot();
+  } catch {
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>

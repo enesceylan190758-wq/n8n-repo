@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" role="img" aria-label="Antwell Hotels">
+  <rect width="200" height="60" rx="8" fill="#1e3a5f"/>
+  <text x="100" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="700" fill="#d4af37">ANTWELL</text>
+  <text x="100" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#cbd5e1">HOTELS</text>
+</svg>

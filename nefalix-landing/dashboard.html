@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<!-- nefalix-seo-start -->
+<meta name="robots" content="noindex, nofollow">
+<!-- nefalix-seo-end -->
+  <title>Nefalix Klinik Paneli</title>
+  <link rel="icon" href="/assets/brand/favicon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/brand/favicon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/nefalix-dashboard.css" />
+</head>
+<body class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="/assets/brand/nefalix-logo.png" alt="Nefalix" />
+      <div>
+        <strong>Nefalix</strong>
+        <span>Klinik Paneli</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="overview">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span class="nav-label"><span class="nav-title">Özet</span><span class="nav-sub">Genel durum</span></span>
+      </button>
+      <div class="nav-group admin-only hidden" id="firms-nav-group">
+        <button type="button" class="nav-item nav-group-head" id="firms-nav-toggle" aria-expanded="false">
+          <i class="fa-solid fa-building"></i>
+          <span class="nav-label">
+            <span class="nav-title">Firmalar</span>
+            <span class="nav-sub" id="firms-nav-sub">Sektör seçin</span>
+          </span>
+          <i class="fa-solid fa-chevron-down nav-chevron"></i>
+        </button>
+        <div class="nav-subitems hidden" id="firms-nav-subitems">
+          <button type="button" class="nav-subitem active" data-sector="clinic">
+            <i class="fa-solid fa-hospital"></i>
+            <span>Klinikler</span>
+            <span class="nav-sub-count" data-sector-count="clinic"></span>
+          </button>
+          <button type="button" class="nav-subitem" data-sector="hotel">
+            <i class="fa-solid fa-hotel"></i>
+            <span>Oteller</span>
+            <span class="nav-sub-count" data-sector-count="hotel"></span>
+          </button>
+          <button type="button" class="nav-subitem" data-sector="auto">
+            <i class="fa-solid fa-car"></i>
+            <span>Oto servisler</span>
+            <span class="nav-sub-count" data-sector-count="auto"></span>
+          </button>
+        </div>
+      </div>
+      <button class="nav-item" data-tab="inbox">
+        <i class="fa-solid fa-inbox"></i>
+        <span class="nav-label"><span class="nav-title">Inbox</span><span class="nav-sub">Gelen kutusu</span></span>
+        <span id="inbox-badge" class="nav-badge hidden">0</span>
+      </button>
+      <button class="nav-item" data-tab="nps">
+        <i class="fa-solid fa-star"></i>
+        <span class="nav-label"><span class="nav-title">NPS</span><span class="nav-sub">Hasta memnuniyeti</span></span>
+      </button>
+      <button class="nav-item" data-tab="reviews">
+        <i class="fa-brands fa-google"></i>
+        <span class="nav-label"><span class="nav-title">Google</span><span class="nav-sub">Yorumlar</span></span>
+        <span id="reviews-badge" class="nav-badge hidden">0</span>
+      </button>
+      <button class="nav-item" data-tab="recall">
+        <i class="fa-solid fa-user-clock"></i>
+        <span class="nav-label"><span class="nav-title">Recall</span><span class="nav-sub">Geri çağırma</span></span>
+      </button>
+      <button class="nav-item" data-tab="voice">
+        <i class="fa-solid fa-microphone-lines"></i>
+        <span class="nav-label"><span class="nav-title">Sesli asistan</span><span class="nav-sub">Randevu araması</span></span>
+        <span class="nav-badge">12</span>
+      </button>
+      <button class="nav-item" data-tab="sentinel">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span class="nav-label"><span class="nav-title">Sentinel</span><span class="nav-sub">İtibar takibi</span></span>
+      </button>
+      <button class="nav-item" data-tab="enps">
+        <i class="fa-solid fa-users"></i>
+        <span class="nav-label"><span class="nav-title">eNPS</span><span class="nav-sub">Çalışan memnuniyeti</span></span>
+      </button>
+      <button class="nav-item" data-tab="billing">
+        <i class="fa-solid fa-credit-card"></i>
+        <span class="nav-label"><span class="nav-title">Abonelik</span><span class="nav-sub">Ödeme ve plan</span></span>
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-social">
+        <a href="https://www.linkedin.com/company/nefalixai/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="https://www.instagram.com/nefalixai/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.youtube.com/@Nefalixai" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+      <a href="/" class="nav-item ghost"><i class="fa-solid fa-arrow-left"></i> Ana site</a>
+    </div>
+  </aside>
+
+  <div class="app-main">
+    <header class="topbar">
+      <div>
+        <p class="topbar-eyebrow" id="topbar-eyebrow">Pilot klinik</p>
+        <h1 id="clinic-name">Medident İstanbul</h1>
+        <div id="clinic-profile-links" class="clinic-profile-links hidden"></div>
+      </div>
+      <div class="topbar-actions">
+        <button id="wa-connect-btn" class="btn-primary hidden" type="button" title="WhatsApp QR ile bağlan">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp Bağla
+        </button>
+        <select id="clinic-select" class="clinic-select admin-only hidden" aria-label="Firma seç">
+          <option value="">Tüm firmalar</option>
+        </select>
+        <span id="wa-mode-pill" class="status-pill wa-mode-receive hidden" title="WhatsApp modu"></span>
+        <span id="status" class="status-pill loading">Yükleniyor…</span>
+        <button id="refresh-btn" class="btn-secondary" type="button"><i class="fa-solid fa-rotate-right"></i> Yenile</button>
+        <div class="user-menu">
+          <button id="user-btn" class="user-btn" type="button">
+            <span class="user-avatar" id="user-initials">N</span>
+            <span class="user-meta">
+              <strong id="user-name">Kullanıcı</strong>
+              <small id="user-role">—</small>
+            </span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div id="user-dropdown" class="user-dropdown hidden">
+            <p id="user-email" class="user-email"></p>
+            <button id="logout-btn" type="button" class="btn-ghost btn-block"><i class="fa-solid fa-right-from-bracket"></i> Çıkış yap</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div id="error" class="alert alert-error hidden"></div>
+      <section id="kpi-grid" class="kpi-grid"></section>
+      <section id="panel" class="panel"></section>
+      <div id="insights-strip" class="insights-strip hidden"></div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Mobil panel menüsü">
+    <button type="button" class="mobile-nav-item" data-tab="overview"><i class="fa-solid fa-chart-pie"></i><span>Özet</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="inbox"><i class="fa-solid fa-inbox"></i><span>Inbox</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="nps"><i class="fa-solid fa-star"></i><span>NPS</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="reviews"><i class="fa-brands fa-google"></i><span>Google</span></button>
+    <button type="button" class="mobile-nav-item" id="mobile-more-toggle"><i class="fa-solid fa-ellipsis"></i><span>Diğer</span></button>
+  </nav>
+
+  <div id="mobile-more-sheet" class="mobile-more-sheet hidden">
+    <button type="button" class="mobile-nav-item" data-tab="recall"><i class="fa-solid fa-user-clock"></i><span>Recall</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="voice"><i class="fa-solid fa-microphone-lines"></i><span>Sesli asistan</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="sentinel"><i class="fa-solid fa-shield-halved"></i><span>Sentinel</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="enps"><i class="fa-solid fa-users"></i><span>eNPS</span></button>
+    <button type="button" class="mobile-nav-item" data-tab="billing"><i class="fa-solid fa-credit-card"></i><span>Abonelik</span></button>
+    <button type="button" class="mobile-nav-item admin-only hidden" data-sector="clinic"><i class="fa-solid fa-building"></i><span>Firmalar</span></button>
+  </div>
+
+  <div id="review-modal" class="modal hidden">
+    <div class="modal-backdrop" data-review-close="1"></div>
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3>Google yorum yanıtı</h3>
+        <button type="button" class="icon-btn" data-review-close="1"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <div class="msg-thread">
+          <p class="msg-label">Google yorumu</p>
+          <p id="review-modal-inbound" class="msg-inbound"></p>
+        </div>
+        <label class="field">
+          <span>AI taslak yanıt</span>
+          <textarea id="review-modal-reply" rows="6" placeholder="Taslak yükleniyor veya düzenleyin…"></textarea>
+        </label>
+        <p id="review-modal-hint" class="field-hint"></p>
+        <p id="review-modal-error" class="login-error hidden"></p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" data-review-close="1">İptal</button>
+        <button type="button" id="review-modal-approve-btn" class="btn-primary"><i class="fa-brands fa-google"></i> Onayla ve yanıtla</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="inbox-modal" class="modal hidden">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="inbox-modal-title">WhatsApp yanıtı</h3>
+        <button type="button" class="icon-btn" data-close="1"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <div class="msg-thread">
+          <p class="msg-label" id="modal-inbound-label">Gelen mesaj</p>
+          <p id="modal-inbound" class="msg-inbound"></p>
+        </div>
+        <label class="field">
+          <span id="modal-reply-label">Yanıt metni</span>
+          <textarea id="modal-reply" rows="5" placeholder="Yanıtınızı yazın veya AI taslağını düzenleyin…"></textarea>
+        </label>
+        <p id="modal-phone-hint" class="field-hint"></p>
+        <p id="modal-send-error" class="login-error hidden"></p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" data-close="1">İptal</button>
+        <button type="button" id="modal-send-btn" class="btn-primary"><i class="fa-brands fa-whatsapp"></i> Onayla ve gönder</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="firm-modal" class="modal hidden">
+    <div class="modal-backdrop" data-firm-close="1"></div>
+    <div class="modal-card modal-card-wide">
+      <header class="modal-header">
+        <h3 id="firm-modal-title">Firma ekle</h3>
+        <button type="button" class="icon-btn" data-firm-close="1"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <div class="onboarding-progress">
+          <div class="onboarding-progress-bar"><div id="firm-progress-fill"></div></div>
+          <p id="firm-progress-text" class="field-hint">Eksik alan olsa bile kaydedebilirsiniz — tamamlanınca otomasyon açılır.</p>
+        </div>
+        <form id="firm-form" class="firm-form">
+          <input type="hidden" id="firm-id" name="id" />
+          <div class="form-grid">
+            <label class="field"><span>Firma adı *</span><input id="firm-name" name="name" required placeholder="Örn. MediDent Kartal" /></label>
+            <label class="field"><span>Sektör *</span>
+              <select id="firm-sector" name="sector">
+                <option value="clinic">Klinik</option>
+                <option value="hotel">Otel</option>
+                <option value="auto">Oto servis</option>
+              </select>
+            </label>
+            <label class="field"><span>Adres *</span><input id="firm-address" name="address" placeholder="İlçe, şehir" /></label>
+            <label class="field"><span>E-posta *</span><input id="firm-email" name="email" type="email" placeholder="info@firma.com" /></label>
+            <p id="firm-login-link" class="field-hint hidden"></p>
+            <label class="field"><span>Web sitesi *</span><input id="firm-website" name="website_url" type="url" placeholder="https://" /></label>
+            <label class="field"><span>Randevu / rezervasyon linki *</span><input id="firm-booking" name="booking_url" type="url" placeholder="https://" /></label>
+            <label class="field"><span>WhatsApp iş hattı *</span><input id="firm-whatsapp" name="whatsapp_phone" placeholder="+905xxxxxxxxx" /></label>
+            <label class="field"><span>Yönetici WhatsApp (alarm) *</span><input id="firm-manager-wa" name="manager_whatsapp_phone" placeholder="+905xxxxxxxxx" /></label>
+            <label class="field"><span>Google Haritalar *</span><input id="firm-maps" name="google_maps_url" type="url" placeholder="https://maps.google.com/..." /></label>
+            <label class="field"><span>Google yorum linki *</span><input id="firm-review-url" name="google_review_url" type="url" placeholder="https://g.page/r/.../review" /></label>
+            <label class="field"><span>Google Place ID</span><input id="firm-place-id" name="google_place_id" placeholder="ChIJ..." /></label>
+            <label class="field"><span>Logo URL</span><input id="firm-logo" name="logo_url" placeholder="/logos/demo/... veya https://" /></label>
+            <label class="field sector-clinic"><span>CRM / HBYS türü *</span>
+              <select id="firm-crm-type" name="crm_type">
+                <option value="">Seçin</option>
+                <option value="estesoft">Estesoft</option>
+                <option value="manual_webhook">Manuel webhook</option>
+                <option value="other">Diğer</option>
+              </select>
+            </label>
+            <label class="field sector-clinic"><span>Evolution instance adı *</span><input id="firm-evolution" name="evolution_instance_name" placeholder="medident-pilot" /></label>
+            <p class="field-hint sector-clinic">WhatsApp QR için üstteki <strong>WhatsApp Bağla</strong> butonunu veya firma kartındaki QR düğmesini kullanın.</p>
+            <label class="field"><span>Şikayet formu</span><input id="firm-complaint" name="complaint_form_url" type="url" /></label>
+            <label class="field"><span>Şikayetvar</span><input id="firm-sikayetvar" name="sikayetvar_url" type="url" /></label>
+          </div>
+          <h4 class="form-section-title">Entegrasyonlar</h4>
+          <ul id="firm-checklist" class="firm-checklist"></ul>
+          <div class="form-grid integration-grid">
+            <label class="field sector-clinic"><span>CRM API anahtarı</span><input id="firm-crm-key" name="crm_api_key" type="password" autocomplete="new-password" placeholder="Güvenli — sadece sunucuda saklanır" /></label>
+          </div>
+          <div class="checkbox-row">
+            <label class="check-label sector-clinic"><input type="checkbox" id="firm-crm-webhook" /> CRM tamamlanma webhook’u kuruldu</label>
+            <label class="check-label sector-clinic"><input type="checkbox" id="firm-evolution-ok" /> WhatsApp (Evolution) bağlı</label>
+            <label class="check-label sector-hotel"><input type="checkbox" id="firm-pms-webhook" /> PMS / rezervasyon webhook’u</label>
+            <label class="check-label sector-auto"><input type="checkbox" id="firm-appt-webhook" /> Servis tamamlanma webhook’u</label>
+            <label class="check-label sector-hotel sector-auto"><input type="checkbox" id="firm-manual-ok" /> Pilot: manuel tetikleme kabul</label>
+          </div>
+          <p id="firm-form-error" class="login-error hidden"></p>
+        </form>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" data-firm-close="1">İptal</button>
+        <button type="button" id="firm-save-btn" class="btn-primary"><i class="fa-solid fa-building-circle-check"></i> Kaydet</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="wa-connect-modal" class="modal hidden">
+    <div class="modal-card modal-card-narrow">
+      <header class="modal-header">
+        <h3>WhatsApp bağlantısı</h3>
+        <button type="button" class="icon-btn" data-wa-close="1"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <input type="hidden" id="wa-connect-clinic-id" />
+        <p class="field-hint">Klinik WhatsApp’ını <strong>kendi telefonunuzdan</strong> bağlayın: telefonda <strong>WhatsApp → Bağlı cihazlar → Cihaz bağla</strong> ile QR’ı okutun (kamera uygulaması değil). QR ~60 sn geçerlidir. Bağlanınca hastaya giden mesajlar bu numaradan çıkar.</p>
+        <label class="field">
+          <span>Evolution instance adı</span>
+          <input id="wa-connect-instance" placeholder="medident-pilot" autocomplete="off" />
+        </label>
+        <div class="wa-qr-actions">
+          <button type="button" class="btn-primary" id="wa-connect-start-btn"><i class="fa-brands fa-whatsapp"></i> QR oluştur</button>
+          <button type="button" class="btn-secondary" id="wa-connect-refresh-btn"><i class="fa-solid fa-rotate"></i> Yenile</button>
+        </div>
+        <p id="wa-connect-status" class="wa-qr-status muted"></p>
+        <div id="wa-connect-wrap" class="wa-qr-wrap hidden">
+          <img id="wa-connect-img" alt="WhatsApp QR" width="280" height="280" />
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" data-wa-close="1">Kapat</button>
+      </footer>
+    </div>
+  </div>
+
+  <script type="module" src="/nefalix-dashboard.js"></script>
+</body>
+</html>

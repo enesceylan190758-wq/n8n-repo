@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- nefalix-seo-start -->
+<meta name="description" content="Estesoft Stella ve HBYS entegrasyonu: randevu tamamlandığında otomatik NPS, WhatsApp ve dashboard akışları.">
+<link rel="canonical" href="https://nefalix.com/hbys-entegrasyon">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nefalix">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="HBYS Entegrasyonu — Nefalix">
+<meta property="og:description" content="Estesoft Stella ve HBYS entegrasyonu: randevu tamamlandığında otomatik NPS, WhatsApp ve dashboard akışları.">
+<meta property="og:url" content="https://nefalix.com/hbys-entegrasyon">
+<meta property="og:image" content="https://nefalix.com/assets/brand/nefalix-logo-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HBYS Entegrasyonu — Nefalix">
+<meta name="twitter:description" content="Estesoft Stella ve HBYS entegrasyonu: randevu tamamlandığında otomatik NPS, WhatsApp ve dashboard akışları.">
+<meta name="twitter:image" content="https://nefalix.com/assets/brand/nefalix-logo-512.png">
+<!-- nefalix-seo-end -->
+<title>HBYS Entegrasyonu — NefalixAI</title>
+<link rel="icon" href="/assets/brand/favicon-192.png" type="image/png">
+<link rel="stylesheet" href="/shared.css">
+</head>
+<body class="site-subpage">
+
+<nav class="site-nav-mount" aria-label="Ana menü">
+<div class="navwrap">
+  <a href="/" class="logo logo-lockup" aria-label="Nefalix ana sayfa">
+    <img src="/assets/brand/nefalix-logo.png" alt="" class="logo-icon" width="48" height="48" />
+    <span class="logo-word">Nefalix</span>
+  </a>
+  <div class="navmid">
+    <div class="navitem">
+      <span>Ürünler <span class="caret">▾</span></span>
+      <div class="dropdown wide">
+        <a class="ddrow" href="/urunler#geri-bildirim"><div class="ddicon">⭐</div><div class="ddtext"><b>Akıllı Geri Bildirim</b><span>Tedavi sonrası otomatik anket ve yorum daveti</span></div></a>
+        <a class="ddrow" href="/urunler#mesaj"><div class="ddicon">💬</div><div class="ddtext"><b>Akıllı Mesaj Yönetimi</b><span>WhatsApp ve web sohbeti tek panelde</span></div></a>
+        <a class="ddrow" href="/urunler#yorum-asistani"><div class="ddicon">🛡️</div><div class="ddtext"><b>Yorum Asistanı</b><span>Google yorumlarına tonunuza uygun taslak</span></div></a>
+        <a class="ddrow" href="/urunler#calisan-deneyimi"><div class="ddicon">👥</div><div class="ddtext"><b>Çalışan Deneyimi</b><span>Haftalık nabız anketi ve aksiyon takibi</span></div></a>
+        <div class="dd-divider">PREMIUM ADD-ON</div>
+        <a class="ddrow" href="/urunler#sentinel"><div class="ddicon">🔍</div><div class="ddtext"><b>Sentinel</b><span>İtibar koruma ve kriz erken uyarı</span></div></a>
+        <a class="ddrow" href="/urunler#recall"><div class="ddicon">🔁</div><div class="ddtext"><b>Recall</b><span>Kayıp hasta geri kazanım motoru</span></div></a>
+      </div>
+    </div>
+    <div class="navitem">
+      <span>Sektörler <span class="caret">▾</span></span>
+      <div class="dropdown">
+        <a class="ddrow" href="/sektorler#saglik"><div class="ddicon">🏥</div><div class="ddtext"><b>Sağlık Kurumları</b><span>Diş, saç ekimi, estetik, hastane</span></div></a>
+        <a class="ddrow" href="/sektorler#otel"><div class="ddicon">🏨</div><div class="ddtext"><b>Oteller</b><span>Bağımsız ve zincir oteller</span></div></a>
+        <a class="ddrow" href="/sektorler#oto"><div class="ddicon">🔧</div><div class="ddtext"><b>Auto Servisler</b><span>Yetkili ve bağımsız servisler</span></div></a>
+      </div>
+    </div>
+    <div class="navitem">
+      <span>Platformlar <span class="caret">▾</span></span>
+      <div class="dropdown">
+        <a class="ddrow" href="/platformlar#saglik"><div class="ddicon">⭐</div><div class="ddtext"><b>Sağlık Platformları</b><span>Google, DoktorTakvimi, Trustpilot...</span></div></a>
+        <a class="ddrow" href="/platformlar#otel"><div class="ddicon">🏨</div><div class="ddtext"><b>Otel Platformları</b><span>Booking, TripAdvisor, Airbnb...</span></div></a>
+        <a class="ddrow" href="/platformlar#oto"><div class="ddicon">🔧</div><div class="ddtext"><b>Auto Servis Platformları</b><span>RepairPal, CarFax...</span></div></a>
+        <a class="ddrow" href="/platformlar#sosyal"><div class="ddicon">📱</div><div class="ddtext"><b>Sosyal Medya</b><span>Instagram, WhatsApp, X, Facebook</span></div></a>
+      </div>
+    </div>
+    <div class="navitem"><a href="/blog">Blog</a></div>
+    <div class="navitem"><a href="/kaynaklar">Kaynaklar</a></div>
+    <div class="navitem"><a href="/ai-ajaniniz" class="nav-ai-link">AI Ajanınız <span class="nav-ai-badge">YENİ</span></a></div>
+    <div class="navitem"><a href="/fiyatlar">Fiyatlar</a></div>
+    <div class="navitem"><a href="/hakkimizda">Hakkımızda</a></div>
+  </div>
+  <div class="navright">
+    <div class="lang-select">🇹🇷 TR <span class="caret">▾</span></div>
+    <a href="/dashboard/login" class="btn-login">Giriş Yap</a>
+    <a href="https://cal.com/enes-ceylan/15min" class="btn-demo cal-demo" data-demo-action="cal">Demo Talep Et</a>
+  </div>
+</div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="/">Ana Sayfa</a> / HBYS Entegrasyonu</div>
+    <h1>HBYS &amp; Klinik Yazılımı Entegrasyonu</h1>
+    <p>Randevu tamamlandığında otomatik NPS, yorum daveti ve operasyon akışları.</p>
+  </div>
+</header>
+
+<main class="legal-page">
+  <div class="wrap legal-content">
+    <p class="legal-updated">Son güncelleme: 8 Temmuz 2026</p>
+
+    <h2>1. Ne Sağlar?</h2>
+    <p>NefalixAI, klinik yazılımınızdan (HBYS / hasta takip sistemi) gelen <strong>randevu tamamlandı</strong> sinyali ile otomatik hasta deneyimi akışlarını başlatır: WhatsApp memnuniyet anketi, promoter yönlendirmesi, düşük skor alarmı ve panel görevleri.</p>
+
+    <h2>2. Desteklenen Yöntemler</h2>
+    <ul>
+      <li><strong>Webhook:</strong> Randevu kapanışında HTTP POST ile hasta ve klinik bilgisi</li>
+      <li><strong>Estesoft / Medident:</strong> Pilot entegrasyon yolu (klinik bazlı yapılandırma)</li>
+      <li><strong>Manuel tetikleme:</strong> API veya panel üzerinden test gönderimi</li>
+    </ul>
+
+    <h2>3. Veri Akışı</h2>
+    <p>HBYS’den gelen minimum alanlar: hasta adı, telefon, klinik, doktor/tedavi (opsiyonel), randevu kimliği. Veriler Supabase üzerinde klinik izolasyonu ile saklanır; üçüncü taraflarla yalnızca hizmetin ifası için paylaşılır.</p>
+
+    <h2>4. Kurulum Süreci</h2>
+    <ol>
+      <li>Pilot klinikte webhook URL ve kimlik bilgileri tanımlanır</li>
+      <li>Test randevusu ile uçtan uca akış doğrulanır</li>
+      <li>Canlıya alındıktan sonra panelden izlenir</li>
+    </ol>
+
+    <h2>5. İletişim</h2>
+    <p>Entegrasyon planı için: <a href="mailto:info@nefalix.com">info@nefalix.com</a> · <a href="https://cal.com/enes-ceylan/15min" class="cal-demo">Demo planla</a></p>
+    <p>İlgili: <a href="/veri-guvenligi">Veri Güvenliği</a> · <a href="/kvkk">KVKK</a></p>
+  </div>
+</main>
+
+<footer class="home-footer">
+  <div class="wrap">
+    <div class="home-footer-top">
+      <div class="home-footer-brand">
+        <div class="logo logo-lockup"><img src="/assets/brand/nefalix-logo.png" alt="" class="logo-icon" width="44" height="44" /><span class="logo-word">Nefalix</span></div>
+        <p>Yorum, mesaj, memnuniyet ve recall akışlarını aynı karar merkezinde birleştiren yapay zeka destekli operasyon platformu.</p>
+        <div class="home-footer-actions">
+          <a href="mailto:info@nefalix.com">Mail Gönder</a>
+          <a href="https://cal.com/enes-ceylan/15min" class="cal-demo">Demo Planla</a>
+        </div>
+      </div>
+      <div class="home-footer-col">
+        <h5>Kurumsal</h5>
+        <a href="/hakkimizda">Hakkımızda</a>
+        <a href="/blog">Blog</a>
+        <a href="/kaynaklar">Kaynaklar</a>
+        <a href="/fiyatlar">Fiyatlar</a>
+      </div>
+      <div class="home-footer-col">
+        <h5>Ürünler</h5>
+        <a href="/urunler#geri-bildirim">Akıllı Geri Bildirim</a>
+        <a href="/urunler#mesaj">Mesaj Yönetimi</a>
+        <a href="/urunler#yorum-asistani">Yorum Asistanı</a>
+        <a href="/urunler#recall">Recall</a>
+      </div>
+      <div class="home-footer-col">
+        <h5>Yasal</h5>
+        <a href="/kullanici-sozlesmesi">Kullanıcı Sözleşmesi</a>
+        <a href="/gizlilik-politikasi">Gizlilik Politikası</a>
+        <a href="/kvkk">KVKK Aydınlatma Metni</a>
+      </div>
+    </div>
+    <div class="home-footer-bottom">
+      <span>© 2026 NefalixAI · Tüm hakları saklıdır.</span>
+      <span>info@nefalix.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/shared.js"></script>
+</body>
+</html>
