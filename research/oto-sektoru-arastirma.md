@@ -1,8 +1,8 @@
 # Oto servis sektoru - yorum / musteri deneyimi otomasyonu arama arastirmasi
 
-**Tarih:** 2026-08-13  
-**Kapsam:** Turkiye - ozel oto servisler, tamirhaneler, lastik/kaporta/oto elektrik, yetkili servis aglari  
-**Tema:** oto servis musteri deneyimi + Google yorum/NPS/WhatsApp otomasyonu  
+**Tarih:** 2026-08-13
+**Kapsam:** Turkiye - ozel oto servisler, tamirhaneler, lastik/kaporta/oto elektrik, yetkili servis aglari
+**Tema:** oto servis musteri deneyimi + Google yorum/NPS/WhatsApp otomasyonu
 **Yontem:** Canli web arama / SERP + sayfa fetch. Keyword Planner, Ahrefs veya benzeri hacim API'si yok; "en yogun" siralama bu oturumda gozlenen **SERP ticari yogunlugu + sorgular arasi tekrar** demektir. Sayisal hacim iddiasi yapilmaz.
 
 **Kisa sonuc:** Oto servis SERP'i bugun agirlikla `oto servis programi` ve `is emri/stok/randevu` yazilimlari tarafindan dolduruluyor; Google yorum, NPS ve kriz/itibar yonetimi icin sektor-spesifik SaaS boslugu daha acik. Nefalix'in firsati, mevcut servis ERP/programlarinin yerine gecmek degil; is emri kapandiktan sonra WhatsApp, NPS, Google yorum cevabi ve dusuk puan alarmi katmanini bu sistemlerin uzerine konumlamak.
@@ -172,8 +172,8 @@ Dogulama: Bu checkout public landing repo degil; canli deploy veya sitemap degis
 
 ## 8) Director denetimi
 
-**Parca:** `research/oto-sektoru-arastirma.md`  
-**Karar:** **Onay**  
+**Parca:** `research/oto-sektoru-arastirma.md`
+**Karar:** **Onay**
 **Gerekce:** Dosya tahmini hacim veya kaynaksiz rakip iddiasi kullanmiyor; fiyat/ozellikler URL ve fetch/SERP alintisiyla sinirlandirildi, Google yorum widget riski ve review-gating uyarisi acik yazildi. Bu bir GEO yayin metni degil; yine de answer-first ozetle basliyor, rakipleri yazilim/ajans/servis ERP olarak ayiriyor ve KVKK rol ayrimini bulandirmiyor.
 
 **Kapi maddeleri:**
