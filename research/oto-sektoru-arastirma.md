@@ -1,8 +1,8 @@
 # Oto servis sektörü — yorum / müşteri deneyimi otomasyonu arama araştırması
 
-**Tarih:** 2026-08-14  
-**Kapsam:** Türkiye · bağımsız oto servisler, tamirhaneler, yetkili servis / teknik servis operasyonları  
-**Tema:** oto servis müşteri deneyimi + Google yorum yönetimi + NPS / servis sonrası anket + WhatsApp otomasyon  
+**Tarih:** 2026-08-14
+**Kapsam:** Türkiye · bağımsız oto servisler, tamirhaneler, yetkili servis / teknik servis operasyonları
+**Tema:** oto servis müşteri deneyimi + Google yorum yönetimi + NPS / servis sonrası anket + WhatsApp otomasyon
 **Yöntem:** Canlı web arama / SERP sonuçları + sayfa fetch. Keyword Planner / Ahrefs hacim API'si yok; "en yoğun" sıralama **sayısal arama hacmi değildir**, bu oturumda gözlenen **SERP ticari yoğunluğu + sorgular arası tekrar** ile yazılmıştır. Rakip fiyatı veya özellikleri kaynakta görünmüyorsa tahmin edilmez.
 **Plan referansı:** `docs/nefalix-seo-geo-ajan-plani.md` §2.3 · Faz 1 (sağlık ve otel sonrası oto servis)
 
