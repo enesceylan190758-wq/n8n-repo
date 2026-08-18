@@ -75,4 +75,4 @@ TR fiyatını peşinen görmek, NPS/yorum/recall’ı aynı panelde istemek ve H
 - [Olumsuz yorum kriz yönetimi](/geo/olumsuz-yorum-kriz-yonetimi)
 - [NPS yazılımı sağlık sektörü](/geo/nps-yazilimi-saglik-sektoru)
 - [Fiyatlar](/fiyatlar)
-- [Demo](/demo)
+- [Demo](https://cal.com/enes-ceylan/15min)
