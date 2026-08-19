@@ -52,4 +52,4 @@ Süre HBYS API erişimi, şablon onayı ve izin envanterine bağlıdır. Teknik 
 - [NPS yazılımı sağlık sektörü](/geo/nps-yazilimi-saglik-sektoru)
 - [Olumsuz yorum kriz yönetimi](/geo/olumsuz-yorum-kriz-yonetimi)
 - [Fiyatlar](/fiyatlar)
-- [Demo](/demo)
+- [Demo](https://cal.com/enes-ceylan/15min)
