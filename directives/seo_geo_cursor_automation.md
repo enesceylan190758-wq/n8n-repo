@@ -34,7 +34,7 @@ Director: `.cursor/rules/nefalix-content-director.mdc`
 
 - Kaynaksız rakip fiyat/özellik; review-gating dili; KVKK sorumluluk bulanıklığı; kaynaksız istatistik
 - `/nav.js` (yok) — `/shared.js` veya inline nav
-- `/demo` (404) — Cal.com demo linki
+- eski demo yolu (404) — Cal.com demo linki
 - GSC “dizine ekle” buradan yok — URL listesi yeterli
 - Aynı koşuda hem büyük pillar seti hem VPS cron’u “yeniden yazma” — cron’a dokunma unless broken
 
