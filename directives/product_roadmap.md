@@ -14,6 +14,7 @@
 | Cloudbeds / TheClico entegrasyon planı | 📋 | `directives/integrations_hotels.md` |
 | HBYS/CRM randevu tetikleme | 📋 SOP | `directives/appointment_trigger.md` |
 | CRM’ye özel adapter | ⏳ | Firmaya göre (Medicasimple vb.) |
+| Reklam performans senkronu (Meta Graph API + Google Ads) | ⏳ token bekleniyor | `directives/ads_performance_sync.md`, wf-20 |
 
 ## NPS iş kuralı (hasta)
 1. Randevu biter → WhatsApp’ta **1–10 puan** sorulur
