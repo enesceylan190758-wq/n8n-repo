@@ -1,0 +1,82 @@
+{
+  "name": "Nefalix - Reklam Performans Senkronu",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Meta Graph API + Google Ads API → Supabase\n\nAktif `ad_accounts` kayıtlarının son 7 günlük kampanya metriklerini çeker.\n\n**Gerekli env:** `META_ACCESS_TOKEN`, `GOOGLE_ADS_DEVELOPER_TOKEN`, `GOOGLE_ADS_ACCESS_TOKEN` (bkz. `directives/ads_performance_sync.md`)\n\nManuel: `POST /webhook/nefalix/ads/sync`",
+        "height": 160,
+        "width": 420,
+        "color": 5
+      },
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 60]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "name": "Her 12 Saatte",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 280]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nefalix/ads/sync",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Manuel Senkron Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [240, 460],
+      "webhookId": "nefalix-ads-sync"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sbBase = ($env.SUPABASE_URL || 'http://host.docker.internal:54321').replace(/\\/$/, '');\nconst sbKey = $env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';\nconst sbHeaders = { apikey: sbKey, Authorization: `Bearer ${sbKey}`, 'Content-Type': 'application/json' };\n\nasync function sb(method, path, body, prefer = 'return=minimal') {\n  return await this.helpers.httpRequest({ method, url: `${sbBase}/rest/v1/${path}`, headers: { ...sbHeaders, Prefer: prefer }, body, json: true });\n}\n\nfunction actionValue(actions, type) {\n  const a = (actions || []).find((x) => x.action_type === type);\n  return a ? Math.round(parseFloat(a.value || 0)) : 0;\n}\n\nasync function upsertInsight(row) {\n  const existing = await sb.call(this, 'GET', `ad_insights_daily?clinic_id=eq.${row.clinic_id}&platform=eq.${row.platform}&campaign_id=eq.${encodeURIComponent(row.campaign_id)}&date=eq.${row.date}&select=id`);\n  if (existing?.length) {\n    await sb.call(this, 'PATCH', `ad_insights_daily?id=eq.${existing[0].id}`, row);\n  } else {\n    await sb.call(this, 'POST', 'ad_insights_daily', row);\n  }\n}\n\nasync function syncMeta(account, since, until) {\n  const token = $env.META_ACCESS_TOKEN;\n  if (!token) throw new Error('META_ACCESS_TOKEN eksik');\n  let url = `https://graph.facebook.com/v21.0/${account.account_id}/insights?` + new URLSearchParams({\n    level: 'campaign',\n    time_increment: '1',\n    time_range: JSON.stringify({ since, until }),\n    fields: 'campaign_id,campaign_name,spend,impressions,clicks,ctr,cpc,actions,date_start',\n    access_token: token,\n    limit: '200',\n  });\n  let rows = 0;\n  while (url) {\n    const data = await this.helpers.httpRequest({ method: 'GET', url, json: true });\n    for (const item of data.data || []) {\n      const leads = actionValue(item.actions, 'lead') + actionValue(item.actions, 'onsite_conversion.lead_grouped');\n      await upsertInsight.call(this, {\n        clinic_id: account.clinic_id,\n        platform: 'meta',\n        account_id: account.account_id,\n        campaign_id: item.campaign_id || 'unknown',\n        campaign_name: item.campaign_name,\n        date: item.date_start,\n        currency: 'TRY',\n        spend: parseFloat(item.spend || 0),\n        impressions: parseInt(item.impressions || 0, 10),\n        clicks: parseInt(item.clicks || 0, 10),\n        leads,\n        conversions: leads,\n        cpc: parseFloat(item.cpc || 0) || null,\n        ctr: parseFloat(item.ctr || 0) || null,\n      });\n      rows++;\n    }\n    url = data.paging?.next || null;\n  }\n  return rows;\n}\n\nasync function syncGoogle(account, since, until) {\n  const devToken = $env.GOOGLE_ADS_DEVELOPER_TOKEN;\n  const accessToken = $env.GOOGLE_ADS_ACCESS_TOKEN;\n  if (!devToken || !accessToken) throw new Error('GOOGLE_ADS_DEVELOPER_TOKEN / GOOGLE_ADS_ACCESS_TOKEN eksik');\n  const customerId = account.account_id.replace(/-/g, '');\n  const headers = { Authorization: `Bearer ${accessToken}`, 'developer-token': devToken };\n  if ($env.GOOGLE_ADS_LOGIN_CUSTOMER_ID) headers['login-customer-id'] = $env.GOOGLE_ADS_LOGIN_CUSTOMER_ID.replace(/-/g, '');\n  const query = `SELECT campaign.id, campaign.name, segments.date, metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions, metrics.ctr, metrics.average_cpc FROM campaign WHERE segments.date BETWEEN '${since}' AND '${until}'`;\n  const data = await this.helpers.httpRequest({\n    method: 'POST',\n    url: `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:searchStream`,\n    headers,\n    body: { query },\n    json: true,\n  });\n  let rows = 0;\n  const batches = Array.isArray(data) ? data : [data];\n  for (const batch of batches) {\n    for (const result of batch.results || []) {\n      const costMicros = parseInt(result.metrics?.costMicros || 0, 10);\n      const conv = Math.round(parseFloat(result.metrics?.conversions || 0));\n      await upsertInsight.call(this, {\n        clinic_id: account.clinic_id,\n        platform: 'google',\n        account_id: account.account_id,\n        campaign_id: String(result.campaign?.id || 'unknown'),\n        campaign_name: result.campaign?.name,\n        date: result.segments?.date,\n        currency: 'TRY',\n        spend: costMicros / 1000000,\n        impressions: parseInt(result.metrics?.impressions || 0, 10),\n        clicks: parseInt(result.metrics?.clicks || 0, 10),\n        leads: conv,\n        conversions: conv,\n        cpc: (parseInt(result.metrics?.averageCpc || 0, 10) / 1000000) || null,\n        ctr: parseFloat(result.metrics?.ctr || 0) || null,\n      });\n      rows++;\n    }\n  }\n  return rows;\n}\n\nconst until = new Date(Date.now() - 86400000).toISOString().slice(0, 10);\nconst since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);\n\nconst accounts = await sb.call(this, 'GET', 'ad_accounts?select=id,clinic_id,platform,account_id,account_name&status=eq.active&order=platform.asc');\nconst results = [];\n\nfor (const account of accounts) {\n  try {\n    const rows = account.platform === 'meta'\n      ? await syncMeta.call(this, account, since, until)\n      : await syncGoogle.call(this, account, since, until);\n    await sb.call(this, 'PATCH', `ad_accounts?id=eq.${account.id}`, { last_synced_at: new Date().toISOString(), status: 'active' });\n    results.push({ platform: account.platform, account: account.account_id, ok: true, rows });\n  } catch (e) {\n    if (/token/i.test(e.message)) {\n      await sb.call(this, 'PATCH', `ad_accounts?id=eq.${account.id}`, { status: 'token_expired' }).catch(() => {});\n    }\n    results.push({ platform: account.platform, account: account.account_id, ok: false, error: e.message });\n  }\n}\n\nreturn [{ json: { ok: true, at: new Date().toISOString(), since, until, results } }];"
+      },
+      "name": "Reklam Senkron",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 360]
+    }
+  ],
+  "connections": {
+    "Her 12 Saatte": {
+      "main": [
+        [
+          {
+            "node": "Reklam Senkron",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuel Senkron Webhook": {
+      "main": [
+        [
+          {
+            "node": "Reklam Senkron",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
