@@ -52,9 +52,9 @@ Eksik (plana göre):
 2. **Faz 1 araştırma:**
    - Sağlık — **yapıldı** → `research/saglik-sektoru-arastirma.md`
    - Otel — **yapıldı** (2026-07-29) → `research/otel-sektoru-arastirma.md`
-   - Oto Servis — **sırada**
+   - Oto Servis — **yapıldı** (2026-08-31) → `research/oto-sektoru-arastirma.md`
 3. **Faz 2–3 sağlık içerik:** 5 GEO pillar + 1 karşılaştırma canlı (`/geo/...` slug’lar, sitemap) — **yapıldı**; ek vs-sayfaları (Nefalix vs klinikitibar / VoyageRespond) opsiyonel.
-4. **Faz 4:** Otel (+ sonra Oto) GEO + karşılaştırma seti — **bekliyor** (otel araştırma tamam).
+4. **Faz 4:** Otel GEO + karşılaştırma seti — **sırada** (otel araştırma tamam); sonra oto GEO seti `research/oto-sektoru-arastirma.md` üzerinden üretilecek.
 5. **Faz 5 ölçüm:** GSC indeks + AI citation testi — GSC URL isteği manuel (API yok).
 
 Director kuralı: `.cursor/rules/nefalix-content-director.mdc` (`geo/**/*.md`, `content/**/*.md`).
@@ -65,3 +65,10 @@ Director kuralı: `.cursor/rules/nefalix-content-director.mdc` (`geo/**/*.md`, `
 ## Landing repo
 
 Araştırma metni **n8n-repo `docs/`** içinde yaşar. `nefalix-landing` yalnızca public yüzey; tam plan kopyası yok. Uygulama (SSR indeks, schema) landing’de yapılır.
+
+## 2026-08-31 cron güncellemesi
+
+- Bu koşuda ana teslimat olarak oto servis Faz 1 araştırması eklendi: `research/oto-sektoru-arastirma.md`.
+- Oto SERP deseni üç ayrı satın alma niyetine ayrıldı: DMS/servis yönetim yazılımı, WhatsApp-native CRM ve yorum/itibar SaaS.
+- Director notu: oto içeriklerinde DMS rakipleriyle fiyat karşılaştırması yapılırken kapsam ayrımı zorunlu; Google review-gating, yorum karşılığı teşvik ve Google yorum widget'ı riskleri açık uyarıyla ele alınmalı.
+- Sıradaki ana teslimat: otel GEO seti (`geo/*.md`) — `research/otel-sektoru-arastirma.md` hazır.
