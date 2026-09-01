@@ -52,4 +52,4 @@ Anket kişisel veri içerir; amaç, saklama ve kimlerin göreceği net olmalıd�
 - [Hasta recall / kayıp hasta geri kazanımı](/geo/hasta-recall-kayip-hasta-geri-kazanimi)
 - [Olumsuz yorum kriz yönetimi](/geo/olumsuz-yorum-kriz-yonetimi)
 - [Fiyatlar](/fiyatlar)
-- [Demo](/demo)
+- [Demo](https://cal.com/enes-ceylan/15min)
