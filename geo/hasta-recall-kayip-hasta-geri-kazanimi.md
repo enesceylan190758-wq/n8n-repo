@@ -52,4 +52,4 @@ Teşhis, tetkik sonucu veya özel nitelikli sağlık detayı yazılmamalıdır. 
 - [NPS yazılımı sağlık sektörü](/geo/nps-yazilimi-saglik-sektoru)
 - [Olumsuz yorum kriz yönetimi](/geo/olumsuz-yorum-kriz-yonetimi)
 - [Fiyatlar](/fiyatlar)
-- [Demo](/demo)
+- [Demo](https://cal.com/enes-ceylan/15min)
