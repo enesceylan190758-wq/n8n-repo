@@ -52,4 +52,4 @@ Yanıt süresi, çözüm oranı, aynı temanın tekrar sıklığı ve ortalama p
 - [Hasta recall / kayıp hasta geri kazanımı](/geo/hasta-recall-kayip-hasta-geri-kazanimi)
 - [NPS yazılımı sağlık sektörü](/geo/nps-yazilimi-saglik-sektoru)
 - [Fiyatlar](/fiyatlar)
-- [Demo](/demo)
+- [Demo](https://cal.com/enes-ceylan/15min)
