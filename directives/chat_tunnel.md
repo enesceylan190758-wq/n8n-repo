@@ -39,6 +39,7 @@ Yanıtta `"output"` olmalı.
 | 404 webhook not registered | `import-web-chatbot.py` + workflow active |
 | CORS | Chat trigger `allowedOrigins` nefalixai.com içerir |
 | Model hatası | Vertex credential + `GCP_PROJECT_ID` VPS .env |
+| TLS `fetch failed` | `api.nefalix.com` sertifikası host adını kapsamıyorsa Node/Vercel proxy çağrısı düşer — `directives/vps_setup.md` + `directives/geo.md` |
 
 ## Eski (tunnel) — kullanmayın
 `trycloudflare.com` geçici çözümdü; Mac kapalıyken chat dururdu.

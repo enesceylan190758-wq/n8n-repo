@@ -167,6 +167,10 @@
       "destination": "/k/enes-ceylan.html"
     },
     {
+      "source": "/k/medident",
+      "destination": "/k/medident.html"
+    },
+    {
       "source": "/iletisim",
       "destination": "/api/blog?action=crm-page&page=iletisim"
     },

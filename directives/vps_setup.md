@@ -134,6 +134,7 @@ https://nefalixai.com/api/billing?action=paytr-callback
 | 8 GB RAM yetmez | 12 GB'ye yükselt veya Supabase ayrı VPS |
 | WhatsApp QR | `execution/reset-evolution-qr.sh` (sunucuda) |
 | Mac kapanınca panel durur | VPS geçişi sonrası çözülür |
+| `api.nefalix.com` / `api.nefalixai.com` TLS | Cert CN şu an `srv1975784.hstgr.cloud`; SAN eşleşmez → Vercel `fetch failed`, `/geo` `/blog` 502. Caddy/Nginx’te bu hostlar için Let’s Encrypt SAN. Kontrol: `curl -vI https://api.nefalix.com/` |
 
 ## Self-anneal
 

@@ -21,11 +21,13 @@ Director: `.cursor/rules/nefalix-content-director.mdc`
 1. **Durum oku:** gap notes + plan; `research/` ve `geo/` listesi.
 2. **Sabah yayını smoke (Katman A kontrolü):**
    - Bugünün `/geo/YYYY-MM-DD` → 200, cevap + SSS HTML’de var mı
-   - Son `/blog` indeksi SSR (curl’de “yükleniyor” yok, yazı linkleri var)
-   - Kırık menü / `Geçersiz tarih` / `Geçersiz action` varsa önce bunu not et; pillar publish’e girme
+   - `/geo` ve `/blog` indeks **HTML 200** mü (plaintext `yüklenemedi: fetch failed` = 502 — pillar publish yok)
+   - Statik pillar `/geo/klinik-itibar-yonetimi-yazilimi` 200 mü
+   - Son `/blog` indeksi SSR (curl’de “yükleniyor” yok, yazı veya statik GEO linkleri var)
+   - Kırık menü / `Geçersiz tarih` / `Geçersiz action` / 502 varsa önce bunu not et; yeni araştırma PR’ı açma
 3. **Strateji teslimatı (Katman B — tek ana iş):**
-   - Önce: yoksa `research/oto-sektoru-arastirma.md` (sağlık/otel formatı, gerçek SERP)
-   - Sonra: otel GEO seti (`geo/*.md` + director)
+   - `research/oto-sektoru-arastirma.md` **main’de yoksa** yaz (sağlık/otel formatı, gerçek SERP). **Varsa atla.** Aynı başlıklı açık PR varsa yeni kopya açma.
+   - Sonra: otel GEO seti (`geo/*.md` + director + `nefalix-landing/geo-pillars/`)
    - Sonra: oto GEO seti
 4. **Director kapısı** — red kuralları director dosyasındaki gibi; Onay/Red + gerekçe.
 5. **Çıktı:** commit’lenebilir dosyalar + Open PR; kısa handoff (yapılan / kalan / smoke / risk).
@@ -44,5 +46,7 @@ Director: `.cursor/rules/nefalix-content-director.mdc`
 Sen Nefalix SEO/GEO cloud ajanısın. Tek kaynak: directives/seo_geo_cursor_automation.md — oku ve aynen uygula.
 Repo: n8n-repo @ main. Plan + gap notes + director + research/ + geo/ orada.
 Günlük blog/GEO mail VPS cron’dadır; sen yerine geçme — smoke et, sonra sıradaki strateji fazını bitir.
+research/oto-sektoru-arastirma.md main’de varsa oto araştırmasını tekrar yazma; sıradaki iş otel GEO seti.
+/geo veya /blog 502 ise yeni pillar PR’ı açma — TLS/proxy notu bırak.
 Tahmin yok. Siteyi bozma. Open PR + kısa handoff.
 ```

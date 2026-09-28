@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from 'crypto';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { sbRequest } from './_lib/supabase.js';
+import { staticGeoPacks, geoSitemapXml, degradedIndexNote } from './_lib/public-fallbacks.js';
 import { parseCookies } from './_lib/auth.js';
 import { CLINIC_ACTIONS, handleClinicAction } from './_lib/clinic-crm.js';
 import firmaBasvuruHandler from './_lib/firma-basvuru-handler.js';
@@ -692,11 +693,20 @@ async function loadBlogPosts(limit = 50) {
   }));
 }
 
+async function loadBlogPostsSafe(limit = 50) {
+  try {
+    return { posts: await loadBlogPosts(limit), degraded: false };
+  } catch (err) {
+    console.error('loadBlogPosts failed', err);
+    return { posts: [], degraded: true, error: err.message };
+  }
+}
+
 async function handleList(req, res) {
   res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
   const limit = Math.min(Number(req.query.limit) || 24, 50);
-  const posts = await loadBlogPosts(limit);
-  res.status(200).json({ ok: true, posts });
+  const { posts, degraded, error } = await loadBlogPostsSafe(limit);
+  res.status(200).json({ ok: !degraded, posts, degraded: Boolean(degraded), error: error || undefined });
 }
 
 function fmtIndexDate(iso) {
@@ -764,19 +774,27 @@ function readPublicHtml(filename) {
 }
 
 async function handleBlogIndex(_req, res) {
-  const posts = await loadBlogPosts(50);
+  const { posts, degraded } = await loadBlogPostsSafe(50);
   let html = readPublicHtml('blog.html');
   if (!html) {
     res.status(500).send('blog.html bulunamadı');
     return;
   }
 
-  const countText = posts.length ? `${posts.length} yazı` : 'Henüz yazı yok';
+  const countText = posts.length
+    ? `${posts.length} yazı`
+    : degraded
+      ? 'Liste geçici olarak kapalı'
+      : 'Henüz yazı yok';
   let featuredHtml = '';
   let gridHtml = '';
   if (!posts.length) {
-    gridHtml =
-      '<p class="blog-empty">İlk yazılar yakında burada. Günlük blog otomasyonu aktif.</p>';
+    const fallbackCards = staticGeoPacks()
+      .map((p) => geoIndexCardHtml(p))
+      .join('');
+    gridHtml = degraded
+      ? `${degradedIndexNote('blog')}${fallbackCards}`
+      : '<p class="blog-empty">İlk yazılar yakında burada. Günlük blog otomasyonu aktif.</p>';
   } else {
     const [featured, ...rest] = posts;
     featuredHtml = blogIndexCardHtml(featured, { featured: true });
@@ -785,6 +803,21 @@ async function handleBlogIndex(_req, res) {
       '<p class="blog-empty" style="grid-column:1/-1;">Diğer yazılar yakında eklenecek.</p>';
   }
 
+  const listItems = posts.length
+    ? posts.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: p.url,
+        name: p.title,
+      }))
+    : degraded
+      ? staticGeoPacks().map((p, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: p.url,
+          name: p.prompt,
+        }))
+      : [];
   const itemList = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -794,13 +827,8 @@ async function handleBlogIndex(_req, res) {
       'Nefalix blog: klinik itibarı, NPS, WhatsApp iletişimi, HBYS entegrasyonu ve hasta deneyimi yazıları.',
     mainEntity: {
       '@type': 'ItemList',
-      numberOfItems: posts.length,
-      itemListElement: posts.map((p, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        url: p.url,
-        name: p.title,
-      })),
+      numberOfItems: listItems.length,
+      itemListElement: listItems,
     },
   };
   const jsonLd = `<script type="application/ld+json">${JSON.stringify(itemList)}</script>`;
@@ -1184,19 +1212,39 @@ async function loadGeoPacks(limit = 60) {
   }));
 }
 
+async function loadGeoPacksSafe(limit = 60) {
+  try {
+    const packs = await loadGeoPacks(limit);
+    return { packs, degraded: false };
+  } catch (err) {
+    console.error('loadGeoPacks failed', err);
+    return { packs: staticGeoPacks(), degraded: true, error: err.message };
+  }
+}
+
 async function handleGeoList(req, res) {
   res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
   const limit = Math.min(Number(req.query.limit) || 60, 120);
-  const packs = await loadGeoPacks(limit);
-  res.status(200).json({ ok: true, packs });
+  const { packs, degraded, error } = await loadGeoPacksSafe(limit);
+  res.status(200).json({ ok: !degraded, packs, degraded: Boolean(degraded), error: error || undefined });
+}
+
+function geoPackMetaLabel(p, featured = false) {
+  const date = String(p.run_date || '').slice(0, 10);
+  const suffix = featured ? ' · Paketi aç →' : '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return `${fmtIndexDate(`${date}T12:00:00Z`)} · GEO${suffix}`;
+  }
+  return `${p.bucket || 'GEO'} · GEO${suffix}`;
 }
 
 function geoIndexCardHtml(p, { featured = false } = {}) {
   const tag = escapeHtml(p.bucket || 'GEO');
-  const path = `/geo/${escapeHtml(p.run_date)}`;
+  const path = escapeHtml(p.path || `/geo/${p.run_date}`);
   const cover = p.cover_image_url
     ? `<img class="${featured ? 'blog-featured-cover' : 'article-card-cover'}" src="${escapeHtml(p.cover_image_url)}" alt="" loading="${featured ? 'eager' : 'lazy'}">`
     : '';
+  const meta = escapeHtml(geoPackMetaLabel(p, featured));
   if (featured) {
     return `
       <a class="blog-featured-card" href="${path}">
@@ -1205,7 +1253,7 @@ function geoIndexCardHtml(p, { featured = false } = {}) {
           <span class="article-card-tag">${tag}</span>
           <h2>${escapeHtml(p.prompt)}</h2>
           <p>${escapeHtml(p.excerpt || '')}</p>
-          <span class="article-card-meta">${escapeHtml(fmtIndexDate(`${String(p.run_date).slice(0, 10)}T12:00:00Z`))} · GEO · Paketi aç →</span>
+          <span class="article-card-meta">${meta}</span>
         </div>
       </a>`;
   }
@@ -1215,19 +1263,23 @@ function geoIndexCardHtml(p, { featured = false } = {}) {
         <span class="article-card-tag">${tag}</span>
         <h3>${escapeHtml(p.prompt)}</h3>
         <p>${escapeHtml(p.excerpt || '')}</p>
-        <span class="article-card-meta">${escapeHtml(fmtIndexDate(`${String(p.run_date).slice(0, 10)}T12:00:00Z`))} · GEO</span>
+        <span class="article-card-meta">${meta}</span>
       </a>`;
 }
 
 async function handleGeoIndex(_req, res) {
-  const packs = await loadGeoPacks(60);
+  const { packs, degraded } = await loadGeoPacksSafe(60);
   let html = readPublicHtml('geo.html');
   if (!html) {
     res.status(500).send('geo.html bulunamadı');
     return;
   }
 
-  const countText = packs.length ? `${packs.length} GEO paketi` : 'Henüz GEO paketi yok';
+  const countText = packs.length
+    ? degraded
+      ? `${packs.length} GEO sayfası (statik)`
+      : `${packs.length} GEO paketi`
+    : 'Henüz GEO paketi yok';
   let featuredHtml = '';
   let gridHtml = '';
   if (!packs.length) {
@@ -1237,6 +1289,7 @@ async function handleGeoIndex(_req, res) {
     const [featured, ...rest] = packs;
     featuredHtml = geoIndexCardHtml(featured, { featured: true });
     gridHtml = rest.map((p) => geoIndexCardHtml(p)).join('');
+    if (degraded) gridHtml = `${degradedIndexNote('geo')}${gridHtml}`;
   }
 
   const itemList = {
@@ -1360,27 +1413,20 @@ async function handleGeoRender(req, res) {
 }
 
 async function handleGeoSitemap(_req, res) {
-  const rows = await sbRequest('GET', 'geo_daily_runs', {
-    query: 'select=run_date&status=eq.published&order=run_date.desc&limit=400',
-    prefer: 'return=representation',
-  });
-  const packs = Array.isArray(rows) ? rows : [];
-  const indexUrl = `  <url>\n    <loc>${SITE}/geo</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>`;
-  const urls = packs
-    .map((p) => {
-      const loc = geoPublicUrl(xmlEscape(p.run_date));
-      const lastmod = String(p.run_date || '').slice(0, 10);
-      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`;
-    })
-    .join('\n');
+  let packs = [];
+  try {
+    const rows = await sbRequest('GET', 'geo_daily_runs', {
+      query: 'select=run_date&status=eq.published&order=run_date.desc&limit=400',
+      prefer: 'return=representation',
+    });
+    packs = Array.isArray(rows) ? rows : [];
+  } catch (err) {
+    console.error('geo-sitemap db failed', err);
+  }
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
-  res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${indexUrl}
-${urls}
-</urlset>`);
+  res.status(200).send(geoSitemapXml({ packs, lastmod: new Date().toISOString().slice(0, 10) }));
 }
 
 function socialPage(title, bodyHtml) {
@@ -1685,7 +1731,12 @@ export default async function handler(req, res) {
     'nfx-crm-save',
   ]);
 
-  if (!crmActions.has(action) && !CLINIC_ACTIONS.has(action) && req.method !== 'GET') {
+  if (
+    !crmActions.has(action) &&
+    !CLINIC_ACTIONS.has(action) &&
+    req.method !== 'GET' &&
+    req.method !== 'HEAD'
+  ) {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
