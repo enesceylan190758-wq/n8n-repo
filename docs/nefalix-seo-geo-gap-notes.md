@@ -1,6 +1,6 @@
 # Nefalix SEO/GEO — Repo çapraz kontrolü
 
-**Tarih:** 2026-07-29  
+**Tarih:** 2026-09-28
 **Kaynak plan:** [`docs/nefalix-seo-geo-ajan-plani.md`](nefalix-seo-geo-ajan-plani.md)  
 **Operasyon SOP:** [`directives/geo.md`](../directives/geo.md), [`directives/daily_blog.md`](../directives/daily_blog.md)  
 **Ölçüm şablonu:** [`docs/geo-prompt-baseline.md`](geo-prompt-baseline.md)
@@ -52,9 +52,9 @@ Eksik (plana göre):
 2. **Faz 1 araştırma:**
    - Sağlık — **yapıldı** → `research/saglik-sektoru-arastirma.md`
    - Otel — **yapıldı** (2026-07-29) → `research/otel-sektoru-arastirma.md`
-   - Oto Servis — **sırada**
+   - Oto Servis — **yapıldı** (2026-09-28) → `research/oto-sektoru-arastirma.md`
 3. **Faz 2–3 sağlık içerik:** 5 GEO pillar + 1 karşılaştırma canlı (`/geo/...` slug’lar, sitemap) — **yapıldı**; ek vs-sayfaları (Nefalix vs klinikitibar / VoyageRespond) opsiyonel.
-4. **Faz 4:** Otel (+ sonra Oto) GEO + karşılaştırma seti — **bekliyor** (otel araştırma tamam).
+4. **Faz 4:** Otel GEO + karşılaştırma seti — **sırada** (otel araştırma tamam). Ardından oto GEO seti, `research/oto-sektoru-arastirma.md` kaynaklarına göre üretilecek.
 5. **Faz 5 ölçüm:** GSC indeks + AI citation testi — GSC URL isteği manuel (API yok).
 
 Director kuralı: `.cursor/rules/nefalix-content-director.mdc` (`geo/**/*.md`, `content/**/*.md`).
@@ -65,3 +65,11 @@ Director kuralı: `.cursor/rules/nefalix-content-director.mdc` (`geo/**/*.md`, `
 ## Landing repo
 
 Araştırma metni **n8n-repo `docs/`** içinde yaşar. `nefalix-landing` yalnızca public yüzey; tam plan kopyası yok. Uygulama (SSR indeks, schema) landing’de yapılır.
+
+## 2026-09-28 koşu notu
+
+- Ana teslimat: Oto servis Faz 1 araştırması eklendi → `research/oto-sektoru-arastirma.md`.
+- Kaynak kapsamı: canlı SERP/WebFetch; Carzi, Jetyorum, Qmeter, OtoCore, OtoWeb, OtoServiso, ÖzgürKod, Scuto, ERM, Otosoft; Google yorum politikası, FTC review-gating rehberi ve Ticaret Bakanlığı Google yorum widget kararı.
+- Director sonucu: **Onay** — rakip iddiaları kaynaklı, review-gating/widget/KVKK riskleri açık, kaynaksız istatistik yok.
+- Landing repo bu checkout’ta olmadığı için canlı siteye dokunulmadı; smoke/deploy iddiası yok.
+- Sıradaki faz: Otel GEO seti (`otel yorum yönetimi yazılımı`, `TripAdvisor + Booking + Google tek panel`, `PMS vs itibar SaaS`, `misafir NPS + WhatsApp`).
