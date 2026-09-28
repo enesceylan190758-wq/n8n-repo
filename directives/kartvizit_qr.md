@@ -16,6 +16,7 @@ Bkz. **`directives/vercel_prod_safety.md`** — GitHub `n8n-repo` push’u eksik
 | Kaynak | Rol |
 |--------|-----|
 | `~/nefalix-landing` | Canlı tam site — sadece Mac CLI `vercel --prod` |
+| `n8n-repo/nefalix-landing/k/` | Tam site kaynağı — `/k/medident.html` burada olmalı |
 | `n8n-repo/landing-kit/` | Patch kit (kartlar) — **asla doğrudan deploy etme** |
 
 ## Acil düzeltme (Mac)

@@ -169,6 +169,7 @@ Her satır: motor · mention · URL · rakip. İlk sürüm manuel; Pazar maili h
 | Aynı gün çift GEO | `geo_daily_runs` run_date unique → skip |
 | Mail yok | `BLOG_SMTP_*` / `GEO_NOTIFY_TO` |
 | Paket DB’de var ama site 404 | Landing deploy / proxy; migration VPS’te mi? |
+| `/geo` veya `/blog` 502 `fetch failed` | Vercel `api/blog.js` proxy’ye gidiyor. `api.nefalix.com` TLS SAN şu an `srv1975784.hstgr.cloud` — Node `fetch` düşer. **Kod:** indeks statik pillar fallback (200 HTML). **Kalıcı:** Vercel `SUPABASE_URL` + service role **veya** VPS’te `api.nefalix.com` sertifikası. `execution/smoke-geo-blog.py` |
 | İçerik blog gibi | Kalite kapısı + prompt; `--force` ile yeniden üret (unique: önce eski satırı sil) |
 | Landing şema | FAQPage (görünür SSS = schema), SoftwareApplication, BlogPosting, llms.txt |
 
@@ -182,6 +183,7 @@ Her satır: motor · mention · URL · rakip. İlk sürüm manuel; Pazar maili h
 | `execution/geo-topics.json` | Alıcı soru bankası |
 | `execution/setup-geo-cron.sh` | Cron 09:15 + Pazar 10:00 |
 | `execution/send-geo-weekly-reminder.py` | Citation checklist mail |
+| `execution/smoke-geo-blog.py` | Canlı `/geo` `/blog` HTML 200 + pillar |
 | `docs/geo-prompt-baseline.md` | 25 prompt skor şablonu |
 | `directives/daily_blog.md` | Blog (ayrı kanal; GEO değil) |
 | `nefalix-landing/api/blog.js` | Public GEO list / render / sitemap (geo-* actions) |
