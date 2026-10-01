@@ -52,10 +52,14 @@ Eksik (plana göre):
 2. **Faz 1 araştırma:**
    - Sağlık — **yapıldı** → `research/saglik-sektoru-arastirma.md`
    - Otel — **yapıldı** (2026-07-29) → `research/otel-sektoru-arastirma.md`
-   - Oto Servis — **sırada**
+   - Oto Servis — **yapıldı** (2026-10-01) → `research/oto-sektoru-arastirma.md`
 3. **Faz 2–3 sağlık içerik:** 5 GEO pillar + 1 karşılaştırma canlı (`/geo/...` slug’lar, sitemap) — **yapıldı**; ek vs-sayfaları (Nefalix vs klinikitibar / VoyageRespond) opsiyonel.
-4. **Faz 4:** Otel (+ sonra Oto) GEO + karşılaştırma seti — **bekliyor** (otel araştırma tamam).
+4. **Faz 4:** Otel (+ sonra Oto) GEO + karşılaştırma seti — **bekliyor** (otel ve oto araştırmaları tamam).
 5. **Faz 5 ölçüm:** GSC indeks + AI citation testi — GSC URL isteği manuel (API yok).
+
+### 2026-10-01 oto araştırma notu
+
+`research/oto-sektoru-arastirma.md` canlı SERP/WebFetch ile eklendi. Önemli düzeltme: önceki plandaki "oto servis tarafında AI itibar + WhatsApp rakibi yok" varsayımı daraltılmalı; Carzi, Piyzi, Jetyorum, Esinix, ÖzgürKod ve Rocketly gibi yorum/CRM/WhatsApp oyuncuları görünüyor. Oto GEO seti yazılırken servis yönetim yazılımı (iş emri/stok/fatura), CRM/inbox ve itibar/NPS katmanı ayrı anlatılmalı; review-gating ve Google yorum widget uyarıları zorunlu.
 
 Director kuralı: `.cursor/rules/nefalix-content-director.mdc` (`geo/**/*.md`, `content/**/*.md`).
 
